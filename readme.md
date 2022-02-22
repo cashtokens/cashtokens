@@ -519,7 +519,7 @@ Please see the following reference implementations for additional examples and t
 ## Feedback & Reviews
 
 - [CashTokens CHIP Issues](https://github.com/bitjson/cashtokens/issues)
-- [`CHIP 2021-02 CashTokens` - Bitcoin Cash Research](https://bitcoincashresearch.org/t/)
+- [`CHIP 2021-02 CashTokens` - Bitcoin Cash Research](https://bitcoincashresearch.org/t/chip-2022-02-cashtokens-token-primitives-for-bitcoin-cash/725)
 
 ## Changelog
 
