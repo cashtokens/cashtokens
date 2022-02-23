@@ -411,7 +411,7 @@ This section documents design decisions made in this specification.
 
 ### Incompatibility of Token Fungibility and Token Commitments
 
-Advanced BCH contract use cases require strategies for transferring authenticated commitments – messages attesting to ownership, authorization, credit, debt, or other contract state – from one contract to another (a motivation behind [PMv3](https://github.com/bitjson/pmv3)). These use cases often conflicted with previous, fungibility-focused token proposals ([`OP_CHECKCOLORVERIFY`](https://bitcointalk.org/index.php?topic=253385.0), [`OP_GROUP`](bitcoinunlimited.net/grouptokenization/groupbchspec), [Unforgeable Groups](https://gitlab.com/0353F40E/group-tokenization/-/blob/master/CHIP-2021-02_Unforgeable_Groups_for_Bitcoin_Cash.md), [Confidential Assets](https://blockstream.com/bitcoin17-final41.pdf)).
+Advanced BCH contract use cases require strategies for transferring authenticated commitments – messages attesting to ownership, authorization, credit, debt, or other contract state – from one contract to another (a motivation behind [PMv3](https://github.com/bitjson/pmv3)). These use cases often conflicted with previous, fungibility-focused token proposals ([`OP_CHECKCOLORVERIFY`](https://bitcointalk.org/index.php?topic=253385.0), [`OP_GROUP`](https://www.bitcoinunlimited.net/grouptokenization/groupbchspec), [Unforgeable Groups](https://gitlab.com/0353F40E/group-tokenization/-/blob/master/CHIP-2021-02_Unforgeable_Groups_for_Bitcoin_Cash.md), [Confidential Assets](https://blockstream.com/bitcoin17-final41.pdf)).
 
 One key insight which precipitated this proposal's bifurcated fungible/non-fungible approach is: **token fungibility and token commitments are conceptually incompatible**.
 
