@@ -82,7 +82,7 @@ PREFIX_TOKEN <category_id> <has_nonfungible> [commitment] <amount>
 ```
 
 1. `<category_id>` – After the `PREFIX_TOKEN` byte, a 32-byte **Token Category ID** is required.
-2. `<has_nonfungible>` – If the next byte is:
+2. `<has_nonfungible>` – this byte is one of these:
    1. `0x00` – the prefix **does not encode a non-fungible token**. Skip to `amount`.
    2. `0xff` (the **`minting` capability**) – the encoded non-fungible token is considered a **minting token**.
    3. `0xfe` (the **`mutable` capability**) – the encoded non-fungible token is considered a **mutable token**.
