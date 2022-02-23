@@ -35,13 +35,17 @@ By enabling token primitives on Bitcoin Cash, this proposal offers several benef
 
 ### Cross-Contract Interfaces
 
-Using **non-fungible tokens** (NFTs), contracts can **trustlessly commit to messages which can be consumed by other contracts**. These messages are impersonation-proof: other contracts can safely read and act on the commitment, certain that it was produced by the claimed contract. This primitive enables covenants to expose **public interfaces** – paths of operation intended for other, not-yet-developed contracts.
+Using **non-fungible tokens** (NFTs), contracts can **create messages which can be read by other contracts**. These messages are impersonation-proof: other contracts can safely read and act on the commitment, certain that it was produced by the claimed contract.
+
+With contract interoperability, behavior can be broken into clusters of smaller, coordinating contracts, **reducing transaction sizes**. This interoperability further enables [covenants](#usage-examples) to communicate over **public interfaces**, allowing diverse ecosystems of compatible covenants to work together, even when developed and deployed separately.
+
+Critically, this cross-contract interaction can be achieved within the "stateless" transaction model employed by Bitcoin Cash, rather than coordinating via shared global state (like that required of the Ethereum virtual machine). This allows Bitcoin Cash to support comparably contract functionality while retaining its [>1000x efficiency advantage](https://blog.bitjson.com/pmv3-build-decentralized-applications-on-bitcoin-cash/#stateless-network-stateful-covenants) in transaction and block validation.
 
 ### Decentralized Applications
 
 Beyond enabling covenants to interoperate with other covenants, these token primitives allow for byte-efficient representations of complex internal state – supporting advanced, decentralized applications on Bitcoin Cash.
 
-**Fungible tokens** are critical for covenants to efficiently represent on-chain assets – e.g. voting shares, utility tokens, collateralized loans, prediction market options, etc. – and to efficiently implement [complex coordination tasks](#voting-with-fungible-tokens) – e.g. liquidity-pooling, auctions, voting, sidechain withdrawals, spin-offs, mergers, and more.
+**Fungible tokens** are critical for covenants to represent on-chain assets – e.g. voting shares, utility tokens, collateralized loans, prediction market options, etc. – and implement [complex coordination tasks](#voting-with-fungible-tokens) – e.g. liquidity-pooling, auctions, voting, sidechain withdrawals, spin-offs, mergers, and more.
 
 **Non-fungible tokens** are critical for coordinating activity trustlessly between multiple covenants, enabling [covenant-tracking tokens](#covenant-tracking-non-fungible-tokens), [depository child covenants](#depository-child-covenants), [multithreaded covenants](#multithreaded-covenants), and other constructions in which a particular covenant instance must be authenticated.
 
@@ -94,7 +98,7 @@ PREFIX_TOKEN <category_id> <has_nonfungible> [commitment] <amount>
 
 <summary>Notes</summary>
 
-1. The **`VarInt` Format** is a variable-length, little-endian, positive integer format used to indicate the length of the following byte array in many Bitcoin Cash P2P protocol message formats (present since the protocol's publication in 2008). For most of this range – `1` (`0x01`) to `40` (`0x28`) – the `VarInt` format is equivalent to the Number encoding used by the VM. (`VarInt` encodes `0` as `0x00`, while VM Numbers encode `0` as empty stack items.)
+1. The **`VarInt` Format** is a variable-length, little-endian, positive integer format used to indicate the length of the following byte array in Bitcoin Cash P2P protocol message formats (present since the protocol's publication in 2008). For most of this range – `1` (`0x01`) to `40` (`0x28`) – the `VarInt` format is equivalent to the Number encoding used by the VM. (`VarInt` encodes `0` as `0x00`, while VM Numbers encode `0` as empty stack items.)
 
 </details>
 
@@ -223,14 +227,14 @@ Implementations must recognize otherwise-standard outputs with token prefixes (`
 
 The following 6 operations pop the top item from the stack as an index (VM Number) and push a single result to the stack. If the consumed value is not a valid, minimally-encoded index for the operation, an error is produced.
 
-| Name                       | Codepoint      | Description                                                                                                                                                                                                                                                                                                  |
-| -------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `OP_UTXOTOKENCATEGORY`     | `0xce` (`206`) | Pop the top item from the stack as an input index (VM Number). Push the token category (with the 0xfe or 0xff capability byte appended, if present) of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO includes no tokens, push a 0 (VM Number).                         |
-| `OP_UTXOTOKENCOMMITMENT`   | `0xcf` (`207`) | Pop the top item from the stack as an input index (VM Number). Push the token commitment of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO includes a zero-byte non-fungible token, push 0x00. If the UTXO does not include a non-fungible token, push a 0 (VM Number). |
-| `OP_UTXOTOKENAMOUNT`       | `0xd0` (`208`) | Pop the top item from the stack as an input index (VM Number). Push the token amount of the Unspent Transaction Output (UTXO) spent by that input to the stack as a VM Number. If the UTXO includes no fungible tokens, push a 0 (VM Number).                                                                |
-| `OP_OUTPUTTOKENCATEGORY`   | `0xd1` (`209`) | Pop the top item from the stack as an output index (VM Number). Push the token category (with the 0xfe or 0xff capability byte appended, if present) of the output at that index to the stack. If the output includes no tokens, push a 0 (VM Number).                                                       |
-| `OP_OUTPUTTOKENCOMMITMENT` | `0xd2` (`210`) | Pop the top item from the stack as an output index (VM Number). Push the token commitment of the output at that index to the stack. If the output includes a zero-byte non-fungible token, push 0x00. If the output does not include a non-fungible token, push a 0 (VM Number).                             |
-| `OP_OUTPUTTOKENAMOUNT`     | `0xd3` (`211`) | Pop the top item from the stack as an input index (VM Number). Push the token amount of the output at that index to the stack as a VM Number. If the output includes no fungible tokens, push a 0 (VM Number).                                                                                               |
+| Name                       | Codepoint      | Description                                                                                                                                                                                                                                                                                                                    |
+| -------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `OP_UTXOTOKENCATEGORY`     | `0xce` (`206`) | Pop the top item from the stack as an input index (VM Number). Push the token category (with the 0xfe or 0xff capability byte appended, if present) of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO includes no tokens, push a 0 (VM Number).                                           |
+| `OP_UTXOTOKENCOMMITMENT`   | `0xcf` (`207`) | Pop the top item from the stack as an input index (VM Number). Push the token commitment of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO includes a non-fungible token with a zero-byte commitment, push 0x00. If the UTXO does not include a non-fungible token, push a 0 (VM Number). |
+| `OP_UTXOTOKENAMOUNT`       | `0xd0` (`208`) | Pop the top item from the stack as an input index (VM Number). Push the token amount of the Unspent Transaction Output (UTXO) spent by that input to the stack as a VM Number. If the UTXO includes no fungible tokens, push a 0 (VM Number).                                                                                  |
+| `OP_OUTPUTTOKENCATEGORY`   | `0xd1` (`209`) | Pop the top item from the stack as an output index (VM Number). Push the token category (with the 0xfe or 0xff capability byte appended, if present) of the output at that index to the stack. If the output includes no tokens, push a 0 (VM Number).                                                                         |
+| `OP_OUTPUTTOKENCOMMITMENT` | `0xd2` (`210`) | Pop the top item from the stack as an output index (VM Number). Push the token commitment of the output at that index to the stack. If the output includes a non-fungible token with a zero-byte commitment, push 0x00. If the output does not include a non-fungible token, push a 0 (VM Number).                             |
+| `OP_OUTPUTTOKENAMOUNT`     | `0xd3` (`211`) | Pop the top item from the stack as an input index (VM Number). Push the token amount of the output at that index to the stack as a VM Number. If the output includes no fungible tokens, push a 0 (VM Number).                                                                                                                 |
 
 <details>
 
@@ -253,14 +257,14 @@ The following test vectors demonstrate the expected result of each token inspect
 | 2-byte NFT; 253 fungible                           | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d`   | `cccc`                                                                             | `fdfd00`             |
 | 10-byte NFT; 65535 fungible                        | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d`   | `cccccccccccccccccccc`                                                             | `fdffff`             |
 | 40-byte NFT; 65536 fungible                        | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d`   | `cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` | `fe00000100`         |
-| 0-byte, mutable NFT; 0 fungible                    | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | (empty item)                                                                       | (empty item)         |
-| 0-byte, mutable NFT; 4294967295 fungible           | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | (empty item)                                                                       | `feffffffff`         |
+| 0-byte, mutable NFT; 0 fungible                    | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | `0x00`                                                                             | (empty item)         |
+| 0-byte, mutable NFT; 4294967295 fungible           | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | `0x00`                                                                             | `feffffffff`         |
 | 1-byte, mutable NFT; 4294967296 fungible           | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | `cc`                                                                               | `ff0000000001000000` |
 | 2-byte, mutable NFT; 9223372036854775807 fungible  | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | `cccc`                                                                             | `ffffffffffffffff7f` |
 | 10-byte, mutable NFT; 1 fungible                   | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | `cccccccccccccccccccc`                                                             | `01`                 |
 | 40-byte, mutable NFT; 252 fungible                 | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dfe` | `cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` | `fc`                 |
-| 0-byte, minting NFT; 0 fungible                    | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | (empty item)                                                                       | (empty item)         |
-| 0-byte, minting NFT; 253 fungible                  | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | (empty item)                                                                       | `fdfd00`             |
+| 0-byte, minting NFT; 0 fungible                    | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | `0x00`                                                                             | (empty item)         |
+| 0-byte, minting NFT; 253 fungible                  | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | `0x00`                                                                             | `fdfd00`             |
 | 1-byte, minting NFT; 65535 fungible                | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | `cc`                                                                               | `fdffff`             |
 | 2-byte, minting NFT; 65536 fungible                | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | `cccc`                                                                             | `fe00000100`         |
 | 10-byte, minting NFT; 4294967297 fungible          | `1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1dff` | `cccccccccccccccccccc`                                                             | `ff0100000001000000` |
@@ -342,7 +346,7 @@ Beyond simplifying logic for clients to safely locate and interact with the cove
 
 Because token category IDs can be known prior to their creation, it is straightforward to create ecosystems of contracts that are mutually-aware of each other's tracking token category ID(s).
 
-Notably, tracking tokens also allow for a significant contract-size and application-layer optimization: a covenant's internal state can be written to it's tracking token's `commitment`, **allowing the locking bytecode of many contracts to remain unchanged across transactions**.
+Notably, tracking tokens also allow for a significant contract-size and application-layer optimization: a covenant's internal state can be written to its tracking token's `commitment`, **allowing the locking bytecode of covenants to remain unchanged across transactions**.
 
 ### Depository Child Covenants
 
@@ -356,14 +360,14 @@ In short, covenants can migrate to a new token category over a voting period –
 
 This construction reveals additional consensus strategies for decentralized organizations:
 
-- **Vote-dependent, post-vote token categories** – covenants which rely on absolute consensus – like certain sidechain bridges (which, e.g. must come to a consensus on an aggregate withdrawal transaction per withdrawal period and then penalize or confiscate dishonest shares) – can issue different categories of post-vote tokens based on the vote cast. This allows for transfer and trading of post-vote tokens even before the voting period ends. When different voting outcomes impact the value of voting tokens (after the voting period ends), such differences will **immediately appear in market prices of post-vote tokens**. This observation presents many further consensus strategies employing hedging, prediction markets, and synthetic assets.
+- **Vote-dependent, post-vote token categories** – covenants which rely on absolute consensus – like certain sidechain bridges (which, e.g. must come to a consensus on an aggregate withdrawal transaction per withdrawal period and then penalize or confiscate dishonest shares) – can issue different categories of post-vote tokens based on the vote cast. This allows for transfer and trading of post-vote tokens even before the voting period ends. When different voting outcomes impact the value of voting tokens (after the voting period ends), such differences will **immediately appear in market prices of post-vote tokens**. This observation presents further consensus strategies employing hedging, prediction markets, synthetic assets, etc.
 - **Covenant spin-offs** – in cases where a covenant-based organization plans a spin-off (e.g. a significant sidechain fork), covenant participants can be allowed to select between receiving shares in the new covenant or receiving an alternative compensation (e.g. a one-time BCH payout or additional shares in the non-forking covenant).
 
 #### Sealed Voting
 
 **"Sealed" voting** – in which the contents of votes are unknown until after all votes are cast – is immediately possible with this proposal.
 
-Voting begins with a "ballot box" merkle tree, containing at least as many `0x00` leaves as outstanding shares. Voters submit "sealed votes" the hash of their vote and an additional length of random bytes (a [salt](<https://en.wikipedia.org/wiki/Salt_(cryptography)>)) concatenated with the amount of share-votes cast, proving that the their sealed vote has been contributed to an empty leaf in the ballot box (as demonstrated in [CashTokens v0](https://gist.github.com/bitjson/a440232cebba8f0b2b6b9aa5db1fdb37)). Once the voting period has ended, each participant can reverse the process: prove the contents of sealed votes within the tree by submitting the preimage, then accumulating results in another part of the covenant's state.
+Voting begins with a "ballot box" merkle tree, containing at least as many empty leaves as outstanding shares. Voters submit a **sealed vote**: a message containing 1) the number of share-votes cast and 2) a hash of their vote concatenated with a [salt](<https://en.wikipedia.org/wiki/Salt_(cryptography)>). Sealed votes are submitted by replacing an empty leaf in the ballot box (as demonstrated in [CashTokens v0](https://gist.github.com/bitjson/a440232cebba8f0b2b6b9aa5db1fdb37)). Once the voting period has ended, each participant can reverse the process: prove the contents of sealed votes within the tree by submitting the preimage, then aggregating results in another part of the covenant's state.
 
 This basic construction can be augmented for various use cases:
 
@@ -382,7 +386,7 @@ Transaction-order contention is of particular concern to **covenants**, contract
 
 **Spend races** occur when multiple entities attempt to spend the same Bitcoin Cash UTXO. Spend races can degrade the user experience of interacting with covenants, requiring users to retry covenant transactions, and possibly preventing a user from interacting with the covenant at all.
 
-To reduce disruptions from spend races, it's important that contracts **carefully consider spend-race incentives**:
+To reduce disruptions from spend races, contracts must **carefully consider spend-race incentives**:
 
 - To reduce frontrunning, covenants should allow actions to be submitted over time, **treating all submitted actions equally (regardless of submission time)** at some later moment.
 - To disincentivize DOS attacks – e.g. where an attacker creates and rapidly broadcasts long chains of covenant transactions, spending each successive UTXO before other users can spend it in their own covenant transactions – covenants should **ensure covenant actions are authenticated and/or costly** (e.g. can only be taken once by each token holder, require some sort of fee or deposit, etc.).
@@ -397,7 +401,7 @@ Thread design is application-specific, but valuable constructions include:
 - **Proof-of-work** – some threads may have use for rate limiting by proof-of-work, requiring users to submit preimages which hash to a value using some required prefix. (Note, for most applications, fees or minimum deposits offer more uniform rate limiting.)
 - modified [**zero-confirmation escrows** (ZCEs)](https://github.com/bitjson/bch-zce) – and similar miner-enforced escrows can be employed by contracts to make abusive behavior more costly.
 
-Given typical transaction propagation speed ([99% at 2 seconds](https://github.com/bitjson/bch-zce#transaction-conflict-monitoring)), multithreaded covenant applications with reasonable spend-race disincentives can expect **minimal contention between users so long as the available thread count exceeds `2` per-interaction-per-second**. (The wallet software of real users can be expected to select evenly/randomly from available threads to maximize the likelihood of a successful transaction.) Many threads can be tracked by the parent covenant (e.g. using a merkle tree), and thread check-ins can be performed incrementally, so covenants can be designed to support a practically unlimited number of threads.
+Given typical transaction propagation speed ([99% at 2 seconds](https://github.com/bitjson/bch-zce#transaction-conflict-monitoring)), multithreaded covenant applications with reasonable spend-race disincentives can expect **minimal contention between users so long as the available thread count exceeds `2` per-interaction-per-second**. (The wallet software of real users can be expected to select evenly/randomly from available threads to maximize the likelihood of a successful transaction.) Multiple threads can be tracked by the parent covenant (e.g. using a merkle tree), and thread check-ins can be performed incrementally, so covenants can be designed to support a practically unlimited number of threads.
 
 Finally, exceptionally active covenant applications – or applications with the potential to incentivize spend-races – should consider using **managed threads**: threads which also require the authorization of a particular key, set of keys, or non-fungible token for each submitted state change. Managed threads allow transaction submission to be ordered without contention by the entity/entities managing each thread; they can be issued either to trusted parties or via a trustless strategy, e.g. requiring a sufficiently large deposit to disincentivize frivolous thread creation.
 
@@ -437,9 +441,9 @@ By implementing category-minting control as a token, minting policies can be def
 
 Mutable tokens allow the holder to create **only one new token** (i.e. "modify" the mutable token's commitment) which may again have the mutable capability.
 
-This is a particularly critical use case for covenants, as it enables covenants to modify the commitment in a [tracking token](#covenant-tracking-non-fungible-tokens) without exhaustively validating that the interaction did not unexpectedly mint new tokens (allowing the user to impersonate the covenant). While such exhaustive validation could be made efficient with new VM opcodes, such validation is also likely to conflict across covenants, preventing many kinds of covenants from being used in the same transaction. As such, this proposal considers the `mutable` capability to be essential for the development of many cross-covenant interfaces.
+This is a particularly critical use case for covenants, as it enables covenants to modify the commitment in a [tracking token](#covenant-tracking-non-fungible-tokens) without exhaustively validating that the interaction did not unexpectedly mint new tokens (allowing the user to impersonate the covenant). While exhaustive validation could be made efficient with new VM opcodes, such validation may commonly conflict across covenants, preventing them from being used in the same transaction. As such, this proposal considers the `mutable` capability to be essential for [cross-covenant interfaces](#cross-contract-interfaces).
 
-Note, because minting and mutable tokens are not immutable, they can be implicitly destroyed, i.e. non-fungible tokens with either capability are not required to be transferred from a transaction's UTXOs to its outputs for the transaction to be considered valid ([unlike most tokens](#disallowing-implicit-destruction-of-immutable-tokens)). This is an important optimization for covenant use cases – tokens controlled by a covenant can be used to efficiently hold or share internal state within a coordinating set of covenants. By not requiring the token to be duplicated to a new `OP_RETURN` output each time it is mutated, transaction sizes are significantly reduced.
+Note, because minting and mutable tokens are not immutable, they can be implicitly destroyed, i.e. non-fungible tokens with either capability are not required to be transferred from a transaction's UTXOs to its outputs for the transaction to be considered valid ([unlike most tokens](#disallowing-implicit-destruction-of-immutable-tokens)). This is an important optimization for covenant use cases – tokens controlled by a covenant can be used to hold or share internal state within a coordinating set of covenants. By not requiring the token to be duplicated to a new `OP_RETURN` output each time it is mutated, transaction sizes are significantly reduced.
 
 ### Disallowing Implicit Destruction of Immutable Tokens
 
@@ -453,7 +457,7 @@ This strategy is also conservative at the protocol level: a future upgrade could
 
 Previous token proposals require token creators to retry hashing preimages until the resulting token category ID matches required patterns. This strategy enables additional bits of information to be packed into the category ID.
 
-In practice, such proof-of-work strategies unnecessarily complicate covenant-managed token creation. To create [ecosystems of contracts which are mutually-aware of each other contract](#covenant-tracking-non-fungible-tokens), it is valuable to be able to predict the category ID of a token which has not yet been created; many hashing strategies preclude such planning.
+In practice, such proof-of-work strategies unnecessarily complicate covenant-managed token creation. To create [ecosystems of contracts which are mutually-aware of each other contract](#covenant-tracking-non-fungible-tokens), it is valuable to be able to predict the category ID of a token which has not yet been created; hashing strategies often preclude such planning.
 
 Finally, at a software level, rapid retrying of hash preimages is expensive to implement and audit. Wallet software must recognize which fields may be modified, and some logic must select the parameters of each attempt. This additional flexibility presents a large surface area for exfiltration of key material (i.e. hiding parts of the private key in various modifiable structures). Signing standards for mitigating this risk may be expensive to specify and implement.
 
@@ -469,10 +473,10 @@ Finally, If real-world usage demonstrates demand, a future upgrade could enable 
 
 ### One Prefix Codepoint Per Output
 
-Many use cases can be demonstrated for allowing the inclusion of multiple token prefixes within the same output (e.g. multiple non-fungible tokens, or multiple categories of fungible tokens). This specification allows only one prefix codepoint per output for several reasons:
+Use cases can be demonstrated for allowing the inclusion of multiple token prefixes within the same output (e.g. multiple non-fungible tokens, or multiple categories of fungible tokens). This specification allows only one prefix codepoint per output for several reasons:
 
 - **More efficient indexing** – by allowing only one prefix, indexing software need not parse token prefixes to create indexes, and such non-token-aware software need only allow for a fixed prefix size (up to `84` bytes<sup>1</sup>).
-- **Ordering of multiple prefixes** – a standard which allows for multiple prefixes must also offer some prescription for ordering such prefixes; contracts which operate on prefix values must have some strategy for inspecting prefixes by index.
+- **Inspecting multiple prefixes** – a model which allows for multiple prefixes must also offer options for inspecting multiple groups of token information, increasing the required complexity of token inspection operations. This would require either additional VM codepoints or additional input items per opcode (increasing transaction sizes).
 
 Importantly, it should be noted that alternative strategies exist for effectively locking multiple (groups of) tokens to a single output. For example, a decentralized order book for trading non-fungible tokens could hold a portfolio of tokens in separate [depository covenants](#depository-child-covenants), contracts which require the parent covenant to participate in any transactions. (The sub-covenant can likewise verify the authenticity of the parent using a ["tracking" non-fungible token](#covenant-tracking-non-fungible-tokens) which moves along with the parent covenant.) This parent-child strategy offers contracts practically unlimited flexibility in holding portfolios of both fungible and non-fungible tokens.
 
@@ -480,7 +484,7 @@ Importantly, it should be noted that alternative strategies exist for effectivel
 
 <summary>Notes</summary>
 
-1. The maximum-length token prefix contains greater than `4294967295` fungible tokens and a non-fungible token (with both a capability and a 40-byte commitment): `PREFIX_TOKEN` – `1` byte; `category` – `32` bytes; `capability` – `1` byte; `commitment` length – `1` byte; `commitment` – `40` bytes; `amount` – `9` bytes.
+1. The maximum-length token prefix contains greater than `4294967295` fungible tokens and a non-fungible token (with both a capability and a 40-byte commitment): `PREFIX_TOKEN` – `1` byte; `category` – `32` bytes; `capability` – `1` byte; `commitment` length – `1` byte; `commitment` – `40` bytes; `amount` – `9` bytes; total: `84` bytes.
 
 </details>
 
@@ -488,7 +492,7 @@ Importantly, it should be noted that alternative strategies exist for effectivel
 
 Limiting non-fungible token `commitment` length is valuable because it restrains unnecessary growth of the UTXO set and limits requirements for general-purpose indexing software. This specification limits the `commitment` field of non-fungible tokens to `40` bytes.
 
-By committing to a hash, contracts can effectively commit to an unlimited collection of data (e.g. a merkle tree). For resistance to [birthday attacks](https://bitcointalk.org/index.php?topic=323443.0), many types of covenants should avoid hashes shorter than `32` bytes. This proposal expands this minimum requirement by `8` bytes, a (maximum-size) VM number. This is particularly valuable for covenants which are optimized to use multiple types of commitment structures (e.g. re-organizing an unbalanced merkle tree of contract state for efficiency when the covenant enters "voting" mode), and need to concisely indicate their current internal "mode" to other contracts. Other valuable constructions also fit within this range: two 20-byte hashes, a 33-byte compressed public key (e.g. Schnorr public key aggregation), a hash locator for content-addressable storage and 8-byte VM number, and a 320-bit hash (if deployed by a future upgrade).
+By committing to a hash, contracts can commit to an unlimited collection of data (e.g. a merkle tree). For resistance to [birthday attacks](https://bitcointalk.org/index.php?topic=323443.0), covenants should typically avoid hashes shorter than `32` bytes. This proposal expands this minimum requirement by `8` bytes, a (maximum-size) VM number. This is particularly valuable for covenants which are optimized to use multiple types of commitment structures (e.g. re-organizing an unbalanced merkle tree of contract state for efficiency when the covenant enters "voting" mode), and need to concisely indicate their current internal "mode" to other contracts. Other valuable constructions also fit within this range: two 20-byte hashes, a 33-byte compressed public key (e.g. Schnorr public key aggregation), a hash locator for content-addressable storage and 8-byte VM number, and a 320-bit hash (if deployed by a future upgrade).
 
 ### Limitation of Fungible Token Supply
 
@@ -502,7 +506,7 @@ Finally, while a cap of `9223372036854775807` is likely sufficient for most case
 
 ### Specification of Token Supply Definitions
 
-The supply of many covenant-issued tokens will be inherently analyzable using the [supply-calculation algorithms](#fungible-token-supply-definitions) included in this specification. For example, all covenants which use a [tracking token](#covenant-tracking-non-fungible-tokens) and retain a supply of unissued tokens will have an easily-calculable [circulating supply](#circulating-supply) (without requiring wallets/indexers to understand the implementation details of the contract).
+The supply of covenant-issued tokens will often be inherently analyzable using the [supply-calculation algorithms](#fungible-token-supply-definitions) included in this specification. For example, all covenants which use a [tracking token](#covenant-tracking-non-fungible-tokens) and retain a supply of unissued tokens will have an easily-calculable [circulating supply](#circulating-supply) (without requiring wallets/indexers to understand the implementation details of the contract).
 
 By explicitly including these supply-calculation algorithms in this specification, token issuers are more likely to be aware of this reality, choosing to issue tokens via a strategy which conforms to common user expectations (improving data availability and compatibility across the ecosystem).
 
