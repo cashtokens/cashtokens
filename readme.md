@@ -5,9 +5,9 @@
         Layer: Consensus
         Maintainer: Jason Dreyzehner
         Status: Draft
-        Specification Version: 2.0.0
+        Specification Version: 2.0.1
         Initial Publication Date: 2022-02-22
-        Latest Revision Date: 2022-02-22
+        Latest Revision Date: 2022-02-25
 
 ## Summary
 
@@ -218,6 +218,8 @@ Perform the following **validations**:
    2. Derive a key-value map of **`Unmatched_Output_Tokens_By_Category`** which maps category IDs to a count of unmatched `Output_Immutable_Tokens`. Each category in `Unmatched_Output_Tokens_By_Category` must either:
       1. Exist in `Minting_Category_IDs`, or
       2. Have a count less than or equal to `Input_Mutable_Tokens_By_Category` minus `Output_Mutable_Tokens_By_Category` for that category.
+
+Note: coinbase transactions have only one input with an outpoint index of `4294967295`, so they must never include a token prefix in any output.
 
 #### Prefix Codepoint Standardness
 
@@ -451,8 +453,6 @@ This specification prevents ([most](#allowing-implicit-destruction-of-minting-to
 
 Wallet software is most likely to be tested for correctness in the common case of sending and receiving BCH, but it is decreasingly likely to be free of bugs in less common functionality – like receiving and sending tokens. This specification takes the conservative approach: require tokens to be explicitly destroyed (by e.g. sending them to an `OP_RETURN` output), protecting end-users from loss due to wallet software bugs.
 
-This strategy is also conservative at the protocol level: a future upgrade could begin to allow implicit forfeiting of tokens, allowing miners to collect them much like they collect implicitly forfeit BCH (the amount not carried through to a transaction's outputs is that transaction's mining fee). This would allow transaction fees to be paid (or partially-paid) using tokens deemed valuable by some set of miners. Initially forbidding implicit forfeiture ensures that such an upgrade could allow users to opt-in, avoiding economic disruption.
-
 ### Avoiding Proof-of-Work for Token Data Compression
 
 Previous token proposals require token creators to retry hashing preimages until the resulting token category ID matches required patterns. This strategy enables additional bits of information to be packed into the category ID.
@@ -494,6 +494,23 @@ Limiting non-fungible token `commitment` length is valuable because it restrains
 
 By committing to a hash, contracts can commit to an unlimited collection of data (e.g. a merkle tree). For resistance to [birthday attacks](https://bitcointalk.org/index.php?topic=323443.0), covenants should typically avoid hashes shorter than `32` bytes. This proposal expands this minimum requirement by `8` bytes, a (maximum-size) VM number. This is particularly valuable for covenants which are optimized to use multiple types of commitment structures (e.g. re-organizing an unbalanced merkle tree of contract state for efficiency when the covenant enters "voting" mode), and need to concisely indicate their current internal "mode" to other contracts. Other valuable constructions also fit within this range: two 20-byte hashes, a 33-byte compressed public key (e.g. Schnorr public key aggregation), a hash locator for content-addressable storage and 8-byte VM number, and a 320-bit hash (if deployed by a future upgrade).
 
+### Including Capabilities in Token Category Inspection Operations
+
+The token category inspection operations (`OP_*TOKENCATEGORY`) in this proposal push the **concatenation of both category and capability** (if present). While token capabilities could instead be inspected with individual `OP_*TOKENCAPABILITY` operations, the behavior specified in this proposal is valuable for contract efficiency and security.
+
+First, the combined `OP_*TOKENCATEGORY` behavior reduces contract size in the most common case: every covenant which handles tokens must regularly compare both the category and capability of tokens. With the separated `OP_*TOKENCATEGORY` behavior, this common case would require at least 3 additional bytes for each occurrence – `<index> OP_*TOKENCAPABILITY OP_CAT`, and commonly, 6 or more bytes: `<index> OP_UTXOTOKENCAPABILITY OP_CAT` and `<index> OP_OUTPUTTOKENCAPABILITY OP_CAT` (`<index>` may require multiple bytes).
+
+There are generally two other cases to consider:
+
+- **covenants which hold mutable tokens** (somewhat common) – these covenants are also optimized by the combined `OP_*TOKENCATEGORY` behavior. Because their mutable token can only create a single new mutable token, they need only verify that the user's transaction doesn't steal that mutable token: `OP_INPUTINDEX OP_UTXOTOKENCATEGORY <index> OP_OUTPUTTOKENCATEGORY OP_EQUALVERIFY` (saving at least 4 bytes when compared to the separated approach: `OP_INPUTINDEX OP_UTXOTOKENCATEGORY OP_INPUTINDEX OP_UTXOTOKENCAPABILITY OP_CAT <index> OP_OUTPUTTOKENCATEGORY <index> OP_OUTPUTTOKENCAPABILITY OP_CAT OP_EQUALVERIFY`).
+- **covenants which hold minting tokens** (rare) – because minting tokens allow for new tokens to be minted, these covenants must exhaustively verify all outputs to ensure the user has not unexpectedly minted new tokens. (For this reason, minting tokens are likely to be held in isolated, minting-token child covenants, allowing the parent covenant to use the safer `mutable` capability.) For most outputs (verifying the output contains no tokens), both behaviors require the same bytes – `<index> OP_OUTPUTTOKENCATEGORY OP_0 OP_EQUALVERIFY`. For expected token outputs, the combined behavior requires a number of bytes similar to the separated behavior, e.g.: `<index> OP_OUTPUTTOKENCATEGORY <32> OP_SPLIT <0> OP_EQUALVERIFY <depth> OP_PICK OP_EQUALVERIFY` (combined, where `depth` holds the 32-byte category set via `OP_INPUTINDEX OP_UTXOTOKENCATEGORY <32> OP_SPLIT OP_DROP`) vs. `OP_INPUTINDEX OP_UTXOTOKENCATEGORY <index> OP_OUTPUTTOKENCATEGORY OP_EQUALVERIFY OP_INPUTINDEX OP_UTXOTOKENCAPABILITY <index> OP_OUTPUTTOKENCAPABILITY` (separated).
+
+Beyond efficiency, this combined behavior is also **critical for the general security of the covenant ecosystem**: it makes the most secure validation (verifying both category and capability) the "default" and cheaper in terms of bytes than more lenient validation (allowing for other token capabilities, e.g. during minting).
+
+For example, assume this proposal specified the separated behavior: if an upgradable (e.g. by shareholder vote) covenant with a tracking token is created without any other token behavior, dependent contracts may be written to check that the user has also somehow interacted with the upgradable covenant (i.e. `<index> OP_UTXOTOKENCATEGORY <expected> OP_EQUALVERIFY`). If the upgradable covenant later begins to issue tokens for any reason, a vulnerability in the dependant contract is exposed: users issued a token by the upgradable covenant can now mislead the dependent contract into believing it is being spent in a transaction with the upgradeable contract (by spending their issued token with the dependent contract). Because the dependent contract did not include a defensive `<index> OP_UTXOTOKENCAPABILITY <0xfe> OP_EQUALVERIFY` (either by omission or to reduce contract size), it became vulnerable after a "public interface change". If `OP_UTXOTOKENCATEGORY` instead uses the combined behavior (as specified by this proposal) this class of vulnerabilities is eliminated.
+
+Finally, this proposal's combined behavior preserves two additional, unused codepoints in the Bitcoin Cash VM instruction set.
+
 ### Limitation of Fungible Token Supply
 
 Token validation has the effect of limiting fungible token supply to the maximum VM number (`9223372036854775807`). This is important for both contract usage and the token application ecosystem.
@@ -529,7 +546,10 @@ Please see the following reference implementations for additional examples and t
 
 This section summarizes the evolution of this document.
 
-- **v2.0.0 – 2022-2-22** (current)
+- **v2.0.1 – 2022-2-25** (current)
+  - Expand rationale
+  - Note impossibility of valid token outputs in coinbase transactions
+- **v2.0.0 – 2022-2-22** ([`879c55ed`](https://github.com/bitjson/cashtokens/blob/879c55edd7e9cd6a2c2d50990d89e5cc7cb07394/readme.md))
   - Initial publication (versioning begins at v2 to differentiate from [CashTokens v1](https://blog.bitjson.com/cashtokens-contract-validated-tokens-for-bitcoin-cash/))
 
 ## Copyright
