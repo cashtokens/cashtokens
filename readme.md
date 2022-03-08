@@ -19,7 +19,9 @@ A **token** is an asset – distinct from the Bitcoin Cash currency – that can
 
 **Fungible tokens** are a token type in which individual units are undifferentiated – groups of fungible tokens can be freely divided and merged without tracking the identity of individual tokens (much like the Bitcoin Cash currency).
 
-**Non-Fungible tokens (NFTs)** are a token type in which individual units cannot be merged or divided – each NFT contains a **commitment**, a short, binary message attested to by the issuer of the NFT.
+**Non-Fungible tokens (NFTs)** are a token type in which individual units cannot be merged or divided – each NFT contains a **commitment**.
+
+A **commitment** is a short, binary message attested to by the issuer of the NFT that ...
 
 ## Deployment
 
