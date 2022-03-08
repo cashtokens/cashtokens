@@ -65,9 +65,9 @@ An **output prefix codepoint** is a codepoint in the VM instruction set which is
 
 **A prefix codepoint opts the containing output into additional validation when the output is created or spent**. This specification includes a single output prefix codepoint, `PREFIX_TOKEN`.
 
-| Name           | Codepoint      | (Opcode-Equivalent) Description                                                                                                        |
-| -------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `PREFIX_TOKEN` | `0xef` (`239`) | Error, even when found in an unexecuted conditional branch. (May occur before an output's locking bytecode to indicate locked tokens.) |
+| Name           | Codepoint      | (Opcode-Equivalent) Description                                                                                                                                                                             |
+| -------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PREFIX_TOKEN` | `0xef` (`239`) | Error when detected as a codepoint, even when found in an unexecuted conditional branch. However it may appear, for example, in data that contains an output's locking bytecode to indicate locked tokens.) |
 
 ### Token Categories
 
