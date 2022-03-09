@@ -92,7 +92,7 @@ PREFIX_TOKEN <category_id> <has_nonfungible> [commitment] <amount>
    5. `0x01`-`0x28` – This byte is a `commitment_length` (encoded as a single-byte `VarInt`<sup>1</sup>) for the encoded non-fungible token. Skip to `commitment`. Values in the range `[0x29, 0xfc]` are reserved for future use and must be considered errors without future consensus specification.
 3. `commitment_length` – A **commitment length** (encoded as a single-byte `VarInt`<sup>1</sup>) with a minimum value of `0` (`0x01`) and maximum value of `40` (`0x28`).
 4. `commitment` – If `commitment_length` is non-zero, a **token commitment** of `commitment_length` is required.
-5. `amount` – a **token amount** (encoded as a `VarInt`) with a minimum value of `0` (`0x00`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`ffffffffffffffff7f`).
+5. `amount` – a **token amount** (encoded as a `VarInt`) with a minimum value of `0` (`0x00`) and a maximum value equal to the maximum VM number, `(2^63)-1 = 9223372036854775807` (`ffffffffffffffff7f`).
 
 `PREFIX_TOKEN` must encode at least one token (non-fungible, fungible, or both).
 
