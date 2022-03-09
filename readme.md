@@ -186,9 +186,9 @@ This algorithm has the following effects:
    1. A transaction output can contain zero or one **non-fungible token**.
    2. Non-fungible tokens (NFTs) of a particular category are created either in the category's genesis transaction or by later transactions which spend `minting` or `mutable` tokens of the same category.
    3. It is possible for multiple NFTs of the same category to carry the same commitment. (Uniqueness can be enforced by a covenant.)
-   4. **Minting tokens** (NFTs with the `minting` capability) allow the spending transaction to create any number of new NFTs of the same category, each with any commitment and (optionally) the `minting` or `mutable` capability.
-   5. Each **Mutable token** (NFTs with the `mutable` capability) allows the spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
-   6. **Immutable tokens** (NFTs without a capability) cannot have their commitment modified when spent.
+   4. A **minting token** (NFT with the `minting` capability) allows its spending transaction to create any number of new NFTs of the same category, with any commitment and (optionally) the `minting` or `mutable` capability.
+   5. A **mutable token** (NFT with the `mutable` capability) allows its spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
+   6. An **immutable tokens** (NFT without a capability) cannot have its commitment modified when spent.
 
 #### Token Validation Algorithm
 
