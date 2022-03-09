@@ -225,7 +225,7 @@ Note: coinbase transactions have only one input with an outpoint index of `42949
 
 #### Prefix Codepoint Standardness
 
-Implementations must recognize otherwise-standard outputs with token prefixes (`PREFIX_TOKEN`) as **standard** (in `isStandard` validation).
+Implementations must recognize otherwise-standard outputs with token prefixes (`PREFIX_TOKEN`) as **standard** (in [isStandard](specUrl) validation).
 
 ### Token Inspection Operations
 
