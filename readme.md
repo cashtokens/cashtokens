@@ -171,7 +171,7 @@ This algorithm has the following effects:
 1. **Universal Token Behavior**
 
    1. A single transaction can create multiple new token categories, and categories can contain both fungible and non-fungible tokens.
-   2. Most tokens can not be implicitly destroyed by omission from a transaction's outputs – they must be explicitly destroyed by, for example, spending them to an `OP_RETURN` output. (Minting tokens and mutable tokens may be implicitly destroyed or modified. See [Behavior of Minting and Mutable Tokens](#behavior-of-minting-and-mutable-tokens).)
+   2. All tokens, except minting and mutable tokens, can not be implicitly destroyed by omission from a transaction's outputs – they must be explicitly destroyed by, for example, spending them to an `OP_RETURN` output. See [Behavior of Minting and Mutable Tokens](#behavior-of-minting-and-mutable-tokens).
    3. Fungible and non-fungible tokens behave independently.
    4. A transaction output can contain both fungible tokens and a non-fungible token of the same category.
 
