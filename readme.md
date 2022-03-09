@@ -195,7 +195,7 @@ This algorithm has the following effects:
 Given the following **definitions**:
 
 1. Reducing the set of UTXOs spent by the transaction:
-   1. A key-value map of **`Input_Sums_By_Category`** (mapping category IDs to positive, 64-bit integers) is created by summing the `amount`s of each token category.
+   1. A key-value map of **`Input_Sums_By_Category`** (mapping category IDs to positive, 64-bit integers) is created by summing the spent fungible token `amount`s of each token category.
    2. A key-value map of **`Input_Mutable_Tokens_By_Category`** (mapping category IDs to positive integers) is created by summing the count of spent mutable tokens for each category.
    3. A de-duplicated list of **`Input_Minting_Categories`** is created including:
       1. The transaction hash of each outpoint with an outpoint index of `0` (i.e. the spent UTXO was the first output in its transaction), and
