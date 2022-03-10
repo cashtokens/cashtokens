@@ -419,7 +419,7 @@ Advanced BCH contract use cases require strategies for transferring authenticate
 
 One key insight which precipitated this proposal's bifurcated fungible/non-fungible approach is: **token fungibility and token commitments are conceptually incompatible**.
 
-Fungible tokens are (by definition) indistinguishable from one another. Fungible token systems must allow amounts of tokens to be freely divided and re-merged without tracking the precise flow of individual token units. Conversely, nonfungible tokens (as defined by this proposal) are most useful to contracts because they offer a strategy for issuing tamper-proof messages which can be read and acted upon by other contracts.
+Fungible tokens are (by definition) indistinguishable from one another. Fungible token systems must allow amounts of tokens to be freely divided and re-merged without tracking the precise flow of individual token units. Conversely, non-fungible tokens (as defined by this proposal) are most useful to contracts because they offer a strategy for issuing tamper-proof messages which can be read and acted upon by other contracts.
 
 Any token standard which attempts to combine these primitives must contend with their conceptually incompatibility – "fungible" tokens with commitments are not strictly fungible (e.g. some covenants could reject certain commitments, so wallet software must "assay" quantities of such tokens) and must have either implicit or user-defined policies for splitting and merging commitments (increasing protocol complexity and impeding standardization).
 
