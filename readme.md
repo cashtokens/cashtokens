@@ -309,7 +309,7 @@ By design, [Genesis Supply](#genesis-supply), [Reserved Supply](#reserved-supply
 
 #### Genesis Supply
 
-A token category's **genesis supply** is an **immutable, easily-computed, maximum possible supply**, known since the token category's genesis transaction. It overestimates total supply if any amount of tokens have been destroyed since the genesis transaction.
+A token category's **genesis supply** is an **immutable, easily-computed, maximum possible supply**, known since the token category's genesis transaction. It overstates total supply if any amount of tokens has been destroyed since the genesis transaction.
 
 The genesis supply of a fungible token category can be computed by parsing the outputs of the category's genesis transaction and summing the `amount` of fungible tokens matching the category's ID.
 
