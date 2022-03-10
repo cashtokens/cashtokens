@@ -451,7 +451,7 @@ Note, because minting and mutable tokens are not immutable, they can be implicit
 
 ### Disallowing Implicit Destruction of Immutable Tokens
 
-This specification prevents ([most](#allowing-implicit-destruction-of-minting-tokens)) spent tokens from being implicitly destroyed by failing to re-include them in a transaction's outputs; for a transaction to be valid, each token present in the spent UTXOs must also appear in some output. This validation improves the safety of all wallet software – particularly of software released prior to the adoption of this specification (simplistic wallet software often does not parse or validate its own UTXOs, and may not be fully-aware of tokens).
+This specification prevents ([most](#behavior-of-minting-and-mutable-tokens)) spent tokens from being implicitly destroyed by failing to re-include them in a transaction's outputs; for a transaction to be valid, each token present in the spent UTXOs must also appear in some output. This validation improves the safety of all wallet software – particularly of software released prior to the adoption of this specification (simplistic wallet software often does not parse or validate its own UTXOs, and may not be fully-aware of tokens).
 
 Wallet software is most likely to be tested for correctness in the common case of sending and receiving BCH, but it is decreasingly likely to be free of bugs in less common functionality – like receiving and sending tokens. This specification takes the conservative approach: require tokens to be explicitly destroyed (by e.g. sending them to an `OP_RETURN` output), protecting end-users from loss due to wallet software bugs.
 
