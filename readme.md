@@ -360,7 +360,7 @@ Given the existence of [covenant-tracking, non-fungible tokens](#covenant-tracki
 
 This proposal allows decentralized organization-coordinating covenants to hold votes using fungible tokens (without pausing the ability to transfer, divide, or merge fungible voting token outputs during the voting period).
 
-In short, covenants can migrate to a new token category over a voting period – shareholders trade in amounts of "pre-vote" shares, receiving "post-vote" shares, and incrementing their chosen result by the `amount` of share-votes cast.
+In short, covenants have the option to migrate to a new token category over a voting period – shareholders trade in amounts of "pre-vote" shares, receiving "post-vote" shares, and incrementing their chosen result by the `amount` of share-votes cast.
 
 This construction reveals additional consensus strategies for decentralized organizations:
 
