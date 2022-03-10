@@ -315,7 +315,7 @@ The genesis supply of a fungible token category can be computed by parsing the o
 
 #### Total Supply
 
-A token category's **total supply** is the sum – at a particular moment in time – of **tokens which are either in circulation or may enter circulation in the future**. A token category's total supply is always less than or equal to its genesis supply.
+A token category's **total supply** is the sum – given a particular block tip and set of mempool utxos – of **tokens which are either in circulation or may enter circulation in the future**. A token category's total supply is always less than or equal to its genesis supply.
 
 The total supply of a fungible token category can be computed by retrieving all UTXOs which contain token prefixes matching the category ID, removing provably-destroyed outputs (spent to `OP_RETURN`), and summing the remaining `amount`s.
 
