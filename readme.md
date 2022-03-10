@@ -100,7 +100,7 @@ PREFIX_TOKEN <category_id> <has_nonfungible> [commitment] <amount>
 
 <summary>Notes</summary>
 
-1. The **`VarInt` Format** is a variable-length, little-endian, positive integer format used to indicate the length of the following byte array in Bitcoin Cash P2P protocol message formats (present since the protocol's publication in 2008). For most of this range – `1` (`0x01`) to `40` (`0x28`) – the `VarInt` format is equivalent to the Number encoding used by the VM. (`VarInt` encodes `0` as `0x00`, while VM Numbers encode `0` as empty stack items.)
+1. The **`VarInt` Format** is a variable-length, little-endian, positive integer format used to indicate the length of the following byte array in Bitcoin Cash P2P protocol message formats (present since the protocol's publication in 2008). For most of this range – `1` (`0x01`) to `40` (`0x28`) – the `VarInt` format is equivalent to the Number encoding used by the VM. (`VarInt` encodes `0` as `0x00`, while VM Numbers encode `0` as empty stack items.)
 
 </details>
 
@@ -354,7 +354,7 @@ Notably, tracking tokens also allow for a significant contract-size and applicat
 
 ### Depository Child Covenants
 
-Given the existence of [covenant-tracking, non-fungible tokens](#covenant-tracking-non-fungible-tokens), it is trivial to develop **depository child covenants** – covenants which hold a non-fungible token and/or an amount of fungible tokens on behalf of a parent covenant. By requiring that the depository covenant be spent only in transactions with the parent covenant, such depository covenants can allow a parent covenant to hold and manipulate token portfolios with an unlimited quantity of fungible or non-fungible tokens (despite the limitation to [one prefix codepoint per output](#one-prefix-codepoint-per-output)).
+Given the existence of [covenant-tracking, non-fungible tokens](#covenant-tracking-non-fungible-tokens), it is trivial to develop **depository child covenants** – covenants which hold a non-fungible token and/or an amount of fungible tokens on behalf of a parent covenant. By requiring that the depository covenant be spent only in transactions with the parent covenant, such depository covenants can allow a parent covenant to hold and manipulate token portfolios with an unlimited quantity of fungible or non-fungible tokens (despite the limitation to [one prefix codepoint per output](#one-prefix-codepoint-per-output)).
 
 ### Voting with Fungible Tokens
 
@@ -365,7 +365,7 @@ In short, covenants can migrate to a new token category over a voting period –
 This construction reveals additional consensus strategies for decentralized organizations:
 
 - **Vote-dependent, post-vote token categories** – covenants which rely on absolute consensus – like certain sidechain bridges (which, e.g. must come to a consensus on an aggregate withdrawal transaction per withdrawal period and then penalize or confiscate dishonest shares) – can issue different categories of post-vote tokens based on the vote cast. This allows for transfer and trading of post-vote tokens even before the voting period ends. When different voting outcomes impact the value of voting tokens (after the voting period ends), such differences will **immediately appear in market prices of post-vote tokens**. This observation presents further consensus strategies employing hedging, prediction markets, synthetic assets, etc.
-- **Covenant spin-offs** – in cases where a covenant-based organization plans a spin-off (e.g. a significant sidechain fork), covenant participants can be allowed to select between receiving shares in the new covenant or receiving an alternative compensation (e.g. a one-time BCH payout or additional shares in the non-forking covenant).
+- **Covenant spin-offs** – in cases where a covenant-based organization plans a spin-off (e.g. a significant sidechain fork), covenant participants can be allowed to select between receiving shares in the new covenant or receiving an alternative compensation (e.g. a one-time BCH payout or additional shares in the non-forking covenant).
 
 #### Sealed Voting
 
