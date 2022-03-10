@@ -323,15 +323,15 @@ Software implementations should emphasize total supply in user interfaces for to
 
 #### Reserved Supply
 
-A token category's **reserved supply** is the sum – at a particular moment in time – of tokens held in reserve by the issuing entity. **This is the portion of the supply which the issuer represents as "not in circulation".**
+A token category's **reserved supply** is the sum – given a particular block tip and set of mempool utxos – of tokens held in reserve by the issuing entity. **This is the portion of the supply which the issuer represents as "not in circulation".**
 
 The reserved supply of a fungible token category can be computed by retrieving all UTXOs which contain token prefixes matching the category ID, removing provably-destroyed outputs (spent to `OP_RETURN`), and summing the `amount`s held in prefixes which have either the `minting` or `mutable` capability.
 
 #### Circulating Supply
 
-A token category's **circulating supply** is the sum – at a particular moment in time – of tokens not held in reserve by the issuing entity. **This is the portion of the supply which the issuer represents as "in circulation".**
+A token category's **circulating supply** is the sum – given a particular block tip and set of mempool utxos – of tokens not held in reserve by the issuing entity. **This is the portion of the supply which the issuer represents as "in circulation".**
 
-The **circulating supply** of a fungible token category can be computed by subtracting the [reserved supply](#reserved-supply) from the [total supply](#total-supply).
+The **circulating supply** of a fungible token category can be computed by subtracting the [reserved supply](#reserved-supply) from the [total supply](#total-supply), with both measures calculated using the same set of UTXOs.
 
 Software implementations might choose to emphasize circulating supply (rather than total supply) in user interfaces for token categories which:
 
