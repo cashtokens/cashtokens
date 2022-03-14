@@ -104,8 +104,9 @@ PREFIX_TOKEN <category_id> <token_output_type> [ft_amount] [<nft_commitment_leng
 
 `PREFIX_TOKEN` must encode at least one token (non-fungible, fungible, or both) i.e. `token_output_type == 0x00` fails the transaction.  
 The NFT commitment flag (`0x10`) may be set only if the output encodes an NFT i.e. `token_output_type & 0x70 == 0x10` fails the transaction.  
+The commitment field is not required i.e. "null" commitment NFTs are allowed.  
+If the NFT commitment field is used, it can not be "empty" i.e. `nft_commitment_length == 0` fails the transaction.  
 Undefined bits are reserved i.e. `(token_output_type & 0x8E) != 0` fails the transaction.  
-The commitment field is not required i.e. "empty" NFTs are allowed.  
 Fungible tokens of `ft_amount == 0` are allowed and distinct from outputs that don't encode a fungible token amount.
 
 Implementations must ensure all token prefixes in newly created transaction outputs satisfy these encoding requirements during transaction validation.
@@ -184,29 +185,29 @@ The following test vectors demonstrate valid and invalid `PREFIX_TOKEN` encoding
 | no NFT; 252 fungible                               | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd01fc`                                                                                                   |
 | no NFT; 253 fungible                               | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd01fdfd00`                                                                                               |
 | no NFT; 9223372036854775807 fungible               | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd01ffffffffffffffff7f`                                                                                   |
-| empty NFT; no fungible                             | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd20`                                                                                                   |
-| empty NFT; 1 fungible                             | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd2101`                                                                                                   |
-| empty NFT; 253 fungible                           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd21fdfd00`                                                                                               |
-| empty NFT; 9223372036854775807 fungible           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd21ffffffffffffffff7f`                                                                                   |
-| 1-byte NFT; 252 fungible                           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fc01cc`                                                                                                 |
-| 2-byte NFT; 253 fungible                           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fdfd0002cccc`                                                                                           |
-| 10-byte NFT; 65535 fungible                        | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fdffff0acccccccccccccccccccc`                                                                           |
-| 40-byte NFT; 65536 fungible                        | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fe0000010028cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`           |
-| 40-byte NFT; no fungible                        | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd3028cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`           |
-| empty, mutable NFT; no fungible                    | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd40`                                                                                                 |
-| empty, mutable NFT; 4294967295 fungible           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41feffffffff`                                                                                         |
-| 1-byte, mutable NFT; 4294967296 fungible           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41ff000000000100000001cc`                                                                               |
-| 2-byte, mutable NFT; 9223372036854775807 fungible  | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41ffffffffffffffff7f02cccc`                                                                             |
-| 10-byte, mutable NFT; 1 fungible                   | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41010acccccccccccccccccccc`                                                                             |
-| 40-byte, mutable NFT; 252 fungible                 | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41fc28cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`                 |
-| 40-byte, mutable NFT; no fungible                 | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd4028cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`                 |
-| empty minting NFT; no fungible                    | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd60`                                                                                                 |
-| empty, minting NFT; 253 fungible                  | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd61fdfd00`                                                                                             |
-| 1-byte, minting NFT; 65535 fungible                | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71fdffff01cc`                                                                                           |
-| 2-byte, minting NFT; 65536 fungible                | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71fe0000010002cccc`                                                                                     |
-| 10-byte, minting NFT; 4294967297 fungible          | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71ff00000001000000010acccccccccccccccccccc`                                                             |
-| 40-byte, minting NFT; 9223372036854775807 fungible | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71ffffffffffffffff7f28cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
-| 40-byte, minting NFT; no fungible | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd7128cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
+| null commitment, immutable NFT; no fungible                             | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd20`                                                                                                   |
+| null commitment, immutable NFT; 1 fungible                             | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd2101`                                                                                                   |
+| null commitment, immutable NFT; 253 fungible                           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd21fdfd00`                                                                                               |
+| null commitment, immutable NFT; 9223372036854775807 fungible           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd21ffffffffffffffff7f`                                                                                   |
+| 1-byte commitment, immutable NFT; 252 fungible                           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fc01cc`                                                                                                 |
+| 2-byte commitment, immutable NFT; 253 fungible                           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fdfd0002cccc`                                                                                           |
+| 10-byte commitment, immutable NFT; 65535 fungible                        | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fdffff0acccccccccccccccccccc`                                                                           |
+| 40-byte commitment, immutable NFT; 65536 fungible                        | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd31fe0000010028cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`           |
+| 40-byte commitment, immutable NFT; no fungible                        | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd3028cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`           |
+| null commitment, mutable NFT; no fungible                    | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd40`                                                                                                 |
+| null commitment, mutable NFT; 4294967295 fungible           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41feffffffff`                                                                                         |
+| 1-byte commitment, mutable NFT; 4294967296 fungible           | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41ff000000000100000001cc`                                                                               |
+| 2-byte commitment, mutable NFT; 9223372036854775807 fungible  | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41ffffffffffffffff7f02cccc`                                                                             |
+| 10-byte commitment, mutable NFT; 1 fungible                   | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41010acccccccccccccccccccc`                                                                             |
+| 40-byte commitment, mutable NFT; 252 fungible                 | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd41fc28cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`                 |
+| 40-byte commitment, mutable NFT; no fungible                 | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd4028cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc`                 |
+| null commitment, minting NFT; no fungible                    | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd60`                                                                                                 |
+| null commitment, minting NFT; 253 fungible                  | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd61fdfd00`                                                                                             |
+| 1-byte commitment, minting NFT; 65535 fungible                | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71fdffff01cc`                                                                                           |
+| 2-byte commitment, minting NFT; 65536 fungible                | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71fe0000010002cccc`                                                                                     |
+| 10-byte commitment, minting NFT; 4294967297 fungible          | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71ff00000001000000010acccccccccccccccccccc`                                                             |
+| 40-byte commitment, minting NFT; 9223372036854775807 fungible | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd71ffffffffffffffff7f28cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
+| 40-byte commitment, minting NFT; no fungible | `efdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd7128cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
 
 #### Invalid `PREFIX_TOKEN` Prefix Encodings
 
