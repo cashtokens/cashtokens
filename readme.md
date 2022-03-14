@@ -75,7 +75,7 @@ Token Category IDs must be selected from the creating transaction's outpoints fi
 
 ### `PREFIX_TOKEN`
 
-`PREFIX_TOKEN` is defined at codepoint `0xef` (`239`) and is the first byte of an output's **token prefix**, a data structure that can encode a non-fungible token (NFT) and an amount of fungible tokens of the same category:
+`PREFIX_TOKEN` is defined at codepoint `0xef` (`239`) and is the first byte of an output's **token prefix**, a data structure that can encode a non-fungible token (NFT) and/or an amount of fungible tokens (FTs) of the same category:
 
 ```
 PREFIX_TOKEN <category_id> <token_output_type> [ft_amount] [<nft_commitment_length><nft_commitment>]
@@ -91,12 +91,8 @@ PREFIX_TOKEN <category_id> <token_output_type> [ft_amount] [<nft_commitment_leng
        3. `0x20` (no capability) – the encoded non-fungible token is considered an **immutable token**.
        4. `0x00` None - the output does not encode an NFT.
 3. `ft_amount` – If `token_output_type & 0x01 != 0` then a **fungible token amount** (encoded as a `VarInt`) is required, with a minimum value of `0` (`0x00`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`ffffffffffffffff7f`).
-4. `nft_commitment_length` – If `token_output_type & 0x10 !=` then the NFT's **commitment length** (encoded as a single-byte `VarInt`<sup>1</sup>) is required, with a minimum value of `1` (`0x01`) and maximum value of `40` (`0x28`).
+4. `nft_commitment_length` – If `token_output_type & 0x10 != 0` then the NFT's **commitment length** (encoded as a single-byte `VarInt`<sup>1</sup>) is required, with a minimum value of `1` (`0x01`) and maximum value of `40` (`0x28`). The NFT commitment will share consensus size limit with the locking script, while maximum value of 40 will be a network rule.
 5. `nft_commitment` – If `token_output_type & 0x02 !=` then the NFT's **commitment** of `nft_commitment_length` size is required.
-
-
-`PREFIX_TOKEN` must encode at least one token (non-fungible, fungible, or both).
-Presence of `nft_commitment` is allowed if and only if the output encodes an NFT.
 
 <details>
 
@@ -106,6 +102,12 @@ Presence of `nft_commitment` is allowed if and only if the output encodes an NFT
 
 </details>
 
+`PREFIX_TOKEN` must encode at least one token (non-fungible, fungible, or both) i.e. `token_output_type == 0x00` fails the transaction.  
+The NFT commitment flag (`0x10`) may be set only if the output encodes an NFT i.e. `token_output_type & 0x70 == 0x10` fails the transaction.  
+Undefined bits are reserved i.e. `(token_output_type & 0x8E) != 0` fails the transaction.  
+The commitment field is not required i.e. "empty" NFTs are allowed.  
+Fungible tokens of `ft_amount == 0` are allowed and distinct from outputs that don't encode a fungible token amount.
+
 Implementations must ensure all token prefixes in newly created transaction outputs satisfy these encoding requirements during transaction validation.
 
 <details>
@@ -113,29 +115,60 @@ Implementations must ensure all token prefixes in newly created transaction outp
 <summary><strong><code>token_output_type</code> List of Allowed Values</strong></summary>
 
 
-token_output_type | bit6 | bit5 | bit4 | bit0 | Note
--- | -- | -- | -- | -- | --
-0x01 | 0 | 0 | 0 | 1 | FT, no NFT, no message
-0x20 | 0 | 1 | 0 | 0 | No FT, immutable NFT, no commitment
-0x21 | 0 | 1 | 0 | 1 | FT, immutable NFT, no commitment
-0x30 | 0 | 1 | 1 | 0 | No FT, immutable NFT, carries a commitment
-0x31 | 0 | 1 | 1 | 1 | FT, immutable NFT, carries a commitment
-0x40 | 1 | 0 | 0 | 0 | No FT, mutable NFT, no commitment
-0x41 | 1 | 0 | 0 | 1 | FT, mutable NFT, no commitment
-0x50 | 1 | 0 | 1 | 0 | No FT, mutable NFT, carries a commitment
-0x51 | 1 | 0 | 1 | 1 | FT, mutable NFT, carries a commitment
-0x60 | 1 | 1 | 0 | 0 | No FT, mint NFT, no commitment
-0x61 | 1 | 1 | 0 | 1 | FT, mint NFT, no commitment
-0x70 | 1 | 1 | 1 | 0 | No FT, mint NFT, carries a commitment
-0x71 | 1 | 1 | 1 | 1 | FT, mint NFT, carries a commitment
+token_output_type | bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0 | Note
+-- | -- | -- | -- | -- | -- | -- | -- | -- | --
+0x01 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | FT, no NFT, no message
+0x20 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | No FT, immutable NFT, no commitment
+0x21 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | FT, immutable NFT, no commitment
+0x30 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | No FT, immutable NFT, carries a commitment
+0x31 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | FT, immutable NFT, carries a commitment
+0x40 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | No FT, mutable NFT, no commitment
+0x41 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | FT, mutable NFT, no commitment
+0x50 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | No FT, mutable NFT, carries a commitment
+0x51 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 1 | FT, mutable NFT, carries a commitment
+0x60 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | No FT, mint NFT, no commitment
+0x61 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 1 | FT, mint NFT, no commitment
+0x70 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | No FT, mint NFT, carries a commitment
+0x71 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 1 | FT, mint NFT, carries a commitment
 
 Values `0x00`, `0x10`, and `0x11` are disabled and will immediately fail the transaction.
 
-All other values (those using any of the undefined bits, i.e. bits 1 through 3) are reserved and reading a reserved value will immediately fail the transaction.
+All other values (those using any of the undefined bits, i.e. bit 7 and bits 1 through 3) are reserved and reading a reserved value will immediately fail the transaction.
 
 </details>
 
-<br>
+<details>
+
+<summary><strong>Output Parsing Algorithm</strong></summary>
+
+  - set `prefix_token_length = 0`,
+  - read the next 8 bytes as `satoshi_amount`,
+  - read the next VarInt bytes as `locking_script_length`,
+  - verify `locking_script_length <= MAX_LOCKING_SCRIPT_LENGTH + 43` _(verify the claimed length first, 43 is the allowance for FT of 8-byte amount because at this point it is indeterminate whether the output encodes a FT)_,
+  - read the next byte as `locking_script[0]`,
+  - if `locking_script[0] == PREFIX_TOKEN` then:
+    - increment `prefix_token_length` by 1,
+    - read the next 32 bytes as `category_id`, increment `prefix_token_length` by 32,
+    - read the next byte as `token_output_type`, increment `prefix_token_length` by 1,
+    - verify `token_output_type`:
+      - if `token_output_type == 0x00` then fail,
+      - if `token_output_type & 0x70 == 0x10` then fail,
+      - if `token_output_type & 0x8e != 0` then fail,
+    - if `(token_output_type & 0x01)` then:
+      - read the next VarInt bytes as `ft_amount`, increment `prefix_token_length` by serialized size of the VarInt (1, 3, 5, or 9) ,
+      - verify `ft_amount <= 2^63 - 1`,
+    - if `(token_output_type & 0x10)` then:
+      - read the next VarInt bytes as `nft_commitment_length` and increment `prefix_token_length` by serialized size of the VarInt (1, 3, 5, or 9),
+      - verify `prefix_token_length + nft_commitment_length <= MAX_LOCKING_SCRIPT_LENGTH + 1`,
+      - read the next `nft_commitment_length` bytes as `nft_commitment` and increment `prefix_token_length` by `nft_commitment_length`,
+    - read the next `(locking_script_length - prefix_token_length)` bytes as `real_locking_script`
+  - else:
+    - read next `locking_script_length - 1` bytes into `locking_script`
+    - set `real_locking_script = locking_script`
+  - _set `prefix_token_length = 0`,_
+  - _read the next 8 bytes as `satoshi_amount`..._
+
+</details>
 
 <details>
 
