@@ -85,11 +85,11 @@ PREFIX_TOKEN <category_id> <token_output_type> [ft_amount] [<nft_commitment_leng
 2. `<token_output_type>` – Encodes whether the output carries a FT amount, an NFT, or both; Also encodes capability of the NFT, and whether the NFT carries a commitment:
    1. If bit 0 flag (`0x01`) is set – the annotation **encodes an amount of fungible tokens**. Read the next bytes as `ft_amount`.
    2. If bit 4 flag (`0x10`) is set - in additon to encoding an NFT, the annotation **encodes the NFT's commitment**. Read the next bytes as `nft_commitment_length` and then read the `nft_commitment`.
-   3. Bits 5 and 6 of `token_output_type` will encode `nft_type` which is read as `nft_type = token_output_type & 0x60`
-       1. `0x60` (the **`minting` capability**) – the encoded non-fungible token is considered a **minting token**.
-       2. `0x40` (the **`mutable` capability**) – the encoded non-fungible token is considered a **mutable token**.
-       3. `0x20` (no capability) – the encoded non-fungible token is considered an **immutable token**.
-       4. `0x00` None - the output does not encode an NFT.
+   3. Bits 5 and 6 of `token_output_type` will encode `nft_capability` which is read as `nft_capability = token_output_type & 0x60`
+       1. `0x60` **immutable**. *(fully constrained)*
+       2. `0x40` **fannable**. *(commitment-constrained)*
+       3. `0x20` **mutable**. *(cardinality-constrained)*
+       4. `0x00` **mint**. *(free of constraints)*
 3. `ft_amount` – If `token_output_type & 0x01 != 0` then a **fungible token amount** (encoded as a `VarInt`) is required, with a minimum value of `0` (`0x00`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`ffffffffffffffff7f`).
 4. `nft_commitment_length` – If `token_output_type & 0x10 != 0` then the NFT's **commitment length** (encoded as a single-byte `VarInt`<sup>1</sup>) is required, with a minimum value of `1` (`0x01`) and maximum value of `40` (`0x28`). The NFT commitment will share consensus size limit with the locking script, while maximum value of 40 will be a network rule.
 5. `nft_commitment` – If `token_output_type & 0x02 !=` then the NFT's **commitment** of `nft_commitment_length` size is required.
@@ -102,8 +102,7 @@ PREFIX_TOKEN <category_id> <token_output_type> [ft_amount] [<nft_commitment_leng
 
 </details>
 
-`PREFIX_TOKEN` must encode at least one token (non-fungible, fungible, or both) i.e. `token_output_type == 0x00` fails the transaction.  
-The NFT commitment flag (`0x10`) may be set only if the output encodes an NFT i.e. `token_output_type & 0x70 == 0x10` fails the transaction.  
+`PREFIX_TOKEN` always encodes an NFT of some capability.  
 The commitment field is not required i.e. "null" commitment NFTs are allowed.  
 If the NFT commitment field is used, it can not be "empty" i.e. `nft_commitment_length == 0` fails the transaction.  
 Undefined bits are reserved i.e. `(token_output_type & 0x8E) != 0` fails the transaction.  
@@ -118,21 +117,23 @@ Implementations must ensure all token prefixes in newly created transaction outp
 
 token_output_type | bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0 | Note
 -- | -- | -- | -- | -- | -- | -- | -- | -- | --
-0x01 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | FT, no NFT, no message
-0x20 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | No FT, immutable NFT, no commitment
-0x21 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | FT, immutable NFT, no commitment
-0x30 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | No FT, immutable NFT, carries a commitment
-0x31 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | FT, immutable NFT, carries a commitment
-0x40 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | No FT, mutable NFT, no commitment
-0x41 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | FT, mutable NFT, no commitment
-0x50 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | No FT, mutable NFT, carries a commitment
-0x51 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 1 | FT, mutable NFT, carries a commitment
-0x60 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | No FT, mint NFT, no commitment
-0x61 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 1 | FT, mint NFT, no commitment
-0x70 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | No FT, mint NFT, carries a commitment
-0x71 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 1 | FT, mint NFT, carries a commitment
+0x00 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | Mint NFT, no commitment, no FT
+0x01 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | Mint NFT, no commitment, has FT
+0x10 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | Mint NFT, has commitment, no FT
+0x11 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | Mint NFT, has commitment, has FT
+0x20 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | Mutable NFT, no commitment, no FT
+0x21 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 1 | Mutable NFT, no commitment, has FT
+0x30 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | Mutable NFT, has commitment, no FT
+0x31 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 | Mutable NFT, has commitment, has FT
+0x40 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | Fannable NFT, no commitment, no FT
+0x41 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 1 | Fannable NFT, no commitment, has FT
+0x50 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | Fannable NFT, has commitment, no FT
+0x51 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 1 | Fannable NFT, has commitment, has FT
+0x60 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | Immutable NFT, no commitment, no FT
+0x61 | 0 | 1 | 1 | 0 | 0 | 0 | 0 | 1 | Immutable NFT, no commitment, has FT
+0x70 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | Immutable NFT, has commitment, no FT
+0x71 | 0 | 1 | 1 | 1 | 0 | 0 | 0 | 1 | Immutable NFT, has commitment, has FT
 
-Values `0x00`, `0x10`, and `0x11` are disabled and will immediately fail the transaction.
 
 All other values (those using any of the undefined bits, i.e. bit 7 and bits 1 through 3) are reserved and reading a reserved value will immediately fail the transaction.
 
