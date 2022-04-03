@@ -162,7 +162,9 @@ The following test vectors demonstrate valid and invalid `PREFIX_TOKEN` encoding
 
 ### SIGHASH_TOKEN
 
-Any output that carries PREFIX_TOKEN MUST only be spent if its spending input is signed with bit 5 set on its nHashType - this is known as SIGHASH_TOKEN, 0x20. When combined with existing sighash types, taking SIGHASH_FORKID (0x40) into account, this then becomes: 
+Any output that carries `PREFIX_TOKEN` MUST only be spent if its spending input is signed with bit 5 set on its nHashType - this is known as `SIGHASH_TOKEN`, 0x20. Outputs that do not carry `PREFIX_TOKEN` MUST NOT be spent if signed with the `SIGHASH_TOKEN` bit set.
+
+When combined with existing sighash types, taking `SIGHASH_FORKID` (0x40) into account, this then becomes: 
 
 | Flag                          | Value for nontoken input, Hex / Binary | Value for Cashtokens input, Hex / Binary  |
 |
