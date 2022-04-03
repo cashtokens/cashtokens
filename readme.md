@@ -51,11 +51,11 @@ Beyond enabling covenants to interoperate with other covenants, these token prim
 
 ### Universal Token Primitives
 
-By exposing basic, consensus-validated token primitives, this proposal supports the development of higher-level, interoperable token standards (e.g. [SLP](https://slp.dev/)). Token primitives can be held by any contract, wallets can easily verify the authenticity of a token or group of tokens, and tokens [cannot be inadvertently destroyed](#disallowing-implicit-destruction-of-immutable-tokens) by non-token-aware wallet software.
+By exposing basic, consensus-validated token primitives, this proposal supports the development of higher-level, interoperable token standards (e.g. [SLP](https://slp.dev/)). Token primitives can be held by any contract, wallets can easily verify the authenticity of a token or group of tokens, and tokens [cannot be inadvertently destroyed](#safety-from-accidental-destruction-while-allowing-implicit-burns) by non-token-aware wallet software.
 
 ## Technical Specification
 
-A new `PREFIX_TOKEN` codepoint is specified in the Bitcoin Cash virtual machine (VM) instruction set, and six new token inspection opcodes are introduced. Transaction validation is modified to support the new prefix codepoint, and CashAddress `types` with token support are specified.
+A new `PREFIX_TOKEN` codepoint is specified in the Bitcoin Cash virtual machine (VM) instruction set, and six new token inspection opcodes are introduced. Transaction validation is modified to support the new prefix codepoint, and CashAddress `types` with token support are specified. Spending outputs with the new `PREFIX_TOKEN` prefix requires flipping bit 5 in the nHashType, 0x20 of SIGHASH_TOKEN, in addition to other sighash flags that may be present. 
 
 ### Output Prefix Codepoints
 
@@ -160,6 +160,27 @@ The following test vectors demonstrate valid and invalid `PREFIX_TOKEN` encoding
 
 </details>
 
+### SIGHASH_TOKEN
+
+Any output that carries PREFIX_TOKEN MUST only be spent if its spending input is signed with bit 5 set on its nHashType - this is known as SIGHASH_TOKEN, 0x20. When combined with existing sighash types, taking SIGHASH_FORKID (0x40) into account, this then becomes: 
+
+| Flag                          | Value for nontoken input, Hex / Binary | Value for Cashtokens input, Hex / Binary  |
+|
+| ----------------------------- | -------------------------------------- | ----------------------------------------- |
+| SIGHASH_ALL                   | 0x41 / 0100 0001                       | 0x61 / 0110 0001                          |
+|
+| SIGHASH_NONE                  | 0x42 / 0100 0010                       | 0x62 / 0110 0010                          |
+|
+| SIGHASH_SINGLE                | 0x43 / 0100 0011                       | 0x63 / 0110 0011                          |
+|
+| SIGHASH_ALL / ANYONECANPAY    | 0xC1 / 1100 0001                       | 0xE1 / 1110 0001                          |
+|
+| SIGHASH_NONE / ANYONECANPAY   | 0xC2 / 1100 0010                       | 0xE2 / 1110 0010                          |
+|
+| SIGHASH_SINGLE / ANYONECANPAY | 0xC3 / 1100 0011                       | 0xE3 / 1110 0011                          |
+|
+
+
 ### Token-Aware Transaction Validation
 
 For any transaction to be valid, the [**token validation algorithm**](#token-validation-algorithm) must succeed.
@@ -169,9 +190,10 @@ This algorithm has the following effects:
 1. **Universal Token Behavior**
 
    1. A single transaction can create multiple new token categories, and categories can contain both fungible and non-fungible tokens.
-   2. Most tokens can not be implicitly destroyed by omission from a transaction's outputs – they must be explicitly destroyed by, for example, spending them to an `OP_RETURN` output. (Minting tokens and mutable tokens may be implicitly destroyed or modified. See [Behavior of Minting and Mutable Tokens](#behavior-of-minting-and-mutable-tokens).)
+   2. Tokens can be implicitly destroyed by omission from a transaction's outputs.
    3. Fungible and non-fungible tokens behave independently.
    4. A transaction output can contain both fungible tokens and a non-fungible token of the same category.
+   5. Any output that includes PREFIX_TOKEN may only be spent when the spending input is signed with SIGHASH_TOKEN set.
 
 2. **Fungible Token Behavior**
 
@@ -201,20 +223,19 @@ Given the following **definitions**:
    4. A list of all **`Input_Immutable_Tokens`** (including duplicates) is created including each NFT which **does not** have a `minting` or `mutable` capability.
 2. Reducing the set of outputs created by the transaction:
    1. A key-value map of **`Output_Sums_By_Category`** (mapping category IDs to positive, 64-bit integers) is created by summing the `amount`s of each token category.
-   2. A key-value map of **`Output_Mutable_Tokens_By_Category`** (mapping category IDs to positive integers) is created by summing the count of spent mutable tokens for each category.
+   2. A key-value map of **`Output_Mutable_Tokens_By_Category`** (mapping category IDs to positive integers) is created by summing the count of mutable tokens for each category.
    3. A de-duplicated list of **`Output_Minting_Categories`** is created including the category ID of each created minting token.
    4. A list of all **`Output_Immutable_Tokens`** (including duplicates) is created including each NFT which **does not** have a `minting` or `mutable` capability.
 
 Perform the following **validations**:
 
-1. Each category in `Input_Sums_By_Category` must exist and have an equal sum in `Output_Sums_By_Category`.
-2. Each category in `Output_Sums_By_Category` which doesn't exist in `Input_Sums_By_Category` must exist in `Minting_Category_IDs` and have an output sum no greater than `9223372036854775807` (the maximum VM number).
-3. Each category in `Output_Mutable_Tokens_By_Category` must either:
+1. Each category in `Output_Sums_By_Category` which doesn't exist in `Input_Sums_By_Category` must exist in `Minting_Category_IDs` and have an output sum no greater than `9223372036854775807` (the maximum VM number).
+2. Each category in `Output_Mutable_Tokens_By_Category` must either:
    1. Exist and have a sum less than or equal to that category in `Input_Mutable_Tokens_By_Category`, or
    2. Exist in `Minting_Category_IDs`.
-4. Each category in `Output_Minting_Categories` must exist in `Input_Minting_Categories`.
-5. Match each token in `Input_Immutable_Tokens` to an exactly equal token in `Output_Immutable_Tokens` (comparing both category ID and commitment).
-   1. `Input_Immutable_Tokens` must have no unmatched tokens.
+3. Each category in `Output_Minting_Categories` must exist in `Input_Minting_Categories`.
+4. Each token in `Output_Immutable_Tokens` must either: 
+   1. Be matched to an exactly equal token in `Input_Immutable_Tokens` (comparing both category ID and commitment).
    2. Derive a key-value map of **`Unmatched_Output_Tokens_By_Category`** which maps category IDs to a count of unmatched `Output_Immutable_Tokens`. Each category in `Unmatched_Output_Tokens_By_Category` must either:
       1. Exist in `Minting_Category_IDs`, or
       2. Have a count less than or equal to `Input_Mutable_Tokens_By_Category` minus `Output_Mutable_Tokens_By_Category` for that category.
@@ -445,13 +466,13 @@ Mutable tokens allow the holder to create **only one new token** (i.e. "modify" 
 
 This is a particularly critical use case for covenants, as it enables covenants to modify the commitment in a [tracking token](#covenant-tracking-non-fungible-tokens) without exhaustively validating that the interaction did not unexpectedly mint new tokens (allowing the user to impersonate the covenant). While exhaustive validation could be made efficient with new VM opcodes, such validation may commonly conflict across covenants, preventing them from being used in the same transaction. As such, this proposal considers the `mutable` capability to be essential for [cross-covenant interfaces](#cross-contract-interfaces).
 
-Note, because minting and mutable tokens are not immutable, they can be implicitly destroyed, i.e. non-fungible tokens with either capability are not required to be transferred from a transaction's UTXOs to its outputs for the transaction to be considered valid ([unlike most tokens](#disallowing-implicit-destruction-of-immutable-tokens)). This is an important optimization for covenant use cases – tokens controlled by a covenant can be used to hold or share internal state within a coordinating set of covenants. By not requiring the token to be duplicated to a new `OP_RETURN` output each time it is mutated, transaction sizes are significantly reduced.
+### Safety from Accidental Destruction while Allowing Implicit Burns
 
-### Disallowing Implicit Destruction of Immutable Tokens
+This specification allows spent tokens from being implicitly destroyed by not re-including them in a transaction's outputs. Similar to BCH transactions, omission of any amount from the spent outputs in created UTXOs is allowed; unlike BCH transactions, such omissions are not claimable by miners as mining fees. This is a modest efficiency gain for most tokens as workarounds like OP_RETURN or burn addresses are not required. For mutable tokens where covenant usecases are especially important, not requiring old tokens to be deposited to burn outputs every time they're mutated presents a larger gain.
 
-This specification prevents ([most](#allowing-implicit-destruction-of-minting-tokens)) spent tokens from being implicitly destroyed by failing to re-include them in a transaction's outputs; for a transaction to be valid, each token present in the spent UTXOs must also appear in some output. This validation improves the safety of all wallet software – particularly of software released prior to the adoption of this specification (simplistic wallet software often does not parse or validate its own UTXOs, and may not be fully-aware of tokens).
+Some tokens will inevitably be deposited to outputs controlled via wallet software unaware of token capabilities due to age or conscious feature choices. Without additional safety measures, such wallets may accidentally burn tokens sent to them by omission. The [SIGHASH_TOKEN](#sighash-token) requirement for inputs spending token outputs prevent such accidents by requiring nHashTypes that non-supporting wallets are unlikely to be capable of using.
 
-Wallet software is most likely to be tested for correctness in the common case of sending and receiving BCH, but it is decreasingly likely to be free of bugs in less common functionality – like receiving and sending tokens. This specification takes the conservative approach: require tokens to be explicitly destroyed (by e.g. sending them to an `OP_RETURN` output), protecting end-users from loss due to wallet software bugs.
+For wallets that are built to be aware of tokens, they will need to be tested for correctness in building token transactions, similar to testing required for sending and receiving BCH. This specification maintains a similar requirement in both cases: Wallets cannot spend output types without being aware of their existence by design, while they are fully responsible for the safety of spending outputs they are aware of.
 
 ### Avoiding Proof-of-Work for Token Data Compression
 
