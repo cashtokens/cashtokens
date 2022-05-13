@@ -537,6 +537,10 @@ Please see the following reference implementations for additional examples and t
 
 [TODO]
 
+>Just had time to finish digesting the proposal and I finally get it. My initial impression a couple of months ago was uncertain to negative, as it seemed to be a shortcut that added application logic to layer 1. However the reasoning provided around the elemental nature of the two types of tokens is sound and the CHIP is really impressive and detailed. I hope it succeeds and I’ve gotten all excited about the possibilities for things to build on top.
+
+<a href="https://bitcoincashresearch.org/t/chip-2022-02-cashtokens-token-primitives-for-bitcoin-cash/725/29"><p align="right">2022-05-12, Richard Brady, Bitcoin and telecoms expert</p></a>
+
 ## Feedback & Reviews
 
 - [CashTokens CHIP Issues](https://github.com/bitjson/cashtokens/issues)
