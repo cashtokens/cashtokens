@@ -231,8 +231,8 @@ These encodings may become valid with a future upgrade.
 | Token prefix must encode at least one token                                                            | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb00`                     |
 | Token prefix requires a token category ID<sup>1</sup>                                                  | `d0`                                                                                       |
 | Token category IDs must be 32 bytes<sup>1</sup>                                                        | `d0bbbbbbbb`                                                                               |
-| Category must be followed by at least a (token_format \| nft_capability) byte<sup>1</sup>              | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`                       |
-| Format indicates no NFT but capability state is present                                                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb01`                     |
+| Category must be followed by at least the (token_format \| nft_capability) byte<sup>1</sup>            | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`                       |
+| Token format indicates no NFT but capability is not 0                                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb01`                     |
 | Commitment length must be specified (immutable token)                                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb60`                     |
 | Commitment length must be specified (mutable token)                                                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb61`                     |
 | Commitment length must be specified (minting token)                                                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb62`                     |
@@ -251,7 +251,7 @@ These encodings may become valid with a future upgrade.
 | Token amount must be specified<sup>1</sup>                                                             | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb50`                     |
 | Token amount (9223372036854775808) may not exceed 9223372036854775807                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb50ff0000000000000080`   |
 
-<sup>1</sup>Parser would continue to read bytes that may be intended for the `real locking script` so these cases are undetectable unless there's not enough of `real locking script` to satisfy the declared length, because they'd require knowing the intent of the transaction author.
+<sup>1</sup>These cases are detectable simply by inspecting the `token_prefix_and_locking_bytecode_length` length.
 
 </details>
 
