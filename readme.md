@@ -180,7 +180,7 @@ Implementations must recognize otherwise-standard outputs with token prefixes as
 
 The following test vectors demonstrate valid and invalid token prefix encodings. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
 
-#### Standard Token Prefix Encodings
+#### Valid Token Prefix Encodings
 
 | Description                                        | Encoded (Hex)                                                                                                                                                              |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
