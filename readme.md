@@ -609,6 +609,8 @@ Specifying multiple token codepoints would add to implementation cost and also i
 
 It is conceptually clearer to treat the codepoint byte as a single switch that activates token validation code which will encapsulate processing the token data and enforcing consensus rules for it. In other words, the `PREFIX_TOKEN` marks the beginning of a different deserialization scheme which all the tokens share - distinct from other existing deserialization schemes - and it is cleaner implementation wise to separate the deserialization-scheme "magic byte" from the payload it encodes.
 
+Tokens aren't expected to be present on the majority of outputs, and for software interested in their presence it is relatively more efficient to inspect the serialized byte for just 1 value. Because we're splicing this encoding into the existing transaction format, it is prudent to prioritize that simplicity over the 1 byte of potential savings in the serialization. A future transaction format could make a different decision after seeing on-chain usage, but the `token outputs / total outputs` ratio would have to be fairly high to justify multiple checks for tokens.
+
 ### Behavior of Minting and Mutable Tokens
 
 This specification includes support for adding two different "capabilities" to non-fungible tokens: `minting` and `mutable`.
