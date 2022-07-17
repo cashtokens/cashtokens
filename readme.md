@@ -332,7 +332,7 @@ REQ: For each distinct `category_id` observed in a transaction, the count of **n
 
 DEF: We define a `nft_mutable_budget` as a difference between those two counts, and only if there's more such inputs than outputs and it's not a genesis transaction of the category and there doesn't exist an input spending a **nft-mint** of the same category.
 
-DEF: We define a `nft_commitment_unmatched` as a total of differences between count of inputs and outputs for each distinct `category_id + nft_commitment_length + nft_commitment` observed in a transaction that carry a **nft-mutable**, and tallied only for cases where there's more such outputs than inputs.
+DEF: We define a `nft_commitment_unmatched` as a total, per category, of differences between count of inputs and outputs for each distinct `category_id + nft_commitment_length + nft_commitment` observed in a transaction that carry a **nft-immutable**, and tallied only for cases where there's more such outputs than inputs.
 
 REQ: The aggregate `nft_commitment_unmatched` MUST be less than or equal than `nft_mutable_budget`, unless there exits at least one input of the category spending a **nft-mint** prevout or unless the category is being created by the genesis input.
 
