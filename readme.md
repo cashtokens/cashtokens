@@ -275,9 +275,10 @@ After activation, any transaction creating an invalid token prefix is itself inv
 
 ### Token-Aware Transaction Validation
 
-For any transaction to be valid, the [**token validation algorithm**](#token-validation-algorithm) must succeed.
+Transactions involving tokens must satisfy [**token validation normative requirements**](#token-validation-normative-requirements).
+Suggested validation algorithm is given [below](#token-validation-algorithm-suggested-implementation).
 
-This algorithm has the following effects:
+The requirements have the following effects:
 
 1. **Universal Token Behavior**
 
@@ -301,7 +302,41 @@ This algorithm has the following effects:
    5. Each **Mutable token** (NFTs with the `mutable` capability) allows the spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
    6. **Immutable tokens** (NFTs without a capability) cannot have their commitment modified when spent.
 
-#### Token Validation Algorithm
+#### Token Validation Normative Requirements
+
+##### Category Membership
+
+DEF: Category genesis input is defined as any input that spends a prevout with outpoint index equal to 0.
+
+REQ: For each distinct `category_id` observed in transaction's outputs there MUST exist a prevout with a matching `category_id` or a category genesis input with its outpoint `TXID` matching the output's `category_id`.
+
+REQ: Inputs CAN introduce two categories into the transaction: that of the genesis input, and that of a pre-existing output token state being spent as input's prevout.
+
+REQ: Multiple new categories CAN be created in a single transaction.
+
+REQ: Coinbase transactions CAN NOT include a token prefix in any output.
+
+##### Fungible Tokens
+
+REQ: For each distinct `category_id` observed in a transaction, sum of `ft_amount` values on the input side MUST NOT exceed the maximum value of 9223372036854775807 (0x7fffffffffffffff).
+
+REQ: For each distinct `category_id` observed in a transaction, sum of `ft_amount` values on the output side MUST NOT exceed the maximum value of 9223372036854775807 (0x7fffffffffffffff).
+
+REQ: For each distinct `category_id` observed in a transaction, sum of `ft_amount` on the output side MUST be less than or equal than the sum of `ft_amount` on the input side, unless the category is being created by a genesis input.
+
+##### Non-fungible Tokens
+
+REQ: For each distinct `category_id` observed in a transaction, if there exists a **nft-mint** output then there MUST exist a genesis input for the category or at least one input of the category spending a **nft-mint** prevout.
+
+REQ: For each distinct `category_id` observed in a transaction, the count of **nft-mutable** outputs MUST be less than or equal than the count of inputs with **nft-mutable**, unless there exits at least one input of the category spending a **nft-mint** prevout or unless the category is being created by the genesis input.
+
+DEF: We define a `nft_mutable_budget` as a difference between those two counts, and only if there's more such inputs than outputs and it's not a genesis transaction of the category and there doesn't exist an input spending a **nft-mint** of the same category.
+
+DEF: We define a `nft_commitment_unmatched` as a total of differences between count of inputs and outputs for each distinct `category_id + nft_commitment_length + nft_commitment` observed in a transaction that carry a **nft-mutable**, and tallied only for cases where there's more such outputs than inputs.
+
+REQ: The aggregate `nft_commitment_unmatched` MUST be less than or equal than `nft_mutable_budget`, unless there exits at least one input of the category spending a **nft-mint** prevout or unless the category is being created by the genesis input.
+
+#### Token Validation Algorithm Suggested Implementation
 
 Given the following **definitions**:
 
@@ -329,8 +364,6 @@ Perform the following **validations**:
 4. For each token in `Output_Immutable_Tokens`, if the token's category ID exists in `Available_Minting_Categories`, skip this (valid) token. Else:
    1. If an equivalent token exists in `Available_Immutable_Tokens` (comparing both category ID and commitment), remove it and continue to the next token. Else:
       1. Deduct `1` from the sum available for the token's category in `Available_Mutable_Tokens_By_Category`. If no mutable tokens are available to downgrade, **fail validation**.
-
-Note: because coinbase transactions have only one input with an outpoint index of `4294967295`, coinbase transactions can never include a token prefix in any output.
 
 ### Token Inspection Operations
 
