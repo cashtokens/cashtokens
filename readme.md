@@ -122,19 +122,18 @@ PREFIX_TOKEN <category_id> <token_format | nft_capability> [<nft_commitment_leng
 
 1. `<category_id>` – After the `PREFIX_TOKEN` byte, a 32-byte **Token Category ID** is required.
 2. `<token_format | nft_capability>` - A bitfield encoding two fields:
-    1. `<token_format> - a 4-bit field indicating the token payload that follows, defined at the higher half of the bitfield, to be read using `token_format = bitfield & 0xf0`.
-        1. `0x10` (`b00010000`) - Fungible tokens
-        2. `0x40` (`b01000000`) - Non-fungible token
-        3. `0x50` (`b01010000`) - Both fungible tokens and a non-fungible token
-        4. `0x60` (`b01100000`) - Non-fungible token with a commitment
-        5. `0x70` (`b01110000`) - Both fungible tokens and a non-fungible with a commitment
-    2. `<nft_capability>` – A 4-bit field indicating the capability of a non-fungible token, defined at the lower half of the bitfield, to be read using `token_format = bitfield & 0x0f`.
+    1. `<token_format>` - a 4-bit flags field that indicates what token payload follows, defined at the higher half of the bitfield, to be read using `token_format = bitfield & 0xf0`. The flags are specified as:
+        1. `0x80` (`b10000000`) - RESERVED, must be unset.
+        2. `0x40` (`b01000000`) - HAS_NFT, the output encodes a non-fungible token.
+        3. `0x20` (`b00100000`) - HAS_NFT_COMMITMENT, the output encodes a non-fungible token's commitment.
+        4. `0x10` (`b00010000`) - HAS_FT, the output encodes a fungible token amount.
+    2. `<nft_capability>` – A 4-bit field indicating the capability of a non-fungible token, defined at the lower half of the bitfield, to be read using `token_format = bitfield & 0x0f`. Usage of this field is reserved for NFTs, so it may be greater than 0 only if the HAS_NFT bit flag is set. Values greater than 2 are reserved and must not be used.
         1. `0x00` – the **`immutable` capability** – the encoded non-fungible token is an **immutable non-fungible token**.
         2. `0x01` – the **`mutable` capability** – the encoded non-fungible token is a **mutable non-fungible token**.
         3. `0x02` – the **`minting` capability** – the encoded non-fungible token is a **minting non-fungible token**.
-3. `commitment_length` – A **commitment length** (encoded in `CompactSize` format<sup>1</sup>). Optional field, `token_format` indicates whether it is skipped or read. If read, then it must encode a number greater than 0.
-4. `commitment` – A **token commitment** byte string of `commitment_length` is required. Optional field, `token_format` indicates whether it is skipped or read.
-5. `ft_amount` – a **token amount** (encoded as in `CompactSize` format) with a minimum value of `1` (`0x01`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`0xffffffffffffff7f`). Optional field, `token_format` indicates whether it is skipped or read.
+3. `commitment_length` – A **commitment length** (encoded in `CompactSize` format<sup>1</sup>). Optional field, `token_format`'s HAS_NFT_COMMITMENT bit flag indicates whether it is skipped or read. If read, then it must encode a number greater than 0.
+4. `commitment` – A **token commitment** byte string of `commitment_length` is required. Optional field, `token_format`'s HAS_NFT_COMMITMENT bit flag indicates whether it is skipped or read.
+5. `ft_amount` – a **token amount** (encoded as in `CompactSize` format) with a minimum value of `1` (`0x01`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`0xffffffffffffff7f`). Optional field, `token_format`'s HAS_FT bit flag indicates whether it is skipped or read.
 
 <details>
 
