@@ -124,8 +124,8 @@ PREFIX_TOKEN <category_id> <token_format | nft_capability> [<nft_commitment_leng
 2. `<token_format | nft_capability>` - A bitfield encoding two fields:
     1. `<token_format>` - a 4-bit flags field that indicates what token payload follows, defined at the higher half of the bitfield, to be read using `token_format = bitfield & 0xf0`. The flags are specified as:
         1. `0x80` (`b10000000`) - RESERVED, must be unset.
-        2. `0x40` (`b01000000`) - HAS_NFT, the output encodes a non-fungible token.
-        3. `0x20` (`b00100000`) - HAS_NFT_COMMITMENT, the output encodes a non-fungible token's commitment.
+        2. `0x40` (`b01000000`) - HAS_NFT_COMMITMENT, the output encodes a non-fungible token's commitment.
+        3. `0x20` (`b00100000`) - HAS_NFT, the output encodes a non-fungible token.
         4. `0x10` (`b00010000`) - HAS_FT, the output encodes a fungible token amount.
     2. `<nft_capability>` – A 4-bit field indicating the capability of a non-fungible token, defined at the lower half of the bitfield, to be read using `token_format = bitfield & 0x0f`. Usage of this field is reserved for NFTs, so it may be greater than 0 only if the HAS_NFT bit flag is set. Values greater than 2 are reserved and must not be used.
         1. `0x00` – the **`immutable` capability** – the encoded non-fungible token is an **immutable non-fungible token**.
@@ -147,7 +147,7 @@ By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrad
 
 A token prefix encoding no tokens (`token_format` is `0x00`) is invalid.
 
-A token prefix encoding a commitment without a non-fungible token (`token_format` is `0x02` or `0x03`) is invalid.
+A token prefix encoding a commitment without a non-fungible token (`token_format` is `0x40` or `0x50`) is invalid.
 
 A token prefix encoding a non-fungible token capability without a non-fungible token (`nft_capability` not equal to `0x00` when `token_format` indicates that no non-fugible token is encoded) is invalid.
 
@@ -156,12 +156,12 @@ When allowed combinations are serialized, there will be 13 allowed states for th
 `token_format` \| `nft_capability` | Note
 -- | --
 0x10 (b00010000, d16) | Fungible tokens
-0x40 (b01000000, d64) | Non-fungible token with **immutable** capability
-0x41 (b01000001, d65) | Non-fungible token with **mutable** capability
-0x42 (b01000010, d66) | Non-fungible token with **mint** capability
-0x50 (b01010000, d80) | Fungible tokens and a non-fungible token with **immutable** capability
-0x51 (b01010001, d81) | Fungible tokens and a non-fungible token with **mutable** capability
-0x52 (b01010010, d82) | Fungible tokens and a non-fungible token with **mint** capability
+0x20 (b00100000, d32) | Non-fungible token with **immutable** capability
+0x21 (b00100001, d33) | Non-fungible token with **mutable** capability
+0x22 (b00100010, d34) | Non-fungible token with **mint** capability
+0x30 (b00110000, d48) | Fungible tokens and a non-fungible token with **immutable** capability
+0x31 (b00110001, d49) | Fungible tokens and a non-fungible token with **mutable** capability
+0x32 (b00110010, d50) | Fungible tokens and a non-fungible token with **mint** capability
 0x60 (b01100000, d96) | Non-fungible token with **immutable** capability and a **commitment**
 0x61 (b01100001, d97) | Non-fungible token with **mutable** capability and a **commitment**
 0x62 (b01100010, d98) | Non-fungible token with **mint** capability and a **commitment**
@@ -187,24 +187,24 @@ The following test vectors demonstrate valid and invalid token prefix encodings.
 | no NFT; 252 fungible                               | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fc`                                                                                                   |
 | no NFT; 253 fungible                               | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fdfd00`                                                                                               |
 | no NFT; 9223372036854775807 fungible               | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10ffffffffffffffff7f`                                                                                   |
-| 0-byte immutable NFT; 0 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb40`                                                                                                     |
-| 0-byte immutable NFT; 1 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5001`                                                                                                   |
-| 0-byte immutable NFT; 253 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb50fdfd00`                                                                                               |
-| 0-byte immutable NFT; 9223372036854775807 fungible | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb50ffffffffffffffff7f`                                                                                   |
+| 0-byte immutable NFT; 0 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb20`                                                                                                     |
+| 0-byte immutable NFT; 1 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb3001`                                                                                                   |
+| 0-byte immutable NFT; 253 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30fdfd00`                                                                                               |
+| 0-byte immutable NFT; 9223372036854775807 fungible | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30ffffffffffffffff7f`                                                                                   |
 | 1-byte immutable NFT; 0 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6001cc`                                                                                                 |
 | 1-byte immutable NFT; 252 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfc`                                                                                               |
 | 2-byte immutable NFT; 253 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7002ccccfdfd00`                                                                                         |
 | 10-byte immutable NFT; 65535 fungible              | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb700accccccccccccccccccccfdffff`                                                                         |
 | 40-byte immutable NFT; 65536 fungible              | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7028ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfe00000100`         |
-| 0-byte, mutable NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb41`                                                                                                     |
-| 0-byte, mutable NFT; 4294967295 fungible           | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb51feffffffff`                                                                                           |
+| 0-byte, mutable NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb21`                                                                                                     |
+| 0-byte, mutable NFT; 4294967295 fungible           | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb31feffffffff`                                                                                           |
 | 1-byte, mutable NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6101cc`                                                                                                 |
 | 1-byte, mutable NFT; 4294967296 fungible           | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7101ccff0000000001000000`                                                                               |
 | 2-byte, mutable NFT; 9223372036854775807 fungible  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7102ccccffffffffffffffff7f`                                                                             |
 | 10-byte, mutable NFT; 1 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb710acccccccccccccccccccc01`                                                                             |
 | 40-byte, mutable NFT; 252 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7128ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfc`                 |
-| 0-byte, minting NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb42`                                                                                                     |
-| 0-byte, minting NFT; 253 fungible                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb52fdfd00`                                                                                               |
+| 0-byte, minting NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb22`                                                                                                     |
+| 0-byte, minting NFT; 253 fungible                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb32fdfd00`                                                                                               |
 | 1-byte, minting NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6201cc`                                                                                                 |
 | 1-byte, minting NFT; 65535 fungible                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7201ccfdffff`                                                                                           |
 | 2-byte, minting NFT; 65536 fungible                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7202ccccfe00000100`                                                                                     |
@@ -247,8 +247,8 @@ These encodings may become valid with a future upgrade.
 | Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 2-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfd00`             |
 | Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 4-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfe000000`         |
 | Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 8-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccff00000000000000` |
-| Token amount must be specified<sup>1</sup>                                                             | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb50`                     |
-| Token amount (9223372036854775808) may not exceed 9223372036854775807                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb50ff0000000000000080`   |
+| Token amount must be specified<sup>1</sup>                                                             | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30`                     |
+| Token amount (9223372036854775808) may not exceed 9223372036854775807                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30ff0000000000000080`   |
 
 <sup>1</sup>These cases are detectable simply by inspecting the `token_prefix_and_locking_bytecode_length` length.
 
