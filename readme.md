@@ -98,7 +98,7 @@ Every token category ID is a transaction ID: the ID must be selected from the in
 
 ### Token Types
 
-Two token types are introduced: **fungible tokens** and **non-fungible tokens**. Fungible tokens have only one property: a 32-byte `category`. Non-fungible tokens have three properties: a 32-byte `category`, a `0` to `9999` byte `commitment`, and a `capability` of `minting`, `mutable`, or `none`.
+Two token types are introduced: **fungible tokens** and **non-fungible tokens**. Fungible tokens have only one property: a 32-byte `category`. Non-fungible tokens have three properties: a 32-byte `category`, a `0` to `40` byte `commitment`, and a `capability` of `minting`, `mutable`, or `none`.
 (Precise behavior is defined in [Token-Aware Transaction Validation](#token-aware-transaction-validation).)
 
 Every transaction output can optionally have a [`token category`](#token-categories), and all fungible or non-fungible tokens locked in that output must share the output's token category. An output may contain:
