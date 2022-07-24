@@ -136,13 +136,22 @@ PREFIX_TOKEN <category_id> <has_nft> [commitment_length commitment] <ft_amount>
 
 </details>
 
-By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrades may increase this limit. Implementers are advised to ensure that values between `253` (`0xfdfd00`) and `65535` (`0xfdffff`) can be parsed. (See [Non-Fungible Token Commitment Length](#non-fungible-token-commitment-length).)
+By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrades may increase this limit. Implementers are REQUIRED to ensure that values between `253` (`0xfdfd00`) and `33554432` (`0xff00000002`) can be parsed, and that values greater than or equal to `33554433` (`0xff01000002`) are rejected with a parse failure. (See [Non-Fungible Token Commitment Length](#non-fungible-token-commitment-length).)
 
 A token prefix encoding no tokens (both `has_nft` and `amount` are `0x00`) is invalid.
 
+### Token Prefix Parse Failure
+
+If locking bytecode contains a prefix byte (`0xd0`) at position 0, but the data after that byte fails to parse according to the token data rules outlined in this document, then we consider this locking script as containing **unparseable token data**.  Implementations SHALL take the bytes in this byte vector and simply assign them all to the ouput's locking script (`scriptPubKey`), as they would have done before this change took effect.  In other words, this means that the serialized locking script may be considered an "envelope" for `token_data + locking_script`, but if `token_data` fails to parse correctly, it is simply prepended to the `locking_script` verbatim when parsing a serialized transation output.
+
 #### Token Prefix Standardness
 
-Implementations must recognize otherwise-standard outputs with token prefixes as **standard**.
+Pre-activation of this change, implementations must regard all transactions containing the prefix byte `0xd0` at position 0 of the locking script as **non-standard** (which was always the case previous to this CHIP).
+
+Post-activation of this change, implementations MUST recognize otherwise-standard outputs with correctly parsed token data (has token prefix, no parse errors) as **standard**.
+
+Post-activation of this change, implementations MUST recognize outputs with prefix byte `0xd0` at position 0, but that do not parse correctly as token data, as **non-standard**. The locking script bytes will simply contain the entire byte blob envelope and the non-standard output may or may not fail to be spent later on (depending on the `scriptSig` used when spending this output).
+
 
 <details>
 
@@ -213,13 +222,13 @@ These encodings are valid but disabled due to excessive `commitment_length`s. Th
 
 ### Token Encoding Activation
 
-Prior to activation of this specification, **pre-activation token-forgery outputs (PATFOs)** – transaction outputs with the `PREFIX_TOKEN` codepoint (`0xd0`/`208`) at locking bytecode `0` – remain **nonstandard** but do not invalidate the transaction by consensus. Because they can still be mined in valid blocks, PATFOs can be used to prepare outputs that, after activation of this specification, could encode tokens for which [Token-Aware Transaction Validation](#token-aware-transaction-validation) was not enforced (producing token categories that do not map to a confirmed transaction hash or have a fungible token supply exceeding the maximum amount).
+Prior to activation of this specification, **pre-activation token-forgery outputs (PATFOs)** – transaction outputs with the `PREFIX_TOKEN` codepoint (`0xd0`/`208`) at locking bytecode `0` *and which parse correctly as token data* – remain **nonstandard** but do not invalidate the transaction by consensus. Because they can still be mined in valid blocks, PATFOs can be used to prepare outputs that, after activation of this specification, could encode tokens for which [Token-Aware Transaction Validation](#token-aware-transaction-validation) was not enforced (producing token categories that do not map to a confirmed transaction hash or have a fungible token supply exceeding the maximum amount).
 
-PATFOs are provably unspendable<sup>1</sup>; all software implementing this specification should immediately remove PATFOs from their local view of the UTXO set (e.g. on startup).
+PATFOs are provably unspendable<sup>1</sup>; all software implementing this specification may wish to immediately remove PATFOs from their local view of the UTXO set (e.g. on startup).
 
 **By consensus, PATFOs mined in blocks prior to the activation of [Token-Aware Transaction Validation](#token-aware-transaction-validation) must remain unspendable after activation**. (Please note: the presence of PATFOs does not render a transaction invalid; until activation, valid blocks may contain PATFOs.)
 
-After activation, any transaction creating an invalid token prefix is itself invalid, and all transactions must pass [Token-Aware Transaction Validation](#token-aware-transaction-validation).
+After activation, any transaction creating an invalid **or valid** token prefix is itself **not necessarily invalid**, however all transactions must pass [Token-Aware Transaction Validation](#token-aware-transaction-validation), such that any correctly parsed token data must respect token consensus rules.  Token data that fails to parse will just end up as the raw bytes (`0xd0 ...`) prefix to the locking script, and will be subject to regular VM script interpreter rules when spending (as a **non-standard** input).
 
 <details>
 
@@ -620,7 +629,7 @@ Finally, this proposal's combined behavior preserves two codepoints in the Bitco
 
 ### Non-Fungible Token Commitment Length
 
-This specification limits the length of non-fungible token commitments to `40` bytes; this restrains excess growth of the UTXO set and reduces the resource requirements of typical wallets and indexers.
+This specification limits the length of non-fungible token commitments to `40` bytes for consensus (but to `33554432` bytes for serialization); this `40`-byte limit restrains excess growth of the UTXO set and reduces the resource requirements of typical wallets and indexers.
 
 By committing to a hash, contracts can commit to an unlimited collection of data (e.g. using a merkle tree). For resistance to [birthday attacks](https://bitcoincashresearch.org/t/p2sh32-a-long-term-solution-for-80-bit-p2sh-collision-attacks/750), covenants should typically use `32` byte hashes. This proposal expands this minimum requirement by `8` bytes to include an additional (padded, maximum-length) VM number. This is particularly valuable for covenants that are optimized to use multiple types of commitment structures and must concisely indicate their current internal "mode" to other contracts (e.g. re-organizing an unbalanced merkle tree of contract state for efficiency when the covenant enters "voting" mode). This additional 8 bytes also provides adequate space for higher-level standards to specify prefixes for committed hashes (e.g. marking identifiers to content-addressable storage).
 
