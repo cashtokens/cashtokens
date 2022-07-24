@@ -631,6 +631,8 @@ Finally, this proposal's combined behavior preserves two codepoints in the Bitco
 
 This specification limits the length of non-fungible token commitments to `40` bytes for consensus (but to `33554432` bytes for serialization); this `40`-byte limit restrains excess growth of the UTXO set and reduces the resource requirements of typical wallets and indexers.
 
+Note that the apparently-generous limit for serialization of `33554432` is not a DoS vector and is in-line with existing `compactSize` limits applied to bitcoin transaction components.  For instance, on the serialization layer, `scriptPubKey` already applies a `32 MiB` (`33554432` bytes) limit to `scriptPubKey` vector size. (even though the consensus limit is much smaller at `~1MB` for outputs, `10KB` when spending as an input).
+
 By committing to a hash, contracts can commit to an unlimited collection of data (e.g. using a merkle tree). For resistance to [birthday attacks](https://bitcoincashresearch.org/t/p2sh32-a-long-term-solution-for-80-bit-p2sh-collision-attacks/750), covenants should typically use `32` byte hashes. This proposal expands this minimum requirement by `8` bytes to include an additional (padded, maximum-length) VM number. This is particularly valuable for covenants that are optimized to use multiple types of commitment structures and must concisely indicate their current internal "mode" to other contracts (e.g. re-organizing an unbalanced merkle tree of contract state for efficiency when the covenant enters "voting" mode). This additional 8 bytes also provides adequate space for higher-level standards to specify prefixes for committed hashes (e.g. marking identifiers to content-addressable storage).
 
 ### Limitation of Fungible Token Supply
