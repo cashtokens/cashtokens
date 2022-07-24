@@ -136,7 +136,7 @@ PREFIX_TOKEN <category_id> <has_nft> [commitment_length commitment] <ft_amount>
 
 </details>
 
-By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrades may increase this limit. Implementers are REQUIRED to ensure that values between `253` (`0xfdfd00`) and `33554432` (`0xff0000000200000000`) can be parsed, and that values greater than or equal to `33554433` (`0xff0100000200000000`) are rejected with a parse failure. (See [Non-Fungible Token Commitment Length](#non-fungible-token-commitment-length).)
+By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrades may increase this limit. Implementers are REQUIRED to ensure that values between `253` (`0xfdfd00`) and `33554432` (`0xfe00000002`) can be parsed, and that values greater than or equal to `33554433` (`0xfe01000002`) are rejected with a parse failure. (See [Non-Fungible Token Commitment Length](#non-fungible-token-commitment-length).)
 
 A token prefix encoding no tokens (both `has_nft` and `amount` are `0x00`) is invalid.
 
