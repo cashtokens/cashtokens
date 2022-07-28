@@ -5,9 +5,9 @@
         Layer: Consensus
         Maintainer: Jason Dreyzehner
         Status: Draft
-        Specification Version: 2.3.0
         Initial Publication Date: 2022-02-22
-        Latest Revision Date: 2022-07-19
+        Latest Revision Date: 2022-6-30
+        Latest Version: 2.1.0 (f8b500a0)
 
 ## Summary
 
@@ -86,6 +86,16 @@ Beyond enabling covenants to interoperate with other covenants, these token prim
 
 By exposing basic, consensus-validated token primitives, this proposal supports the development of higher-level, interoperable token standards (e.g. [SLP](https://slp.dev/)). Token primitives can be held by any contract, wallets can easily verify the authenticity of a token or group of tokens, and tokens cannot be inadvertently destroyed by wallet software that does not support tokens.
 
+## Technical Summary
+
+<!-- TODO: ![Technical Summary Graphic](./figures/summary.svg) -->
+
+1. A token **category** can include both non-fungible and fungible tokens, and every category is represented by a 32-byte category identifier – the transaction ID of the outpoint spent to create to the category.
+   1. All fungible tokens for a category must be created when the token category is created, ensuring the total supply within a category remains below the global limit.
+   2. Non-fungible tokens may be created either at category creation or in later transactions that spend tokens with `minting` or `mutable` capabilities for that category.
+2. Transaction outputs are extended to support 4 new optional fields: token `category`, non-fungible token `capability`, non-fungible token `commitment`, and fungible token `amount`; an output can include one **non-fungible token** and any amount of **fungible tokens** from a single token category.
+3. [Token inspection opcodes](#token-inspection-operations) allow contracts to operate on tokens, enabling [cross-contract interfaces and decentralized applications](#usage-examples).
+
 ## Technical Specification
 
 Token primitives are defined, token encoding and activation are specified, and six new token inspection opcodes are introduced. Transaction validation and transaction signing serialization is modified to support tokens, `SIGHASH_UTXOS` is specified, and CashAddress `types` with token support are defined.
@@ -110,64 +120,55 @@ Every transaction output can optionally have a [`token category`](#token-categor
 
 Tokens are encoded in outputs using a **token prefix**, a data structure that can encode a token category, zero or one non-fungible token (NFT), and an amount of fungible tokens (FTs).
 
-For backwards-compatibility with existing transaction decoding implementations, a transaction output's token prefix (if present) is encoded before index `0` of its locking bytecode, and the `CompactSize` length preceding the two fields is increased to cover both fields (such that the length could be renamed `token_prefix_and_locking_bytecode_length`). The token prefix is not part of the locking bytecode and must not be included in bytecode evaluation. To illustrate, the serialized output format is modified as:
-
-*`<satoshi_value> <token_prefix_and_locking_bytecode_length>`* **`[PREFIX_TOKEN <token_data>]`** *`<locking_bytecode>`*.
-
-`PREFIX_TOKEN` is defined at codepoint `0xd0` (`208`) and indicates the presence of token data, defined as:
+For backwards-compatibility with existing transaction decoding implementations, a transaction output's token prefix (if present) is encoded before index `0` of its locking bytecode, and the `CompactSize` length preceding the two fields is increased to cover both fields (such that the length could be renamed `token_prefix_and_locking_bytecode_length`). The token prefix is not part of the locking bytecode and must not be included in bytecode evaluation. To illustrate, after deployment, the serialized output format becomes:
 
 ```
-PREFIX_TOKEN <category_id> <token_format | nft_capability> [<nft_commitment_length> <nft_commitment>] [ft_amount]
+<satoshi_value> <token_prefix_and_locking_bytecode_length> [PREFIX_TOKEN <token_data>] <locking_bytecode>
 ```
 
-1. `<category_id>` – After the `PREFIX_TOKEN` byte, a 32-byte **Token Category ID** is required.
-2. `<token_format | nft_capability>` - A bitfield encoding two fields:
-    1. `<token_format>` - a 4-bit flags field that indicates what token payload follows, defined at the higher half of the bitfield, to be read using `token_format = bitfield & 0xf0`. The flags are specified as:
-        1. `0x80` (`b10000000`) - RESERVED, must be unset.
-        2. `0x40` (`b01000000`) - HAS_NFT_COMMITMENT, the output encodes a non-fungible token's commitment.
-        3. `0x20` (`b00100000`) - HAS_NFT, the output encodes a non-fungible token.
-        4. `0x10` (`b00010000`) - HAS_FT, the output encodes a fungible token amount.
-    2. `<nft_capability>` – A 4-bit field indicating the capability of a non-fungible token, defined at the lower half of the bitfield, to be read using `token_format = bitfield & 0x0f`. Usage of this field is reserved for NFTs, so it may be greater than 0 only if the HAS_NFT bit flag is set. Values greater than 2 are reserved and must not be used.
-        1. `0x00` – the **`immutable` capability** – the encoded non-fungible token is an **immutable non-fungible token**.
-        2. `0x01` – the **`mutable` capability** – the encoded non-fungible token is a **mutable non-fungible token**.
-        3. `0x02` – the **`minting` capability** – the encoded non-fungible token is a **minting non-fungible token**.
-3. `commitment_length` – A **commitment length** (encoded in `CompactSize` format<sup>1</sup>). Optional field, `token_format`'s HAS_NFT_COMMITMENT bit flag indicates whether it is skipped or read. If read, then it must encode a number greater than 0.
-4. `commitment` – A **token commitment** byte string of `commitment_length` is required. Optional field, `token_format`'s HAS_NFT_COMMITMENT bit flag indicates whether it is skipped or read.
-5. `ft_amount` – a **token amount** (encoded as in `CompactSize` format) with a minimum value of `1` (`0x01`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`0xffffffffffffff7f`). Optional field, `token_format`'s HAS_FT bit flag indicates whether it is skipped or read.
+#### Token Prefix
+
+`PREFIX_TOKEN` is defined at codepoint `0xef` (`239`) and indicates the presence of a token prefix:
+
+```
+PREFIX_TOKEN <category_id> <token_bitfield> [nft_commitment_length nft_commitment] [ft_amount]
+```
+
+1. `<category_id>` – After the `PREFIX_TOKEN` byte, a 32-byte **Token Category ID** is required, encoded in `OP_HASH256` byte order<sup>1</sup>.
+2. `<token_bitfield>` - A bitfield encoding two 4-bit fields is required:
+   1. `prefix_structure` (`token_bitfield & 0xf0`) - 4 bitflags, defined at the higher half of the bitfield, indicating the structure of the token prefix:
+      1. `0x80` (`0b10000000`) - `RESERVED_BIT`, must be unset.
+      2. `0x40` (`0b01000000`) - `HAS_COMMITMENT_LENGTH`, the prefix encodes a commitment length and commitment.
+      3. `0x20` (`0b00100000`) - `HAS_NFT`, the prefix encodes a non-fungible token.
+      4. `0x10` (`0b00010000`) - `HAS_AMOUNT`, the prefix encodes an amount of fungible tokens.
+   2. `nft_capability` (`token_bitfield & 0x0f`) – A 4-bit value, defined at the lower half of the bitfield, indicating the non-fungible token capability, if present.
+      1. If not `HAS_NFT`: must be `0x00`.
+      2. If `HAS_NFT`:
+         1. `0x00` – No capability – the encoded non-fungible token is an **immutable token**.
+         2. `0x01` – The **`mutable` capability** – the encoded non-fungible token is a **mutable token**.
+         3. `0x02` – The **`minting` capability** – the encoded non-fungible token is a **minting token**.
+         4. Values greater than `0x02` are reserved and must not be used.
+3. If `HAS_COMMITMENT_LENGTH`:
+   1. `commitment_length` – A **commitment length** is required (minimally-encoded in `CompactSize` format<sup>2</sup>) with a minimum value of `1` (`0x01`).
+   2. `commitment` – The non-fungible token's **commitment** byte string of `commitment_length` is required.
+4. If `HAS_AMOUNT`:
+   1. `ft_amount` – An amount of **fungible tokens** is required (minimally-encoded in `CompactSize` format<sup>2</sup>) with a minimum value of `1` (`0x01`) and a maximum value equal to the maximum VM number, `9223372036854775807` (`0xffffffffffffff7f`).
 
 <details>
 
 <summary>Notes</summary>
 
-1. The **`CompactSize` Format** is a variable-length, little-endian, positive integer format used to indicate the length of the following byte array in Bitcoin Cash P2P protocol message formats (present since the protocol's publication in 2008).
+1. This is the byte order produced/required by all BCH VM operations which employ SHA-256 (including `OP_SHA256` and `OP_HASH256`), the byte order used for outpoint transaction hashes in the P2P transaction format, and the byte order produced by most SHA-256 libraries. For reference, the genesis block header in this byte order is little-endian – `6fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000` – and can be produced by this script: `<0x0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c> OP_HASH256`. (Note, this is the opposite byte order as is commonly used in user interfaces like block explorers.)
+2. The **`CompactSize` Format** is a variable-length, little-endian, positive integer format used to indicate the length of the following byte array in Bitcoin Cash P2P protocol message formats (present since the protocol's publication in 2008). The format historically allowed some values to be encoded in multiple ways; token prefixes must always use minimally-encoded/canonically-encoded `CompactSize`s, e.g. the value `1` must be encoded as `0x01` rather than `0xfd0100`, `0xfe0100000`, or `0xff010000000000000`.
 
 </details>
 
-By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrades may increase this limit. Implementers are advised to ensure that values between `253` (`0xfdfd00`) and `65535` (`0xfdffff`) can be parsed. (See [Non-Fungible Token Commitment Length](#non-fungible-token-commitment-length).)
+#### Token Prefix Validation
 
-A token prefix encoding no tokens (`token_format` is `0x00`) is invalid.
-
-A token prefix encoding a commitment without a non-fungible token (`token_format` is `0x40` or `0x50`) is invalid.
-
-A token prefix encoding a non-fungible token capability without a non-fungible token (`nft_capability` not equal to `0x00` when `token_format` indicates that no non-fugible token is encoded) is invalid.
-
-When allowed combinations are serialized, there will be 13 allowed states for the `token_format | nft_capability` byte, as listed in table below.
-
-`token_format` \| `nft_capability` | Note
--- | --
-0x10 (b00010000, d16) | Fungible tokens
-0x20 (b00100000, d32) | Non-fungible token with **immutable** capability
-0x21 (b00100001, d33) | Non-fungible token with **mutable** capability
-0x22 (b00100010, d34) | Non-fungible token with **mint** capability
-0x30 (b00110000, d48) | Fungible tokens and a non-fungible token with **immutable** capability
-0x31 (b00110001, d49) | Fungible tokens and a non-fungible token with **mutable** capability
-0x32 (b00110010, d50) | Fungible tokens and a non-fungible token with **mint** capability
-0x60 (b01100000, d96) | Non-fungible token with **immutable** capability and a **commitment**
-0x61 (b01100001, d97) | Non-fungible token with **mutable** capability and a **commitment**
-0x62 (b01100010, d98) | Non-fungible token with **mint** capability and a **commitment**
-0x70 (b01110000, d112) | Fungible tokens and a non-fungible token with **immutable** capability and a **commitment**
-0x71 (b01110001, d113) | Fungible tokens and a non-fungible token with **mutable** capability and a **commitment**
-0x72 (b01110010, d114) | Fungible tokens and a non-fungible token with **mint** capability and a **commitment**
+1. By consensus, `commitment_length` is limited to `40` (`0x28`), but future upgrades may increase this limit. Implementers are advised to ensure that values between `253` (`0xfdfd00`) and `65535` (`0xfdffff`) can be parsed. (See [Non-Fungible Token Commitment Length](#non-fungible-token-commitment-length).)
+2. A token prefix encoding no tokens (both `HAS_NFT` and `HAS_AMOUNT` are unset) is invalid.
+3. A token prefix encoding `HAS_COMMITMENT_LENGTH` without `HAS_NFT` is invalid.
+4. A token prefix where `HAS_NFT` is unset must encode `nft_capability` of `0x00`.
 
 #### Token Prefix Standardness
 
@@ -177,88 +178,98 @@ Implementations must recognize otherwise-standard outputs with token prefixes as
 
 <summary><strong>Token Prefix Encoding Test Vectors</strong></summary>
 
-The following test vectors demonstrate valid and invalid token prefix encodings. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
+The following test vectors demonstrate valid, reserved, and invalid token prefix encodings. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
+
+The complete set of test vectors can be found in [`test-vectors/token-prefix-valid.json`](./test-vectors/token-prefix-valid.json) and [`test-vectors/token-prefix-invalid.json`](./test-vectors/token-prefix-invalid.json), respectively.
 
 #### Valid Token Prefix Encodings
 
 | Description                                        | Encoded (Hex)                                                                                                                                                              |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| no NFT; 1 fungible                                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1001`                                                                                                   |
-| no NFT; 252 fungible                               | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fc`                                                                                                   |
-| no NFT; 253 fungible                               | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fdfd00`                                                                                               |
-| no NFT; 9223372036854775807 fungible               | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10ffffffffffffffff7f`                                                                                   |
-| 0-byte immutable NFT; 0 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb20`                                                                                                     |
-| 0-byte immutable NFT; 1 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb3001`                                                                                                   |
-| 0-byte immutable NFT; 253 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30fdfd00`                                                                                               |
-| 0-byte immutable NFT; 9223372036854775807 fungible | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30ffffffffffffffff7f`                                                                                   |
-| 1-byte immutable NFT; 0 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6001cc`                                                                                                 |
-| 1-byte immutable NFT; 252 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfc`                                                                                               |
-| 2-byte immutable NFT; 253 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7002ccccfdfd00`                                                                                         |
-| 10-byte immutable NFT; 65535 fungible              | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb700accccccccccccccccccccfdffff`                                                                         |
-| 40-byte immutable NFT; 65536 fungible              | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7028ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfe00000100`         |
-| 0-byte, mutable NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb21`                                                                                                     |
-| 0-byte, mutable NFT; 4294967295 fungible           | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb31feffffffff`                                                                                           |
-| 1-byte, mutable NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6101cc`                                                                                                 |
-| 1-byte, mutable NFT; 4294967296 fungible           | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7101ccff0000000001000000`                                                                               |
-| 2-byte, mutable NFT; 9223372036854775807 fungible  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7102ccccffffffffffffffff7f`                                                                             |
-| 10-byte, mutable NFT; 1 fungible                   | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb710acccccccccccccccccccc01`                                                                             |
-| 40-byte, mutable NFT; 252 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7128ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfc`                 |
-| 0-byte, minting NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb22`                                                                                                     |
-| 0-byte, minting NFT; 253 fungible                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb32fdfd00`                                                                                               |
-| 1-byte, minting NFT; 0 fungible                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6201cc`                                                                                                 |
-| 1-byte, minting NFT; 65535 fungible                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7201ccfdffff`                                                                                           |
-| 2-byte, minting NFT; 65536 fungible                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7202ccccfe00000100`                                                                                     |
-| 10-byte, minting NFT; 4294967297 fungible          | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb720accccccccccccccccccccff0100000001000000`                                                             |
-| 40-byte, minting NFT; 9223372036854775807 fungible | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7228ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccffffffffffffffff7f` |
+| no NFT; 1 fungible                                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1001`                                                                                                   |
+| no NFT; 252 fungible                               | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fc`                                                                                                   |
+| no NFT; 253 fungible                               | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fdfd00`                                                                                               |
+| no NFT; 9223372036854775807 fungible               | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10ffffffffffffffff7f`                                                                                   |
+| 0-byte immutable NFT; 0 fungible                   | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb20`                                                                                                     |
+| 0-byte immutable NFT; 1 fungible                   | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb3001`                                                                                                   |
+| 0-byte immutable NFT; 253 fungible                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30fdfd00`                                                                                               |
+| 0-byte immutable NFT; 9223372036854775807 fungible | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30ffffffffffffffff7f`                                                                                   |
+| 1-byte immutable NFT; 0 fungible                   | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6001cc`                                                                                                 |
+| 1-byte immutable NFT; 252 fungible                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfc`                                                                                               |
+| 2-byte immutable NFT; 253 fungible                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7002ccccfdfd00`                                                                                         |
+| 10-byte immutable NFT; 65535 fungible              | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb700accccccccccccccccccccfdffff`                                                                         |
+| 40-byte immutable NFT; 65536 fungible              | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7028ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfe00000100`         |
+| 0-byte, mutable NFT; 0 fungible                    | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb21`                                                                                                     |
+| 0-byte, mutable NFT; 4294967295 fungible           | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb31feffffffff`                                                                                           |
+| 1-byte, mutable NFT; 0 fungible                    | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6101cc`                                                                                                 |
+| 1-byte, mutable NFT; 4294967296 fungible           | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7101ccff0000000001000000`                                                                               |
+| 2-byte, mutable NFT; 9223372036854775807 fungible  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7102ccccffffffffffffffff7f`                                                                             |
+| 10-byte, mutable NFT; 1 fungible                   | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb710acccccccccccccccccccc01`                                                                             |
+| 40-byte, mutable NFT; 252 fungible                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7128ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfc`                 |
+| 0-byte, minting NFT; 0 fungible                    | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb22`                                                                                                     |
+| 0-byte, minting NFT; 253 fungible                  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb32fdfd00`                                                                                               |
+| 1-byte, minting NFT; 0 fungible                    | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6201cc`                                                                                                 |
+| 1-byte, minting NFT; 65535 fungible                | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7201ccfdffff`                                                                                           |
+| 2-byte, minting NFT; 65536 fungible                | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7202ccccfe00000100`                                                                                     |
+| 10-byte, minting NFT; 4294967297 fungible          | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb720accccccccccccccccccccff0100000001000000`                                                             |
+| 40-byte, minting NFT; 9223372036854775807 fungible | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7228ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccffffffffffffffff7f` |
 
-#### Reserved Encoding
+##### Reserved Token Prefix Encodings
 
-These encodings are properly formatted but disallowed due to excessive `commitment_length`s and the transaction attemting to create such outputs will be rejected by consensus rules.
-These encodings may become valid with a future upgrade.
+These encodings are valid but disabled due to excessive `commitment_length`s. Transactions attempting to create outputs with these token prefixes are currently rejected by consensus, but future upgrades may increase the maximum valid `commitment_length`.
 
 | Description                                        | Encoded (Hex)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 41-byte immutable NFT; 65536 fungible              | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7029ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfe00000100`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| 41-byte, mutable NFT; 252 fungible                 | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7129ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfc`                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| 41-byte, minting NFT; 9223372036854775807 fungible | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7229ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccffffffffffffffff7f`                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| 253-byte, immutable NFT; 0 fungible                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb60fdfd00cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
+| 41-byte immutable NFT; 65536 fungible              | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7029ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfe00000100`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 41-byte, mutable NFT; 252 fungible                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7129ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccfc`                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 41-byte, minting NFT; 9223372036854775807 fungible | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7229ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccffffffffffffffff7f`                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 253-byte, immutable NFT; 0 fungible                | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb60fdfd00cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
 
 #### Invalid Token Prefix Encodings
 
 | Reason                                                                                                 | Encoded (Hex)                                                                              |
 | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| Token prefix must encode at least one token                                                            | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb00`                     |
-| Token prefix requires a token category ID<sup>1</sup>                                                  | `d0`                                                                                       |
-| Token category IDs must be 32 bytes<sup>1</sup>                                                        | `d0bbbbbbbb`                                                                               |
-| Category must be followed by at least the (token_format \| nft_capability) byte<sup>1</sup>            | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`                       |
-| Token format indicates no NFT but capability is not 0                                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb01`                     |
-| Commitment length must be specified (immutable token)                                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb60`                     |
-| Commitment length must be specified (mutable token)                                                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb61`                     |
-| Commitment length must be specified (minting token)                                                    | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb62`                     |
-| Not enough bytes remaining in locking bytecode to satisfy commitment length (0/1 bytes)                | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6001`                   |
-| Not enough bytes remaining in locking bytecode to satisfy commitment length (mutable token, 0/1 bytes) | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6101`                   |
-| Not enough bytes remaining in locking bytecode to satisfy commitment length (mutable token, 1/2 bytes) | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6102cc`                 |
-| Not enough bytes remaining in locking bytecode to satisfy commitment length (minting token, 1/2 bytes) | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6202cc`                 |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 1-byte amount)         | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10`                     |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 2-byte amount)         | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fd00`                 |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 4-byte amount)         | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fe000000`             |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 8-byte amount)         | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10ff00000000000000`     |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 1-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001cc`                 |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 2-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfd00`             |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 4-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfe000000`         |
-| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 8-byte amount)  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccff00000000000000` |
-| Token amount must be specified<sup>1</sup>                                                             | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30`                     |
-| Token amount (9223372036854775808) may not exceed 9223372036854775807                                  | `d0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30ff0000000000000080`   |
-
-<sup>1</sup>These cases are detectable simply by inspecting the `token_prefix_and_locking_bytecode_length` length.
+| Token prefix must encode at least one token                                                            | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb00`                     |
+| Token prefix must encode at least one token (0 fungible)                                               | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1000`                   |
+| Token prefix requires a token category ID                                                              | `ef`                                                                                       |
+| Token category IDs must be 32 bytes                                                                    | `efbbbbbbbb1001`                                                                           |
+| Missing token bitfield                                                                                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`                       |
+| Token bitfield sets reserved bit                                                                       | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb9001`                   |
+| Unknown capability (0-byte NFT, capability 3)                                                          | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb23`                     |
+| Has commitment length without NFT (1 fungible)                                                         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb5001`                   |
+| Prefix encodes a capability without an NFT                                                             | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1101`                   |
+| Commitment length must be specified (immutable token)                                                  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb60`                     |
+| Commitment length must be specified (mutable token)                                                    | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb61`                     |
+| Commitment length must be specified (minting token)                                                    | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb62`                     |
+| Commitment length must be minimally-encoded                                                            | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb60fd0100cc`             |
+| If specified, commitment length must be greater than 0                                                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6000`                   |
+| Not enough bytes remaining in locking bytecode to satisfy commitment length (0/1 bytes)                | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6001`                   |
+| Not enough bytes remaining in locking bytecode to satisfy commitment length (mutable token, 0/1 bytes) | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6101`                   |
+| Not enough bytes remaining in locking bytecode to satisfy commitment length (mutable token, 1/2 bytes) | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6102cc`                 |
+| Not enough bytes remaining in locking bytecode to satisfy commitment length (minting token, 1/2 bytes) | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb6202cc`                 |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 1-byte amount)         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10`                     |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 2-byte amount)         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fd00`                 |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 4-byte amount)         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fe000000`             |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (no NFT, 8-byte amount)         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10ff00000000000000`     |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 1-byte amount)  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001cc`                 |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 2-byte amount)  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfd00`             |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 4-byte amount)  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccfe000000`         |
+| Not enough bytes remaining in locking bytecode to satisfy token amount (immutable NFT, 8-byte amount)  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb7001ccff00000000000000` |
+| Token amount must be specified                                                                         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30`                     |
+| If specified, token amount must be greater than 0 (no NFT)                                             | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb1000`                   |
+| If specified, token amount must be greater than 0 (0-byte NFT)                                         | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb3000`                   |
+| Token amount must be minimally-encoded                                                                 | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb10fd0100`               |
+| Token amount (9223372036854775808) may not exceed 9223372036854775807                                  | `efbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb30ff0000000000000080`   |
 
 </details>
 
 ### Token Encoding Activation
 
-Prior to activation of this specification, **pre-activation token-forgery outputs (PATFOs)** – transaction outputs with the `PREFIX_TOKEN` codepoint (`0xd0`/`208`) at locking bytecode `0` – remain **nonstandard** but do not invalidate the transaction by consensus. Because they can still be mined in valid blocks, PATFOs can be used to prepare outputs that, after activation of this specification, could encode tokens for which [Token-Aware Transaction Validation](#token-aware-transaction-validation) was not enforced (producing token categories that do not map to a confirmed transaction hash or have a fungible token supply exceeding the maximum amount).
+**Pre-activation token-forgery outputs (PATFOs)** are transaction outputs mined in blocks prior to activation of this specification where locking bytecode index `0` is set to the `PREFIX_TOKEN` codepoint.
 
-PATFOs are provably unspendable<sup>1</sup>; all software implementing this specification should immediately remove PATFOs from their local view of the UTXO set (e.g. on startup).
+Prior to activation, PATFOs remain **nonstandard** but do not invalidate the transaction by consensus. Because they can still be mined in valid blocks, PATFOs can be used to prepare outputs that, after activation of this specification, could encode tokens for which [Token-Aware Transaction Validation](#token-aware-transaction-validation) was not enforced (producing token categories that do not map to a confirmed transaction hash or have a fungible token supply exceeding the maximum amount).
+
+PATFOs are provably unspendable<sup>1</sup>; all software implementing this specification should immediately remove PATFOs from their local view of the UTXO set (e.g. on startup and upon receipt).
 
 **By consensus, PATFOs mined in blocks prior to the activation of [Token-Aware Transaction Validation](#token-aware-transaction-validation) must remain unspendable after activation**. (Please note: the presence of PATFOs does not render a transaction invalid; until activation, valid blocks may contain PATFOs.)
 
@@ -335,14 +346,14 @@ Note: because coinbase transactions have only one input with an outpoint index o
 
 The following 6 operations pop the top item from the stack as an index (VM Number) and push a single result to the stack. If the consumed value is not a valid, minimally-encoded index for the operation, an error is produced.
 
-| Name                       | Codepoint      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| -------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `OP_UTXOTOKENCATEGORY`     | `0xce` (`206`) | Pop the top item from the stack as an input index (VM Number). If the Unspent Transaction Output (UTXO) spent by that input includes no tokens, push a 0 (VM Number) to the stack. If the UTXO does not include a non-fungible token with a capability greater than 0 (immutable capability), push the UTXO's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number). |
-| `OP_UTXOTOKENCOMMITMENT`   | `0xcf` (`207`) | Pop the top item from the stack as an input index (VM Number). Push the token commitment of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO does not include a non-fungible token, or if it includes a non-fungible token without a commitment, push a 0 (VM Number).                                                                                                                                                                                                                      |
-| `OP_UTXOTOKENAMOUNT`       | `0xd0` (`208`) | Pop the top item from the stack as an input index (VM Number). Push the fungible token amount of the Unspent Transaction Output (UTXO) spent by that input to the stack as a VM Number. If the UTXO includes no fungible tokens, push a 0 (VM Number).                                                                                                                                                                                                                                                                         |
-| `OP_OUTPUTTOKENCATEGORY`   | `0xd1` (`209`) | Pop the top item from the stack as an output index (VM Number). If the output spent by that input includes no tokens, push a 0 (VM Number) to the stack. If the output does not include a non-fungible token with a capability greater than 0 (immutable capability), push the output's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number).                       |
-| `OP_OUTPUTTOKENCOMMITMENT` | `0xd2` (`210`) | Pop the top item from the stack as an output index (VM Number). Push the token commitment of the output at that index to the stack. If the output does not include a non-fungible token, or if it includes a non-fungible token without a commitment, push a 0 (VM Number).                                                                                                                                                                                                                                                    |
-| `OP_OUTPUTTOKENAMOUNT`     | `0xd3` (`211`) | Pop the top item from the stack as an output index (VM Number). Push the fungible token amount of the output at that index to the stack as a VM Number. If the output includes no fungible tokens, push a 0 (VM Number).                                                                                                                                                                                                                                                                                                       |
+| Name                       | Codepoint      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OP_UTXOTOKENCATEGORY`     | `0xce` (`206`) | Pop the top item from the stack as an input index (VM Number). If the Unspent Transaction Output (UTXO) spent by that input includes no tokens, push a 0 (VM Number) to the stack. If the UTXO does not include a non-fungible token with a capability, push the UTXO's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number). |
+| `OP_UTXOTOKENCOMMITMENT`   | `0xcf` (`207`) | Pop the top item from the stack as an input index (VM Number). Push the token commitment of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO does not include a non-fungible token, or if it includes a non-fungible token with a zero-length commitment, push a 0 (VM Number).                                                                                                                                                                       |
+| `OP_UTXOTOKENAMOUNT`       | `0xd0` (`208`) | Pop the top item from the stack as an input index (VM Number). Push the fungible token amount of the Unspent Transaction Output (UTXO) spent by that input to the stack as a VM Number. If the UTXO includes no fungible tokens, push a 0 (VM Number).                                                                                                                                                                                                                                   |
+| `OP_OUTPUTTOKENCATEGORY`   | `0xd1` (`209`) | Pop the top item from the stack as an output index (VM Number). If the output spent by that input includes no tokens, push a 0 (VM Number) to the stack. If the output does not include a non-fungible token with a capability, push the output's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number).                       |
+| `OP_OUTPUTTOKENCOMMITMENT` | `0xd2` (`210`) | Pop the top item from the stack as an output index (VM Number). Push the token commitment of the output at that index to the stack. If the output does not include a non-fungible token, or if it includes a non-fungible token with a zero-length commitment, push a 0 (VM Number).                                                                                                                                                                                                     |
+| `OP_OUTPUTTOKENAMOUNT`     | `0xd3` (`211`) | Pop the top item from the stack as an output index (VM Number). Push the fungible token amount of the output at that index to the stack as a VM Number. If the output includes no fungible tokens, push a 0 (VM Number).                                                                                                                                                                                                                                                                 |
 
 <details>
 
@@ -410,8 +421,8 @@ Two new [`CashAddress` types](https://github.com/bitcoincashorg/bitcoincash.org/
 
 | Type Bits      | Meaning           | Version Byte Value  |
 | -------------- | ----------------- | ------------------- |
-| `2` (`0b0010`) | Token-Aware P2PKH | `16` (`0b00010000`) |
-| `3` (`0b0011`) | Token-Aware P2SH  | `24` (`0b00011000`) |
+| `8` (`0b1000`) | Token-Aware P2PKH | `64` (`0b01000000`) |
+| `9` (`0b1001`) | Token-Aware P2SH  | `72` (`0b01001000`) |
 
 **Token-aware wallet software** – wallet software which supports management of tokens – should use these CashAddress version byte values in newly created addresses.
 
@@ -773,17 +784,20 @@ CashTokens differs from SLP in that CashTokens are validated by the network, and
 ## Acknowledgements
 
 Thank you to the following contributors for reviewing and contributing improvements to this proposal, providing feedback, and promoting consensus among stakeholders:
-[Calin Culianu](https://github.com/cculianu), [bitcoincashautist](https://github.com/A60AB5450353F40E), [imaginary_username](https://gitlab.com/im_uname), [Mathieu Geukens](https://github.com/mr-zwets), [Richard Brady](https://github.com/rnbrady), [Marty Alcala](https://github.com/msalcala11), [Tom Zander](https://github.com/zander), [John Nieri](https://gitlab.com/emergent-reasons), [Jonathan Silverblood](https://gitlab.com/monsterbitar), [Benjamin Scherrey](https://github.com/scherrey), [Rosco Kalis](https://github.com/rkalis), [Deyan Dimitrov](https://github.com/dikel).
+[Calin Culianu](https://github.com/cculianu), [bitcoincashautist](https://github.com/A60AB5450353F40E), [imaginary_username](https://gitlab.com/im_uname), [Andrew Groot](https://github.com/thesquaregroot), [Tom Zander](https://github.com/zander), [Mathieu Geukens](https://github.com/mr-zwets), [Richard Brady](https://github.com/rnbrady), [Marty Alcala](https://github.com/msalcala11), [John Nieri](https://gitlab.com/emergent-reasons), [Jonathan Silverblood](https://gitlab.com/monsterbitar), [Benjamin Scherrey](https://github.com/scherrey), [Rosco Kalis](https://github.com/rkalis), [Deyan Dimitrov](https://github.com/dikel).
 
 ## Changelog
 
 This section summarizes the evolution of this document.
 
 - **Draft (current)**
-  - Bitfield token encoding
+  - Compress token encoding using bitfield
   - Encode mutable capability as `0x01` and minting capability as `0x02`
   - Revert to limiting `commitment_length` by consensus (`40` bytes)
+  - Revert `PREFIX_TOKEN` to unique codepoint (`0xef`)
   - Modify `OP_*TOKENCOMMITMENT` to push `0` for zero-length commitments
+  - Use highest type bit to indicate token support in CashAddresses
+  - Expand test vectors
 - **v2.1.0 – 2022-6-30** ([`f8b500a0`](https://github.com/bitjson/cashtokens/blob/f8b500a051f82d42dbf9e9e890bc6cdc14592307/readme.md))
   - Expand motivation, benefits, rationale, prior art & alternatives
   - Simplify token encoding, update test vectors
