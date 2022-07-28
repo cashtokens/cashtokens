@@ -426,7 +426,56 @@ Two new [`CashAddress` types](https://github.com/bitcoincashorg/bitcoincash.org/
 
 **Token-aware wallet software** – wallet software which supports management of tokens – should use these CashAddress version byte values in newly created addresses.
 
-Token-aware wallet software **must refuse to create token transactions paying to any CashAddress(es) without explicit token support** (i.e. `P2PKH` – version `0`, and `P2SH` version `8`).
+Token-aware wallet software **must refuse to send tokens to addresses without explicit token support** i.e. `P2PKH` CashAddresses (type bits: `0`/version byte: `0`), `P2SH` CashAddresses (type bits: `1`/version byte: `8`), and legacy Base58 addresses.
+
+<details>
+
+<summary><strong>Token-Aware CashAddress Test Vectors</strong></summary>
+
+Test vectors for the CashAddress format have been [standardized and widely used since 2017](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/cashaddr.md), including test vectors for not-yet-defined `type` values.
+
+While this specification simply uses the available `type` values, to assist implementers, the below test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json).
+
+#### Token-Aware CashAddresses
+
+| CashAddress                                                                 | Type Bits               | Size Bits      | Payload (Hex)                                                      |
+| --------------------------------------------------------------------------- | ----------------------- | -------------- | ------------------------------------------------------------------ |
+| `bitcoincash:qr7fzmep8g7h7ymfxy74lgc0v950j3r2959lhtxxsl`                    | `0` (P2PKH)             | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `bitcoincash:gr7fzmep8g7h7ymfxy74lgc0v950j3r295e7fgh7hp`                    | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `bchtest:qr7fzmep8g7h7ymfxy74lgc0v950j3r295pdnvy3hr`                        | `0` (P2PKH)             | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `bchtest:gr7fzmep8g7h7ymfxy74lgc0v950j3r295avd04fsa`                        | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `bchreg:qr7fzmep8g7h7ymfxy74lgc0v950j3r295m39d8z59`                         | `0` (P2PKH)             | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `bchreg:gr7fzmep8g7h7ymfxy74lgc0v950j3r2958smwk6nm`                         | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `prefix:qr7fzmep8g7h7ymfxy74lgc0v950j3r295fu6e430r`                         | `0` (P2PKH)             | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `prefix:gr7fzmep8g7h7ymfxy74lgc0v950j3r2954ay6yfga`                         | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `fc916f213a3d7f1369313d5fa30f6168f9446a2d`                         |
+| `bitcoincash:qpagr634w55t4wp56ftxx53xukhqgl24yse53qxdge`                    | `0` (P2PKH)             | `0` (20 bytes) | `7a81ea357528bab834d256635226e5ae047d5524`                         |
+| `bitcoincash:gpagr634w55t4wp56ftxx53xukhqgl24ys940rh408`                    | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `7a81ea357528bab834d256635226e5ae047d5524`                         |
+| `bitcoincash:qq9l9e2dgkx0hp43qm3c3h252e9euugrfc6vlt3r9e`                    | `0` (P2PKH)             | `0` (20 bytes) | `0bf2e54d458cfb86b106e388dd54564b9e71034e`                         |
+| `bitcoincash:gq9l9e2dgkx0hp43qm3c3h252e9euugrfcxdpgqmz8`                    | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `0bf2e54d458cfb86b106e388dd54564b9e71034e`                         |
+| `bitcoincash:qre24q38ghy6k3pegpyvtxahu8q8hqmxmqqn28z85p`                    | `0` (P2PKH)             | `0` (20 bytes) | `f2aa822745c9ab44394048c59bb7e1c07b8366d8`                         |
+| `bitcoincash:gre24q38ghy6k3pegpyvtxahu8q8hqmxmquj5ynlnl`                    | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `f2aa822745c9ab44394048c59bb7e1c07b8366d8`                         |
+| `bitcoincash:qz7xc0vl85nck65ffrsx5wvewjznp9lflgktxc5878`                    | `0` (P2PKH)             | `0` (20 bytes) | `bc6c3d9f3d278b6a8948e06a399974853097e9fa`                         |
+| `bitcoincash:gz7xc0vl85nck65ffrsx5wvewjznp9lflg22cm9lee`                    | `8` (Token-Aware P2PKH) | `0` (20 bytes) | `bc6c3d9f3d278b6a8948e06a399974853097e9fa`                         |
+| `bitcoincash:ppawqn2h74a4t50phuza84kdp3794pq3ccvm92p8sh`                    | `1` (P2SH)              | `0` (20 bytes) | `7ae04d57f57b55d1e1bf05d3d6cd0c7c5a8411c6`                         |
+| `bitcoincash:fpawqn2h74a4t50phuza84kdp3794pq3ccs6mfslhf`                    | `9` (Token-Aware P2SH)  | `0` (20 bytes) | `7ae04d57f57b55d1e1bf05d3d6cd0c7c5a8411c6`                         |
+| `bitcoincash:pqv53dwyatxse2xh7nnlqhyr6ryjgfdtagkd4vc388`                    | `1` (P2SH)              | `0` (20 bytes) | `1948b5c4eacd0ca8d7f4e7f05c83d0c92425abea`                         |
+| `bitcoincash:fqv53dwyatxse2xh7nnlqhyr6ryjgfdtag2vt0ffqe`                    | `9` (Token-Aware P2SH)  | `0` (20 bytes) | `1948b5c4eacd0ca8d7f4e7f05c83d0c92425abea`                         |
+| `bitcoincash:prseh0a4aejjcewhc665wjqhppgwrz2lw5txgn666a`                    | `1` (P2SH)              | `0` (20 bytes) | `e19bbfb5ee652c65d7c6b54748170850e1895f75`                         |
+| `bitcoincash:frseh0a4aejjcewhc665wjqhppgwrz2lw5h8kstzar`                    | `9` (Token-Aware P2SH)  | `0` (20 bytes) | `e19bbfb5ee652c65d7c6b54748170850e1895f75`                         |
+| `bitcoincash:pzltaslh7xnrsxeqm7qtvh0v53n3gfk0v5wwf6d7j4`                    | `1` (P2SH)              | `0` (20 bytes) | `bebec3f7f1a6381b20df80b65deca4671426cf65`                         |
+| `bitcoincash:fzltaslh7xnrsxeqm7qtvh0v53n3gfk0v5j0heux4t`                    | `9` (Token-Aware P2SH)  | `0` (20 bytes) | `bebec3f7f1a6381b20df80b65deca4671426cf65`                         |
+| `bitcoincash:pvqqqqqqqqqqqqqqqqqqqqqqzg69v7ysqqqqqqqqqqqqqqqqqqqqqpkp7fqn0` | `1` (P2SH)              | `3` (32 bytes) | `0000000000000000000000000000123456789000000000000000000000000000` |
+| `bitcoincash:fvqqqqqqqqqqqqqqqqqqqqqqzg69v7ysqqqqqqqqqqqqqqqqqqqqqmg26kyv2` | `9` (Token-Aware P2SH)  | `3` (32 bytes) | `0000000000000000000000000000123456789000000000000000000000000000` |
+| `bitcoincash:pdzyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3jh2p5nn` | `1` (P2SH)              | `3` (32 bytes) | `4444444444444444444444444444444444444444444444444444444444444444` |
+| `bitcoincash:fdzyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zygtvuw7svk` | `9` (Token-Aware P2SH)  | `3` (32 bytes) | `4444444444444444444444444444444444444444444444444444444444444444` |
+| `bitcoincash:pwyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zygsh3sujgcr` | `1` (P2SH)              | `3` (32 bytes) | `8888888888888888888888888888888888888888888888888888888888888888` |
+| `bitcoincash:fwyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zyg3zygsd0mcdv8x` | `9` (Token-Aware P2SH)  | `3` (32 bytes) | `8888888888888888888888888888888888888888888888888888888888888888` |
+| `bitcoincash:p0xvenxvenxvenxvenxvenxvenxvenxvenxvenxvenxvenxvenxvcm6gz4t77` | `1` (P2SH)              | `3` (32 bytes) | `cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
+| `bitcoincash:f0xvenxvenxvenxvenxvenxvenxvenxvenxvenxvenxvenxvenxvcpyrx20pm` | `9` (Token-Aware P2SH)  | `3` (32 bytes) | `cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc` |
+| `bitcoincash:p0llllllllllllllllllllllllllllllllllllllllllllllllll7x3vthu35` | `1` (P2SH)              | `3` (32 bytes) | `ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff` |
+| `bitcoincash:f0llllllllllllllllllllllllllllllllllllllllllllllllll7u080gcw3` | `9` (Token-Aware P2SH)  | `3` (32 bytes) | `ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff` |
+
+</details>
 
 ### Fungible Token Supply Definitions
 
