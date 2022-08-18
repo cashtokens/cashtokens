@@ -104,7 +104,7 @@ Token primitives are defined, token encoding and activation are specified, and s
 
 Every token belongs to a **token category** specified via an immutable, 32-byte **Token Category ID** assigned in the category's **genesis transaction** – the transaction in which the token category is initially created.
 
-Every token category ID is a transaction ID: the ID must be selected from the inputs of its genesis transaction, and only inputs which spend output `0` of the parent transaction are eligible (i.e. the `outpoint transaction hash` of genesis transaction inputs with an `outpoint index` of `0`). As such, implementations can locate the genesis transaction of any category by identifying the transaction that spent the `0`th output of the transaction referenced by the category ID. (See [Use of Transaction IDs as Token Category IDs](#use-of-transaction-ids-as-token-category-ids).)
+Every token category ID is a transaction ID: the ID must be selected from the inputs of its genesis transaction, and only **token genesis inputs** – inputs which spend output `0` of their parent transaction – are eligible (i.e. outpoint transaction hashes of inputs with an outpoint index of `0`). As such, implementations can locate the genesis transaction of any category by identifying the transaction that spent the `0`th output of the transaction referenced by the category ID. (See [Use of Transaction IDs as Token Category IDs](#use-of-transaction-ids-as-token-category-ids).)
 
 ### Token Types
 
@@ -180,7 +180,7 @@ Implementations must recognize otherwise-standard outputs with token prefixes as
 
 The following test vectors demonstrate valid, reserved, and invalid token prefix encodings. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
 
-The complete set of test vectors can be found in [`test-vectors/token-prefix-valid.json`](./test-vectors/token-prefix-valid.json) and [`test-vectors/token-prefix-invalid.json`](./test-vectors/token-prefix-invalid.json), respectively.
+For the complete set of test vectors, see [Test Vectors](#test-vectors).
 
 #### Valid Token Prefix Encodings
 
@@ -335,12 +335,14 @@ Perform the following **validations**:
    1. Have an equal or greater sum in `Available_Sums_By_Category`, or
    2. Exist in `Genesis_Categories` and have an output sum no greater than `9223372036854775807` (the maximum VM number).
 3. For each category in `Output_Mutable_Tokens_By_Category`, if the token's category ID exists in `Available_Minting_Categories`, skip this (valid) category. Else:
-   1. Deduct the sum in `Output_Mutable_Tokens_By_Category` from the sum available in `Available_Mutable_Tokens_By_Category`. If the value fall below `0`, **fail validation**.
+   1. Deduct the sum in `Output_Mutable_Tokens_By_Category` from the sum available in `Available_Mutable_Tokens_By_Category`. If the value falls below `0`, **fail validation**.
 4. For each token in `Output_Immutable_Tokens`, if the token's category ID exists in `Available_Minting_Categories`, skip this (valid) token. Else:
    1. If an equivalent token exists in `Available_Immutable_Tokens` (comparing both category ID and commitment), remove it and continue to the next token. Else:
       1. Deduct `1` from the sum available for the token's category in `Available_Mutable_Tokens_By_Category`. If no mutable tokens are available to downgrade, **fail validation**.
 
 Note: because coinbase transactions have only one input with an outpoint index of `4294967295`, coinbase transactions can never include a token prefix in any output.
+
+See [Implementations](#implementations) for examples of this algorithm in multiple programming languages.
 
 ### Token Inspection Operations
 
@@ -360,6 +362,8 @@ The following 6 operations pop the top item from the stack as an index (VM Numbe
 <summary><strong>Token Inspection Operation Test Vectors</strong></summary>
 
 The following test vectors demonstrate the expected result of each token inspection operation for a particular output. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
+
+For the complete set of test vectors, see [Test Vectors](#test-vectors).
 
 | Description                                        | `OP_UTXOTOKENCATEGORY`/`OP_OUTPUTTOKENCATEGORY` (Hex)                | `OP_UTXOTOKENCOMMITMENT`/`OP_OUTPUTTOKENCOMMITMENT` (Hex)                          | `OP_UTXOTOKENAMOUNT`/`OP_OUTPUTTOKENAMOUNT` (Hex) |
 | -------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------- |
@@ -434,7 +438,7 @@ Token-aware wallet software **must refuse to send tokens to addresses without ex
 
 Test vectors for the CashAddress format have been [standardized and widely used since 2017](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/cashaddr.md), including test vectors for not-yet-defined `type` values.
 
-While this specification simply uses the available `type` values, to assist implementers, the below test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json).
+While this specification simply uses the available `type` values, to assist implementers, the below test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json). (For details, see [Test Vectors](#test-vectors).)
 
 #### Token-Aware CashAddresses
 
@@ -554,14 +558,21 @@ Finally, note that the above discussion focuses on coordinating on-chain voting 
 
 **"Sealed" voting** – in which the contents of votes are unknown until after all votes are cast – is immediately possible with this proposal.
 
-Voting begins with a "ballot box" merkle tree, containing at least as many empty leaves as outstanding shares. Voters submit a **sealed vote**: a message containing 1) the number of share-votes cast and 2) a hash of their vote concatenated with a [salt](<https://en.wikipedia.org/wiki/Salt_(cryptography)>). Sealed votes are submitted by replacing an empty leaf in the ballot box (as demonstrated in [CashTokens v0](https://gist.github.com/bitjson/a440232cebba8f0b2b6b9aa5db1fdb37)). Once the voting period has ended, each participant can reverse the process: prove the contents of sealed votes within the tree by submitting the preimage, then aggregating results in another part of the covenant's state.
+Voters cast a **sealed vote** – a message containing 1) the number of share-votes cast and 2) a hash of their vote concatenated with a [salt](<https://en.wikipedia.org/wiki/Salt_(cryptography)>) – by minting a **sealed vote NFT** from the vote-taking covenant. Once the voting period has ended, each participant can re-submit all sealed vote NFTs to the covenant, aggregating results in another part of the covenant's state.
 
 This basic construction can be augmented for various use cases:
 
 - **voting quorum** – requiring some minimum percentage of sealed votes before a voting period ends.
 - **unsealing quorum** – requiring some minimum percentage of sealed votes to be unsealed before vote results can be considered final.
 - **sealing deposits** – requiring voters to submit a deposit with sealed votes that can be retrieved by later unsealing the vote.
-- **enforced vote secrecy** – allowing holders of either pre-vote or post-vote tokens to submit sealed "unsealing proofs", proving that another voter divulged their unsealed vote prior to the end of the voting period. Such proofs could reward the submitter at the expense of the prematurely-unsealing voter, frustrating attempts to coordinate malicious voting blocs. (A strategy [developed for Truthcoin](https://bitcoinhivemind.com/papers/truthcoin-whitepaper.pdf).)
+- **enforced vote secrecy** – allowing voters to submit sealed "unsealing proofs", proving that another voter divulged their unsealed vote prior to the end of the voting period. Such proofs could reward the submitter at the expense of the prematurely-unsealing voter<sup>1</sup>, frustrating attempts to coordinate malicious voting blocs. (A strategy [developed for Truthcoin](https://bitcoinhivemind.com/papers/truthcoin-whitepaper.pdf).)
+
+<details>
+<summary>Notes</summary>
+
+1. This can be accomplished by requiring each sealed vote NFT to be placed in a time-delayed "unsealing covenant" that accepts such proofs. If the penalized voter can't be relied upon to re-submit a sealed vote NFT during such an enforcement period, the vote-accepting covenant must maintain sealed votes in its internal state. For example, a "ballot box" merkle tree can contain at least as many empty leaves as outstanding shares. Sealed votes are submitted by replacing an empty leaf in the ballot box (as demonstrated in [CashTokens v0](https://gist.github.com/bitjson/a440232cebba8f0b2b6b9aa5db1fdb37)), and the process is reversed to prove the contents of sealed votes, enforce penalties, and aggregate results.
+
+</details>
 
 ### Multithreaded Covenants
 
@@ -600,7 +611,7 @@ This section documents design decisions made in this specification.
 
 ### Incompatibility of Token Fungibility and Token Commitments
 
-Advanced BCH contract use cases require strategies for transferring authenticated commitments – messages attesting to ownership, authorization, credit, debt, or other contract state – from one contract to another (a motivation behind [PMv3](https://github.com/bitjson/pmv3)). These use cases often conflicted with previous, fungibility-focused token proposals ([`OP_CHECKCOLORVERIFY`](#op_checkcolorverify), [Open Assets](https://github.com/OpenAssets/open-assets-protocol/blob/master/specification.mediawiki), [Colu](https://github.com/Colored-Coins/Colored-Coins-Protocol-Specification), [`OP_GROUP`](https://www.bitcoinunlimited.net/grouptokenization/groupbchspec), [Unforgeable Groups](https://gitlab.com/0353F40E/group-tokenization/-/blob/master/CHIP-2021-02_Unforgeable_Groups_for_Bitcoin_Cash.md), [Confidential Assets](https://blockstream.com/bitcoin17-final41.pdf)).
+Advanced BCH contract use cases require strategies for transferring authenticated commitments – messages attesting to ownership, authorization, credit, debt, or other contract state – from one contract to another (a motivation behind [PMv3](https://github.com/bitjson/pmv3)). These use cases often conflicted with previous, fungibility-focused token proposals (see [Colored Coins](#colored-coins)).
 
 One key insight which precipitated this proposal's bifurcated fungible/non-fungible approach is: **token fungibility and token commitments are conceptually incompatible**.
 
@@ -752,12 +763,6 @@ The supply of covenant-issued tokens will often be inherently analyzable using t
 
 By explicitly including these supply-calculation algorithms in this specification, token issuers are more likely to be aware of this reality, choosing to issue tokens via a strategy that conforms to common user expectations (improving data availability and compatibility across the ecosystem).
 
-## Implementations
-
-Please see the following reference implementations for additional examples and test vectors:
-
-[TODO: after initial public feedback]
-
 ## Prior Art & Alternatives
 
 Prior art and alternative token systems are reviewed below.
@@ -824,6 +829,62 @@ CashTokens differs from SLP in that CashTokens are validated by the network, and
 ## Stakeholders & Statements
 
 > With these primitives, Bitcoin Cash can support decentralized applications comparable to Ethereum contract functionality, while retaining Bitcoin Cash’s >1000x efficiency advantage in transaction and block validation. [...] Because CashTokens could now enable more efficient, user-friendly decentralized prediction markets than PMv3, I’m withdrawing the PMv3 CHIP. —[Jason Dreyzehner, PMv3 CHIP Author](https://bitcoincashresearch.org/t/chip-2021-01-pmv3-version-3-transaction-format/265/55?u=bitjson)
+
+## Test Vectors
+
+Sets of cross-implementation test vectors are provided in the [`test-vectors`](./test-vectors/) directory. Each set is described below.
+
+### Token-Aware CashAddress Test Vectors
+
+[`cashaddr.json`](./test-vectors/cashaddr.json) includes an updated set of test vectors including tests for [token-aware CashAddresses](#cashaddress-token-support).
+
+Test vectors for the CashAddress format have been [standardized and widely used since 2017](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/cashaddr.md), including test vectors for not-yet-defined `type` values.
+
+While this specification simply uses the available `type` values, to assist implementers, several additional test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json).
+
+### Token Encoding Test Vectors
+
+A complete set of test vectors that validate token encoding can be found in [`test-vectors/token-prefix-valid.json`](./test-vectors/token-prefix-valid.json) and [`test-vectors/token-prefix-invalid.json`](./test-vectors/token-prefix-invalid.json), respectively.
+
+### Transaction Validation Test Vectors
+
+The [`test-vectors/vmb_tests`](./test-vectors/vmb_tests/) directory contains sets of transaction test vectors that validate all technical elements of this proposal.
+
+To maximize portability between implementations, these test vectors use Libauth's [full-transaction testing strategy](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/readme.md). Test vectors are sorted into files based on their expected behavior:
+
+- **Pre-activation test vectors** – these vectors test transaction validation prior to the activation of this proposal.
+  - [`bch_vmb_tests_before_chip_cashtokens_invalid.json`](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_invalid.json) - test vectors that must fail validation in both nonstandard and standard mode (see [Standard Vs. Non-Standard VMs](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/readme.md#standard-vs-non-standard-vms)). To assist implementers, a companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_invalid_reasons.json) describes the reason each test vector is expected to fail.
+  - [`bch_vmb_tests_before_chip_cashtokens_nonstandard.json`](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_nonstandard.json) - test vectors that must fail validation in standard mode but pass validation in nonstandard mode. A companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_nonstandard_reasons.json) describes the reason each test vector is expected to fail in standard mode.
+  - [`bch_vmb_tests_before_chip_cashtokens_standard.json`](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_standard.json) - test vectors that must pass validation in both standard and nonstandard mode.
+- **Post-activation test vectors** – these vectors test transaction validation as it must behave after activation of this proposal.
+  - [`bch_vmb_tests_chip_cashtokens_invalid.json`](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_invalid.json) - test vectors that must fail validation in both nonstandard and standard mode. To assist implementers, a companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_invalid_reasons.json) describes the reason each test vector is expected to fail.
+  - [`bch_vmb_tests_chip_cashtokens_nonstandard.json`](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_nonstandard.json) - test vectors that must fail validation in standard mode but pass validation in nonstandard mode. A companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_nonstandard_reasons.json) describes the reason each test vector is expected to fail in standard mode.
+  - [`bch_vmb_tests_chip_cashtokens_standard.json`](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_standard.json) - test vectors that must pass validation in both standard and nonstandard mode.
+
+Each test vector is an array including:
+
+1. A short, unique identifier for the test (based on the hash of the test contents)
+2. A string describing the purpose/behavior of the test
+3. The unlocking script under test (disassembled, i.e. human-readable)
+4. The locking script under test (disassembled)
+5. The full, encoded test transaction
+6. An encoded list of unspent transaction outputs (UTXOs) with which to verify the test transaction (ordered to match the input order of the test transaction)
+
+**Only array items 5 and 6 are strictly necessary**; items 1 through 4 are purely informational, and may be useful in debugging and cross-implementation communication.
+
+To use these test vectors, implementations should decode the transaction under test (5) and its UTXOs (6), then validate the transaction using all of the implementation's transaction validation infrastructure initialized in the expected standard/nonstandard mode(s). See [Implementations](#implementations) for examples.
+
+## Implementations
+
+Please see the following implementations for additional examples and test vectors:
+
+- C++
+  - [Bitcoin Cash Node (BCHN)](https://bitcoincashnode.org/) – A professional, miner-friendly node that solves practical problems for Bitcoin Cash.
+    - CashTokens support: [Merge Request !1580](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1580)
+    - Token-aware CashAddresses: [Merge Request !1596](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1596)
+- JavaScript/TypeScript
+  - [Libauth](https://github/com/bitauth/libauth) – An ultra-lightweight, zero-dependency JavaScript library for Bitcoin Cash.
+    - [Pull Request #98](https://github.com/bitauth/libauth/pull/98) - examples: [token encoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L395-L435), [token decoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L209-L324), [token-aware validation](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L163-L297), [token inspection operations](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L355-L389), [token-aware CashAddresses](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/address/cash-address.ts#L61-L82), [usage of vmb_test vectors](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/bch-vmb-tests.spec.ts#L122-L1522)
 
 ## Feedback & Reviews
 
