@@ -25,6 +25,9 @@ A **token** is an asset – distinct from the Bitcoin Cash currency – that can
 
 Deployment of this specification is proposed for the May 2023 upgrade.
 
+- Activation is proposed for `1668513600` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2022-11-15T12:00:00.000Z`) on `testnet4`.
+- Activation is proposed for `1684152000` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2023-05-15T12:00:00.000Z`) on the BCH network (`mainnet`) and `testnet3`.
+
 ## Motivation
 
 Bitcoin Cash contracts lack primitives for issuing messages that can be verified by other contracts, preventing the development of decentralized application ecosystems on Bitcoin Cash.
