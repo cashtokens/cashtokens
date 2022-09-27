@@ -25,8 +25,8 @@ A **token** is an asset – distinct from the Bitcoin Cash currency – that can
 
 Deployment of this specification is proposed for the May 2023 upgrade.
 
-- Activation is proposed for `1668513600` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2022-11-15T12:00:00.000Z`) on `testnet4`.
-- Activation is proposed for `1684152000` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2023-05-15T12:00:00.000Z`) on the BCH network (`mainnet`) and `testnet3`.
+- Activation is proposed for `1668513600` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2022-11-15T12:00:00.000Z`) on `testnet4`, splitting to create `chipnet`.
+- Activation is proposed for `1684152000` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2023-05-15T12:00:00.000Z`) on the BCH network (`mainnet`), `testnet3`, and `testnet4`.
 
 ## Motivation
 
@@ -916,9 +916,19 @@ Please see the following implementations for additional examples and test vector
   - [Bitcoin Cash Node (BCHN)](https://bitcoincashnode.org/) – A professional, miner-friendly node that solves practical problems for Bitcoin Cash.
     - CashTokens support: [Merge Request !1580](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1580)
     - Token-aware CashAddresses: [Merge Request !1596](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1596)
+    - This CHIP also includes CashToken integration test vectors for other proposals:
+      - P2SH32: [Merge Request !1556](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1556)
+      - 65-byte TXs: [Merge Request !1598](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1598)
 - JavaScript/TypeScript
   - [Libauth](https://github/com/bitauth/libauth) – An ultra-lightweight, zero-dependency JavaScript library for Bitcoin Cash.
-    - [Pull Request #98](https://github.com/bitauth/libauth/pull/98) - examples: [token encoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L395-L435), [token decoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L209-L324), [token-aware validation](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L163-L297), [token inspection operations](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L355-L389), [token-aware CashAddresses](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/address/cash-address.ts#L61-L82), [usage of vmb_test vectors](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/bch-vmb-tests.spec.ts#L122-L1522)
+    - [Pull Request #98](https://github.com/bitauth/libauth/pull/98)
+      - [Token encoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L395-L435)
+      - [Token decoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L209-L324)
+      - [Token-aware validation](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L163-L297)
+      - [Token inspection operations](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L355-L389)
+      - [Token-aware signing serialization](https://github.com/bitauth/libauth/blob/9dfa6cc0b8710dedfe007b47bd018f5a47079df5/src/lib/vm/instruction-sets/common/signing-serialization.ts#L456-L474)
+      - [Token-aware CashAddresses](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/address/cash-address.ts#L61-L82)
+      - [Verifying vmb_tests](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/bch-vmb-tests.spec.ts#L122-L152)
 
 ## Feedback & Reviews
 
