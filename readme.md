@@ -506,7 +506,9 @@ A new signing serialization type, `SIGHASH_UTXOS`, is defined at `0x20` (`32`/`0
 
 The `SIGHASH_UTXOS` and `SIGHASH_ANYONECANPAY` types must not be used together; if a signature in which both flags are enabled is encountered during VM evaluation, an error is emitted (evaluation fails).
 
-**For security, wallets should enable `SIGHASH_UTXOS` when participating in multi-entity transactions**. This includes both 1) transactions where signatures are collected from multiple keys and assembled into a single transaction, and 2) transactions involving contracts that can be influenced by multiple entities (e.g. covenants).
+The `SIGHASH_UTXOS` type must be used with the `SIGHASH_FORKID` type; if a signature is encountered during VM evaluation with the `SIGHASH_UTXOS` flag and without the `SIGHASH_FORKID` flag, an error is emitted (evaluation fails).
+
+**For security, wallets should enable `SIGHASH_UTXOS` when participating in multi-entity transactions**. This includes both 1) transactions where signatures are collected from multiple keys and assembled into a single transaction, and 2) transactions involving contracts that can be influenced by multiple entities (e.g. covenants). (See [Recommendation of `SIGHASH_UTXOS` for Multi-Entity Transactions](#recommendation-of-sighashutxos-for-multi-entity-transactions).)
 
 ### CashAddress Token Support
 
