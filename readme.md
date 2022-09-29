@@ -91,13 +91,97 @@ By exposing basic, consensus-validated token primitives, this proposal supports 
 
 ## Technical Summary
 
-<!-- TODO: ![Technical Summary Graphic](./figures/summary.svg) -->
-
-1. A token **category** can include both non-fungible and fungible tokens, and every category is represented by a 32-byte category identifier – the transaction ID of the outpoint spent to create to the category.
-   1. All fungible tokens for a category must be created when the token category is created, ensuring the total supply within a category remains below the global limit.
+1. A token **category** can include both non-fungible and fungible tokens, and every category is represented by a 32-byte category identifier – the transaction ID of the outpoint spent to create the category.
+   1. All fungible tokens for a category must be created when the token category is created, ensuring the total supply within a category remains below the maximum VM number.
    2. Non-fungible tokens may be created either at category creation or in later transactions that spend tokens with `minting` or `mutable` capabilities for that category.
-2. Transaction outputs are extended to support 4 new optional fields: token `category`, non-fungible token `capability`, non-fungible token `commitment`, and fungible token `amount`; an output can include one **non-fungible token** and any amount of **fungible tokens** from a single token category.
+2. Transaction outputs are extended to support four new `token` fields; every output can include one **non-fungible token** and any amount of **fungible tokens** from a single token category.
 3. [Token inspection opcodes](#token-inspection-operations) allow contracts to operate on tokens, enabling [cross-contract interfaces and decentralized applications](#usage-examples).
+
+### Transaction Output Data Model
+
+This proposal extends the data model of transaction outputs to add four new `token` fields: token `category`, non-fungible token `capability`, non-fungible token `commitment`, and fungible token `amount`.
+
+| Existing Fields  | Description                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Value            | The value of the output in satoshis, the smallest unit of bitcoin cash. (A.K.A. `vout`)                                                             |
+| Locking Bytecode | The VM bytecode used to encumber this transaction output. (A.K.A. `scriptPubKey`)                                                                   |
+| **Token Fields** | (New, optional fields added by this proposal:)                                                                                                      |
+| Category         | The 32-byte ID of the token category to which the token(s) in this output belong. If no tokens are present, undefined.                              |
+| Capability       | The capability of the NFT held in this output: `none`, `mutable`, or `minting`. If no NFT is present, undefined.                                    |
+| Commitment       | The commitment contents of the NFT held in this output (`0` to `40` bytes). If no NFT is present, undefined.                                        |
+| Amount           | The number of fungible tokens held in this output (an integer between `1` and `9223372036854775807`). If no fungible tokens are present, undefined. |
+
+<details>
+
+<summary><strong>Transaction Output JSON Format</strong></summary>
+
+The following snippet demonstrates a JSON representation of a transaction output using TypeScript types.
+
+A new, optional `token` property is added, and the existing `lockingBytecode` and `valueSatoshis` properties are unmodified.
+
+Note, this type is used by the [test vectors](#test-vectors).
+
+```ts
+/**
+ * Data type representing a Transaction Output.
+ */
+type Output = {
+  /**
+   * The bytecode used to encumber this transaction output. To spend the output,
+   * unlocking bytecode must be included in a transaction input that – when
+   * evaluated before the locking bytecode – completes in a valid state.
+   *
+   * A.K.A. `scriptPubKey` or "locking script"
+   */
+  lockingBytecode: Uint8Array;
+
+  /**
+   * The CashToken contents of this output. This property is only defined if the
+   * output contains one or more tokens.
+   */
+  token?: {
+    /**
+     * The number of fungible tokens held in this output.
+     *
+     * Because `Number.MAX_SAFE_INTEGER` (`9007199254740991`) is less than the
+     * maximum token amount (`9223372036854775807`), this value is encoded as
+     * a `bigint`. (Note, because standard JSON does not support `bigint`, this
+     * value must be converted to and from a `string` to pass over the network.)
+     */
+    amount: bigint;
+    /**
+     * The 32-byte token category ID to which the token(s) in this output belong
+     * in big-endian byte order. This is the byte order typically seen in block
+     * explorers and user interfaces (as opposed to little-endian byte order,
+     * which is used in standard P2P network messages).
+     */
+    category: Uint8Array;
+    /**
+     * If present, the non-fungible token (NFT) held by this output. If the
+     * output does not include a non-fungible token, `undefined`.
+     */
+    nft?: {
+      /**
+       * The capability of this non-fungible token.
+       */
+      capability: 'none' | 'mutable' | 'minting';
+
+      /**
+       * The commitment contents included in the non-fungible token held in
+       * this output.
+       */
+      commitment: Uint8Array;
+    };
+  };
+
+  /**
+   * The value of the output in satoshis, the smallest unit of bitcoin cash.
+   */
+  valueSatoshis: number;
+};
+```
+
+</details>
 
 ## Technical Specification
 
@@ -109,15 +193,41 @@ Every token belongs to a **token category** specified via an immutable, 32-byte 
 
 Every token category ID is a transaction ID: the ID must be selected from the inputs of its genesis transaction, and only **token genesis inputs** – inputs which spend output `0` of their parent transaction – are eligible (i.e. outpoint transaction hashes of inputs with an outpoint index of `0`). As such, implementations can locate the genesis transaction of any category by identifying the transaction that spent the `0`th output of the transaction referenced by the category ID. (See [Use of Transaction IDs as Token Category IDs](#use-of-transaction-ids-as-token-category-ids).)
 
+Note that because every transaction has at least one output, every transaction ID can later become a token category ID.
+
+![CashToken Creation](./figures/cashtoken-creation.svg)
+_Figure 1. Two new token categories are created by transaction `c3a601...`. The first category (<span style="color:#8a11b2">■</span>`b201a0...`) is created by spending the 0th output of transaction `b201a0...`; for this category, a supply of `150` fungible tokens are created across two outputs (`100` and `50`). The second category (<span style="color:#3ab211">▲</span>`a1efcd...`) is created by spending the 0th output of transaction `a1efcd...`; for this category, a supply of `100` fungible tokens are created across two outputs (`20` and `80`), and two NFTs are created (each with a commitment of `0x010203`)._
+
 ### Token Types
 
 Two token types are introduced: **fungible tokens** and **non-fungible tokens**. Fungible tokens have only one property: a 32-byte `category`. Non-fungible tokens have three properties: a 32-byte `category`, a `0` to `40` byte `commitment`, and a `capability` of `minting`, `mutable`, or `none`.
-(Precise behavior is defined in [Token-Aware Transaction Validation](#token-aware-transaction-validation).)
 
-Every transaction output can optionally have a [`token category`](#token-categories), and all fungible or non-fungible tokens locked in that output must share the output's token category. An output may contain:
+### Token Behavior
 
-- Zero or one non-fungible token and
-- Any `amount` of the category's fungible token (a count of the fungible tokens held).
+Token behavior is enforced by the [**token validation algorithm**](#token-validation-algorithm). This algorithm has the following effects:
+
+#### Universal Token Behavior
+
+1.  A single transaction can create multiple new token categories, and each category can contain both fungible and non-fungible tokens.
+2.  Tokens can be implicitly destroyed by omission from a transaction's outputs.
+3.  Each transaction output can contain zero or one non-fungible token and any `amount` of fungible tokens, but all tokens in an output must share the same token category.
+
+#### Non-Fungible Token Behavior
+
+1.  A transaction output can contain zero or one **non-fungible token**.
+2.  Non-fungible tokens (NFTs) of a particular category are created either in the category's genesis transaction or by later transactions that spend `minting` or `mutable` tokens of the same category.
+3.  It is possible for multiple NFTs of the same category to carry the same commitment. (Though uniqueness can be enforced by covenants.)
+4.  **Minting tokens** (NFTs with the `minting` capability) allow the spending transaction to create any number of new NFTs of the same category, each with any commitment and (optionally) the `minting` or `mutable` capability.
+5.  Each **Mutable token** (NFTs with the `mutable` capability) allows the spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
+6.  **Immutable tokens** (NFTs without a capability) cannot have their commitment modified when spent.
+
+#### Fungible Token Behavior
+
+1.  A transaction output can contain any `amount` of fungible token from a single category.
+2.  All fungible tokens of a category are created in that category's genesis transaction; their combined `amount` may not exceed `9223372036854775807`.
+3.  A transaction can spend fungible tokens from any number of UTXOs to any number of outputs, so long as the sum of output `amount`s do not exceed the sum of input `amount`s (for each token category).
+
+Note that fungible tokens behave independently from non-fungible tokens: non-fungible tokens are never counted in the `amount`, and the existence of `minting` or `mutable` NFTs in a transaction's inputs do not allow for new fungible tokens to be created.
 
 ### Token Encoding
 
@@ -289,30 +399,6 @@ After activation, any transaction creating an invalid token prefix is itself inv
 ### Token-Aware Transaction Validation
 
 For any transaction to be valid, the [**token validation algorithm**](#token-validation-algorithm) must succeed.
-
-This algorithm has the following effects:
-
-1. **Universal Token Behavior**
-
-   1. A single transaction can create multiple new token categories, and categories can contain both fungible and non-fungible tokens.
-   2. Tokens may be implicitly destroyed by omission from a transaction's outputs.
-   3. Fungible and non-fungible tokens behave independently.
-   4. A transaction output can contain both fungible tokens and a non-fungible token of the same category.
-
-2. **Fungible Token Behavior**
-
-   1. A transaction output can contain any fungible token amount of a single category.
-   2. All fungible tokens of a particular category are created in the category's genesis transaction; their combined `amount` may not exceed `9223372036854775807`.
-   3. A transaction can spend fungible tokens from any number of UTXOs to any number of outputs, so long as the sum of output `amount`s do not exceed the sum of input `amount`s (for each token category).
-
-3. **Non-Fungible Token Behavior**
-
-   1. A transaction output can contain zero or one **non-fungible token**.
-   2. Non-fungible tokens (NFTs) of a particular category are created either in the category's genesis transaction or by later transactions that spend `minting` or `mutable` tokens of the same category.
-   3. It is possible for multiple NFTs of the same category to carry the same commitment. (Though uniqueness can be enforced by covenants.)
-   4. **Minting tokens** (NFTs with the `minting` capability) allow the spending transaction to create any number of new NFTs of the same category, each with any commitment and (optionally) the `minting` or `mutable` capability.
-   5. Each **Mutable token** (NFTs with the `mutable` capability) allows the spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
-   6. **Immutable tokens** (NFTs without a capability) cannot have their commitment modified when spent.
 
 #### Token Validation Algorithm
 
@@ -777,7 +863,7 @@ This proposal recommends that all wallets enable the `SIGHASH_UTXOS` signing ser
 
 Alternatively, signers could download and verify the spent output of each transaction referenced by each input prior to signing vulnerable transactions, but this approach would require significantly higher bandwidth, memory, and/or storage requirements for many light wallet and offline signing devices, impeding support for interacting with tokens or decentralized applications.
 
-While these potential vulnerabilities do not impact signers with a full view of the necessary data (e.g. wallets with integrated, fully-validating nodes), because a subset of light wallets must enable `SIGHASH_UTXOS` for security, enabling `SIGHASH_UTXOS` for these signers improves privacy by maximizing the anonymity set of the resulting transactions. As such, this proposal recommends use of `SIGHASH_UTXOS` for all multi-entity transactions, even for non-vulnerable wallets.
+While these potential vulnerabilities do not impact signers with a full view of the necessary data (e.g. wallets with integrated, fully-validating nodes), because a subset of light wallets must enable `SIGHASH_UTXOS` for security, enabling `SIGHASH_UTXOS` for all signers improves privacy by maximizing the anonymity set of the resulting transactions. As such, this proposal recommends use of `SIGHASH_UTXOS` for all multi-entity transactions, even for non-vulnerable wallets.
 
 ### Limitation of Fungible Token Supply
 
