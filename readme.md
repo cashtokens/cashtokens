@@ -25,6 +25,9 @@ A **token** is an asset – distinct from the Bitcoin Cash currency – that can
 
 Deployment of this specification is proposed for the May 2023 upgrade.
 
+- Activation is proposed for `1668513600` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2022-11-15T12:00:00.000Z`) on `testnet4`, splitting to create `chipnet`.
+- Activation is proposed for `1684152000` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2023-05-15T12:00:00.000Z`) on the BCH network (`mainnet`), `testnet3`, and `testnet4`.
+
 ## Motivation
 
 Bitcoin Cash contracts lack primitives for issuing messages that can be verified by other contracts, preventing the development of decentralized application ecosystems on Bitcoin Cash.
@@ -78,7 +81,7 @@ Critically, this cross-contract interaction can be achieved within the "stateles
 
 Beyond enabling covenants to interoperate with other covenants, these token primitives allow for byte-efficient representations of complex internal state – supporting [advanced, decentralized applications](https://github.com/bitjson/jedex) on Bitcoin Cash.
 
-**Non-fungible tokens** are critical for coordinating activity trustlessly between multiple covenants, enabling [covenant-tracking tokens](#covenant-tracking-non-fungible-tokens), [depository child covenants](#depository-child-covenants), [multithreaded covenants](#multithreaded-covenants), and other constructions in which a particular covenant instance must be authenticated.
+**Non-fungible tokens** are critical for coordinating activity trustlessly between multiple covenants, enabling [covenant-tracking tokens](#covenant-tracking-identity-tokens), [depository child covenants](#depository-child-covenants), [multithreaded covenants](#multithreaded-covenants), and other constructions in which a particular covenant instance must be authenticated.
 
 **Fungible tokens** are valuable for covenants to represent on-chain assets – e.g. voting shares, utility tokens, collateralized loans, prediction market options, etc. – and implement [complex coordination tasks](#voting-with-fungible-tokens) – e.g. liquidity-pooling, auctions, voting, sidechain withdrawals, spin-offs, mergers, and more.
 
@@ -88,13 +91,97 @@ By exposing basic, consensus-validated token primitives, this proposal supports 
 
 ## Technical Summary
 
-<!-- TODO: ![Technical Summary Graphic](./figures/summary.svg) -->
-
-1. A token **category** can include both non-fungible and fungible tokens, and every category is represented by a 32-byte category identifier – the transaction ID of the outpoint spent to create to the category.
-   1. All fungible tokens for a category must be created when the token category is created, ensuring the total supply within a category remains below the global limit.
+1. A token **category** can include both non-fungible and fungible tokens, and every category is represented by a 32-byte category identifier – the transaction ID of the outpoint spent to create the category.
+   1. All fungible tokens for a category must be created when the token category is created, ensuring the total supply within a category remains below the maximum VM number.
    2. Non-fungible tokens may be created either at category creation or in later transactions that spend tokens with `minting` or `mutable` capabilities for that category.
-2. Transaction outputs are extended to support 4 new optional fields: token `category`, non-fungible token `capability`, non-fungible token `commitment`, and fungible token `amount`; an output can include one **non-fungible token** and any amount of **fungible tokens** from a single token category.
+2. Transaction outputs are extended to support four new `token` fields; every output can include one **non-fungible token** and any amount of **fungible tokens** from a single token category.
 3. [Token inspection opcodes](#token-inspection-operations) allow contracts to operate on tokens, enabling [cross-contract interfaces and decentralized applications](#usage-examples).
+
+### Transaction Output Data Model
+
+This proposal extends the data model of transaction outputs to add four new `token` fields: token `category`, non-fungible token `capability`, non-fungible token `commitment`, and fungible token `amount`.
+
+| Existing Fields  | Description                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Value            | The value of the output in satoshis, the smallest unit of bitcoin cash. (A.K.A. `vout`)                                                             |
+| Locking Bytecode | The VM bytecode used to encumber this transaction output. (A.K.A. `scriptPubKey`)                                                                   |
+| **Token Fields** | (New, optional fields added by this proposal:)                                                                                                      |
+| Category         | The 32-byte ID of the token category to which the token(s) in this output belong. If no tokens are present, undefined.                              |
+| Capability       | The capability of the NFT held in this output: `none`, `mutable`, or `minting`. If no NFT is present, undefined.                                    |
+| Commitment       | The commitment contents of the NFT held in this output (`0` to `40` bytes). If no NFT is present, undefined.                                        |
+| Amount           | The number of fungible tokens held in this output (an integer between `1` and `9223372036854775807`). If no fungible tokens are present, undefined. |
+
+<details>
+
+<summary><strong>Transaction Output JSON Format</strong></summary>
+
+The following snippet demonstrates a JSON representation of a transaction output using TypeScript types.
+
+A new, optional `token` property is added, and the existing `lockingBytecode` and `valueSatoshis` properties are unmodified.
+
+Note, this type is used by the [test vectors](#test-vectors).
+
+```ts
+/**
+ * Data type representing a Transaction Output.
+ */
+type Output = {
+  /**
+   * The bytecode used to encumber this transaction output. To spend the output,
+   * unlocking bytecode must be included in a transaction input that – when
+   * evaluated before the locking bytecode – completes in a valid state.
+   *
+   * A.K.A. `scriptPubKey` or "locking script"
+   */
+  lockingBytecode: Uint8Array;
+
+  /**
+   * The CashToken contents of this output. This property is only defined if the
+   * output contains one or more tokens.
+   */
+  token?: {
+    /**
+     * The number of fungible tokens held in this output.
+     *
+     * Because `Number.MAX_SAFE_INTEGER` (`9007199254740991`) is less than the
+     * maximum token amount (`9223372036854775807`), this value is encoded as
+     * a `bigint`. (Note, because standard JSON does not support `bigint`, this
+     * value must be converted to and from a `string` to pass over the network.)
+     */
+    amount: bigint;
+    /**
+     * The 32-byte token category ID to which the token(s) in this output belong
+     * in big-endian byte order. This is the byte order typically seen in block
+     * explorers and user interfaces (as opposed to little-endian byte order,
+     * which is used in standard P2P network messages).
+     */
+    category: Uint8Array;
+    /**
+     * If present, the non-fungible token (NFT) held by this output. If the
+     * output does not include a non-fungible token, `undefined`.
+     */
+    nft?: {
+      /**
+       * The capability of this non-fungible token.
+       */
+      capability: 'none' | 'mutable' | 'minting';
+
+      /**
+       * The commitment contents included in the non-fungible token held in
+       * this output.
+       */
+      commitment: Uint8Array;
+    };
+  };
+
+  /**
+   * The value of the output in satoshis, the smallest unit of bitcoin cash.
+   */
+  valueSatoshis: number;
+};
+```
+
+</details>
 
 ## Technical Specification
 
@@ -104,17 +191,43 @@ Token primitives are defined, token encoding and activation are specified, and s
 
 Every token belongs to a **token category** specified via an immutable, 32-byte **Token Category ID** assigned in the category's **genesis transaction** – the transaction in which the token category is initially created.
 
-Every token category ID is a transaction ID: the ID must be selected from the inputs of its genesis transaction, and only inputs which spend output `0` of the parent transaction are eligible (i.e. the `outpoint transaction hash` of genesis transaction inputs with an `outpoint index` of `0`). As such, implementations can locate the genesis transaction of any category by identifying the transaction that spent the `0`th output of the transaction referenced by the category ID. (See [Use of Transaction IDs as Token Category IDs](#use-of-transaction-ids-as-token-category-ids).)
+Every token category ID is a transaction ID: the ID must be selected from the inputs of its genesis transaction, and only **token genesis inputs** – inputs which spend output `0` of their parent transaction – are eligible (i.e. outpoint transaction hashes of inputs with an outpoint index of `0`). As such, implementations can locate the genesis transaction of any category by identifying the transaction that spent the `0`th output of the transaction referenced by the category ID. (See [Use of Transaction IDs as Token Category IDs](#use-of-transaction-ids-as-token-category-ids).)
+
+Note that because every transaction has at least one output, every transaction ID can later become a token category ID.
+
+![CashToken Creation](./figures/cashtoken-creation.svg)
+_Figure 1. Two new token categories are created by transaction `c3a601...`. The first category (<span style="color:#8a11b2">■</span>`b201a0...`) is created by spending the 0th output of transaction `b201a0...`; for this category, a supply of `150` fungible tokens are created across two outputs (`100` and `50`). The second category (<span style="color:#3ab211">▲</span>`a1efcd...`) is created by spending the 0th output of transaction `a1efcd...`; for this category, a supply of `100` fungible tokens are created across two outputs (`20` and `80`), and two NFTs are created (each with a commitment of `0x010203`)._
 
 ### Token Types
 
 Two token types are introduced: **fungible tokens** and **non-fungible tokens**. Fungible tokens have only one property: a 32-byte `category`. Non-fungible tokens have three properties: a 32-byte `category`, a `0` to `40` byte `commitment`, and a `capability` of `minting`, `mutable`, or `none`.
-(Precise behavior is defined in [Token-Aware Transaction Validation](#token-aware-transaction-validation).)
 
-Every transaction output can optionally have a [`token category`](#token-categories), and all fungible or non-fungible tokens locked in that output must share the output's token category. An output may contain:
+### Token Behavior
 
-- Zero or one non-fungible token and
-- Any `amount` of the category's fungible token (a count of the fungible tokens held).
+Token behavior is enforced by the [**token validation algorithm**](#token-validation-algorithm). This algorithm has the following effects:
+
+#### Universal Token Behavior
+
+1.  A single transaction can create multiple new token categories, and each category can contain both fungible and non-fungible tokens.
+2.  Tokens can be implicitly destroyed by omission from a transaction's outputs.
+3.  Each transaction output can contain zero or one non-fungible token and any `amount` of fungible tokens, but all tokens in an output must share the same token category.
+
+#### Non-Fungible Token Behavior
+
+1.  A transaction output can contain zero or one **non-fungible token**.
+2.  Non-fungible tokens (NFTs) of a particular category are created either in the category's genesis transaction or by later transactions that spend `minting` or `mutable` tokens of the same category.
+3.  It is possible for multiple NFTs of the same category to carry the same commitment. (Though uniqueness can be enforced by covenants.)
+4.  **Minting tokens** (NFTs with the `minting` capability) allow the spending transaction to create any number of new NFTs of the same category, each with any commitment and (optionally) the `minting` or `mutable` capability.
+5.  Each **Mutable token** (NFTs with the `mutable` capability) allows the spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
+6.  **Immutable tokens** (NFTs without a capability) cannot have their commitment modified when spent.
+
+#### Fungible Token Behavior
+
+1.  A transaction output can contain any `amount` of fungible token from a single category.
+2.  All fungible tokens of a category are created in that category's genesis transaction; their combined `amount` may not exceed `9223372036854775807`.
+3.  A transaction can spend fungible tokens from any number of UTXOs to any number of outputs, so long as the sum of output `amount`s do not exceed the sum of input `amount`s (for each token category).
+
+Note that fungible tokens behave independently from non-fungible tokens: non-fungible tokens are never counted in the `amount`, and the existence of `minting` or `mutable` NFTs in a transaction's inputs do not allow for new fungible tokens to be created.
 
 ### Token Encoding
 
@@ -180,7 +293,7 @@ Implementations must recognize otherwise-standard outputs with token prefixes as
 
 The following test vectors demonstrate valid, reserved, and invalid token prefix encodings. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
 
-The complete set of test vectors can be found in [`test-vectors/token-prefix-valid.json`](./test-vectors/token-prefix-valid.json) and [`test-vectors/token-prefix-invalid.json`](./test-vectors/token-prefix-invalid.json), respectively.
+For the complete set of test vectors, see [Test Vectors](#test-vectors).
 
 #### Valid Token Prefix Encodings
 
@@ -287,30 +400,6 @@ After activation, any transaction creating an invalid token prefix is itself inv
 
 For any transaction to be valid, the [**token validation algorithm**](#token-validation-algorithm) must succeed.
 
-This algorithm has the following effects:
-
-1. **Universal Token Behavior**
-
-   1. A single transaction can create multiple new token categories, and categories can contain both fungible and non-fungible tokens.
-   2. Tokens may be implicitly destroyed by omission from a transaction's outputs.
-   3. Fungible and non-fungible tokens behave independently.
-   4. A transaction output can contain both fungible tokens and a non-fungible token of the same category.
-
-2. **Fungible Token Behavior**
-
-   1. A transaction output can contain any fungible token amount of a single category.
-   2. All fungible tokens of a particular category are created in the category's genesis transaction; their combined `amount` may not exceed `9223372036854775807`.
-   3. A transaction can spend fungible tokens from any number of UTXOs to any number of outputs, so long as the sum of output `amount`s do not exceed the sum of input `amount`s (for each token category).
-
-3. **Non-Fungible Token Behavior**
-
-   1. A transaction output can contain zero or one **non-fungible token**.
-   2. Non-fungible tokens (NFTs) of a particular category are created either in the category's genesis transaction or by later transactions that spend `minting` or `mutable` tokens of the same category.
-   3. It is possible for multiple NFTs of the same category to carry the same commitment. (Though uniqueness can be enforced by covenants.)
-   4. **Minting tokens** (NFTs with the `minting` capability) allow the spending transaction to create any number of new NFTs of the same category, each with any commitment and (optionally) the `minting` or `mutable` capability.
-   5. Each **Mutable token** (NFTs with the `mutable` capability) allows the spending transaction to create one NFT of the same category, with any commitment and (optionally) the `mutable` capability.
-   6. **Immutable tokens** (NFTs without a capability) cannot have their commitment modified when spent.
-
 #### Token Validation Algorithm
 
 Given the following **definitions**:
@@ -335,12 +424,14 @@ Perform the following **validations**:
    1. Have an equal or greater sum in `Available_Sums_By_Category`, or
    2. Exist in `Genesis_Categories` and have an output sum no greater than `9223372036854775807` (the maximum VM number).
 3. For each category in `Output_Mutable_Tokens_By_Category`, if the token's category ID exists in `Available_Minting_Categories`, skip this (valid) category. Else:
-   1. Deduct the sum in `Output_Mutable_Tokens_By_Category` from the sum available in `Available_Mutable_Tokens_By_Category`. If the value fall below `0`, **fail validation**.
+   1. Deduct the sum in `Output_Mutable_Tokens_By_Category` from the sum available in `Available_Mutable_Tokens_By_Category`. If the value falls below `0`, **fail validation**.
 4. For each token in `Output_Immutable_Tokens`, if the token's category ID exists in `Available_Minting_Categories`, skip this (valid) token. Else:
    1. If an equivalent token exists in `Available_Immutable_Tokens` (comparing both category ID and commitment), remove it and continue to the next token. Else:
       1. Deduct `1` from the sum available for the token's category in `Available_Mutable_Tokens_By_Category`. If no mutable tokens are available to downgrade, **fail validation**.
 
 Note: because coinbase transactions have only one input with an outpoint index of `4294967295`, coinbase transactions can never include a token prefix in any output.
+
+See [Implementations](#implementations) for examples of this algorithm in multiple programming languages.
 
 ### Token Inspection Operations
 
@@ -360,6 +451,8 @@ The following 6 operations pop the top item from the stack as an index (VM Numbe
 <summary><strong>Token Inspection Operation Test Vectors</strong></summary>
 
 The following test vectors demonstrate the expected result of each token inspection operation for a particular output. The token category ID is `0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb` and commitments use repetitions of `0xcc`.
+
+For the complete set of test vectors, see [Test Vectors](#test-vectors).
 
 | Description                                        | `OP_UTXOTOKENCATEGORY`/`OP_OUTPUTTOKENCATEGORY` (Hex)                | `OP_UTXOTOKENCOMMITMENT`/`OP_OUTPUTTOKENCOMMITMENT` (Hex)                          | `OP_UTXOTOKENAMOUNT`/`OP_OUTPUTTOKENAMOUNT` (Hex) |
 | -------------------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------- |
@@ -409,11 +502,13 @@ The [signing serialization algorithm](https://github.com/bitcoincashorg/bitcoinc
 
 ### `SIGHASH_UTXOS`
 
-A new signing serialization type, `SIGHASH_UTXOS`, is defined at `0x20` (`32`/`0b100000`). When `SIGHASH_UTXOS` is enabled, `hashUtxos` is inserted in the [signing serialization algorithm](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/replay-protected-sighash.md) immediately following `hashPrevouts`. `hashUtxos` is a 32-byte double SHA256 of the serialization of all UTXOs spent by the transaction's inputs (concatenated in input order).
+A new signing serialization type, `SIGHASH_UTXOS`, is defined at `0x20` (`32`/`0b100000`). When `SIGHASH_UTXOS` is enabled, `hashUtxos` is inserted in the [signing serialization algorithm](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/replay-protected-sighash.md) immediately following `hashPrevouts`. `hashUtxos` is a 32-byte double SHA256 of the serialization of all UTXOs spent by the transaction's inputs, concatenated in input order, excluding output count. (Note: this serialization is equivalent to the segment of a P2P transaction message beginning after `output count` and ending before `locktime` if the UTXOs were serialized in order as the transaction's outputs.)
 
 The `SIGHASH_UTXOS` and `SIGHASH_ANYONECANPAY` types must not be used together; if a signature in which both flags are enabled is encountered during VM evaluation, an error is emitted (evaluation fails).
 
-**For security, wallets should enable `SIGHASH_UTXOS` when participating in multi-entity transactions involving tokens**. This includes both 1) transactions where signatures are collected from multiple entities and assembled into a single transaction, and 2) transactions that interact with multi-entity covenants.
+The `SIGHASH_UTXOS` type must be used with the `SIGHASH_FORKID` type; if a signature is encountered during VM evaluation with the `SIGHASH_UTXOS` flag and without the `SIGHASH_FORKID` flag, an error is emitted (evaluation fails).
+
+**For security, wallets should enable `SIGHASH_UTXOS` when participating in multi-entity transactions**. This includes both 1) transactions where signatures are collected from multiple keys and assembled into a single transaction, and 2) transactions involving contracts that can be influenced by multiple entities (e.g. covenants). (See [Recommendation of `SIGHASH_UTXOS` for Multi-Entity Transactions](#recommendation-of-sighashutxos-for-multi-entity-transactions).)
 
 ### CashAddress Token Support
 
@@ -434,7 +529,7 @@ Token-aware wallet software **must refuse to send tokens to addresses without ex
 
 Test vectors for the CashAddress format have been [standardized and widely used since 2017](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/cashaddr.md), including test vectors for not-yet-defined `type` values.
 
-While this specification simply uses the available `type` values, to assist implementers, the below test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json).
+While this specification simply uses the available `type` values, to assist implementers, the below test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json). (For details, see [Test Vectors](#test-vectors).)
 
 #### Token-Aware CashAddresses
 
@@ -518,9 +613,15 @@ Software implementations might choose to emphasize circulating supply (rather th
 
 The following examples outline high-level constructions made possible by this proposal. The term **covenant** is used to describe a Bitcoin Cash contract that inspects the transaction that spends it, enforcing constraints – e.g. a contract that requires user to send an equal number of satoshis back to the same contract (such that the contract maintains its own "balance").
 
-### Covenant-Tracking, Non-Fungible Tokens
+### Identity Tokens
 
-A covenant can be associated with a **"tracking" non-fungible token**, requiring that spends always re-associate the non-fungible token with the covenant.
+Prior to this proposal, Bitcoin Cash contracts were limited to interacting with static identities, usually defined by one or more public keys. A contract might allow a particular identity to spend funds under certain conditions (e.g. after a fixed delay), but if an identity needs to update its public key(s), the migration would require that the contract be re-created and the funds moved.
+
+This proposal enables contracts to instead interact with **identity tokens** – non-fungible tokens that prove control of a represented identity. Identity tokens can be moved independently of the contracts that verify them, allowing greater flexibility and control over the identities within contracts, e.g. a user may upgrade to a two-factor (multisig) wallet, a company may rotate keys after a security breach, or an organization may add or remove individuals with signing authority. With identity tokens, contracts can be designed to allow identities to perform these updates without re-creating the contract, reducing the cost and complexity of coordinating with other contract participants.
+
+### Covenant-Tracking Identity Tokens
+
+A covenant can be associated with a **"tracking" identity token**, requiring that spends always re-associate the identity token with the covenant.
 
 Beyond simplifying logic for clients to safely locate and interact with the covenant, such a tracking token offers an impersonation-proof strategy for other contracts to authenticate a particular covenant instance. This primitive enables covenants to design **public interfaces**, paths of operation intended for other contracts (which may themselves be designed and deployed after the creation of the original covenant).
 
@@ -530,7 +631,7 @@ Notably, tracking tokens also allow for a significant contract-size and applicat
 
 ### Depository Child Covenants
 
-Given the existence of [covenant-tracking, non-fungible tokens](#covenant-tracking-non-fungible-tokens), it is trivial to develop **depository child covenants** – covenants that hold a non-fungible token and/or an amount of fungible tokens on behalf of a parent covenant. By requiring that the depository covenant be spent only in transactions with the parent covenant, such depository covenants can allow a parent covenant to hold and manipulate token portfolios with an unlimited quantity of fungible or non-fungible tokens (despite the limitation to [one prefix codepoint per output](#one-prefix-codepoint-per-output)).
+Given the existence of [covenant-tracking identity tokens](#covenant-tracking-identity-tokens), it is trivial to develop **depository child covenants** – covenants that hold a non-fungible token and/or an amount of fungible tokens on behalf of a parent covenant. By requiring that the depository covenant be spent only in transactions with the parent covenant, such depository covenants can allow a parent covenant to hold and manipulate token portfolios with an unlimited quantity of fungible or non-fungible tokens (despite the limitation to [one prefix codepoint per output](#one-prefix-codepoint-per-output)).
 
 ### Voting with Fungible Tokens
 
@@ -554,14 +655,21 @@ Finally, note that the above discussion focuses on coordinating on-chain voting 
 
 **"Sealed" voting** – in which the contents of votes are unknown until after all votes are cast – is immediately possible with this proposal.
 
-Voting begins with a "ballot box" merkle tree, containing at least as many empty leaves as outstanding shares. Voters submit a **sealed vote**: a message containing 1) the number of share-votes cast and 2) a hash of their vote concatenated with a [salt](<https://en.wikipedia.org/wiki/Salt_(cryptography)>). Sealed votes are submitted by replacing an empty leaf in the ballot box (as demonstrated in [CashTokens v0](https://gist.github.com/bitjson/a440232cebba8f0b2b6b9aa5db1fdb37)). Once the voting period has ended, each participant can reverse the process: prove the contents of sealed votes within the tree by submitting the preimage, then aggregating results in another part of the covenant's state.
+Voters cast a **sealed vote** – a message containing 1) the number of share-votes cast and 2) a hash of their vote concatenated with a [salt](<https://en.wikipedia.org/wiki/Salt_(cryptography)>) – by minting a **sealed vote NFT** from the vote-taking covenant. Once the voting period has ended, each participant can re-submit all sealed vote NFTs to the covenant, aggregating results in another part of the covenant's state.
 
 This basic construction can be augmented for various use cases:
 
 - **voting quorum** – requiring some minimum percentage of sealed votes before a voting period ends.
 - **unsealing quorum** – requiring some minimum percentage of sealed votes to be unsealed before vote results can be considered final.
 - **sealing deposits** – requiring voters to submit a deposit with sealed votes that can be retrieved by later unsealing the vote.
-- **enforced vote secrecy** – allowing holders of either pre-vote or post-vote tokens to submit sealed "unsealing proofs", proving that another voter divulged their unsealed vote prior to the end of the voting period. Such proofs could reward the submitter at the expense of the prematurely-unsealing voter, frustrating attempts to coordinate malicious voting blocs. (A strategy [developed for Truthcoin](https://bitcoinhivemind.com/papers/truthcoin-whitepaper.pdf).)
+- **enforced vote secrecy** – allowing voters to submit sealed "unsealing proofs", proving that another voter divulged their unsealed vote prior to the end of the voting period. Such proofs could reward the submitter at the expense of the prematurely-unsealing voter<sup>1</sup>, frustrating attempts to coordinate malicious voting blocs. (A strategy [developed for Truthcoin](https://bitcoinhivemind.com/papers/truthcoin-whitepaper.pdf).)
+
+<details>
+<summary>Notes</summary>
+
+1. This can be accomplished by requiring each sealed vote NFT to be placed in a time-delayed "unsealing covenant" that accepts such proofs. If the penalized voter can't be relied upon to re-submit a sealed vote NFT during such an enforcement period, the vote-accepting covenant must maintain sealed votes in its internal state. For example, a "ballot box" merkle tree can contain at least as many empty leaves as outstanding shares. Sealed votes are submitted by replacing an empty leaf in the ballot box (as demonstrated in [CashTokens v0](https://gist.github.com/bitjson/a440232cebba8f0b2b6b9aa5db1fdb37)), and the process is reversed to prove the contents of sealed votes, enforce penalties, and aggregate results.
+
+</details>
 
 ### Multithreaded Covenants
 
@@ -577,7 +685,7 @@ To reduce disruptions from spend races, contracts must **carefully consider spen
 - To disincentivize DOS attacks – e.g. where an attacker creates and rapidly broadcasts long chains of covenant transactions, spending each successive UTXO before other users can spend it in their own covenant transactions – covenants should **ensure covenant actions are authenticated and/or costly** (e.g. can only be taken once by each token holder, require some sort of fee or deposit, etc.).
 - To resist censorship or orphaning of unconfirmed covenant transaction chains by malicious miners, covenants should **ensure important activity can occur over the course of many blocks**, and wallet software should maintain logic for recovering (possibly re-requesting authorization from the user) and retrying covenant transactions that are invalidated by malicious miners.
 
-Beyond these basic strategies, this proposal enables another strategy: **multithreaded covenants** can offload logic to **"thread"** sub-covenants, allowing users to interact in parallel with multiple UTXOs. Threads aggregate state independently, allowing input or results to be "checked in" to the parent covenant in batches. Multithreaded covenants can identify authentic threads using [tracking non-fungible tokens](#covenant-tracking-non-fungible-tokens) (issued by the parent contract), and threads can authenticate both other threads and the parent covenant in the same way.
+Beyond these basic strategies, this proposal enables another strategy: **multithreaded covenants** can offload logic to **"thread"** sub-covenants, allowing users to interact in parallel with multiple UTXOs. Threads aggregate state independently, allowing input or results to be "checked in" to the parent covenant in batches. Multithreaded covenants can identify authentic threads using [tracking tokens](#covenant-tracking-identity-tokens) (issued by the parent contract), and threads can authenticate both other threads and the parent covenant in the same way.
 
 Thread design is application-specific, but valuable constructions may include:
 
@@ -600,7 +708,7 @@ This section documents design decisions made in this specification.
 
 ### Incompatibility of Token Fungibility and Token Commitments
 
-Advanced BCH contract use cases require strategies for transferring authenticated commitments – messages attesting to ownership, authorization, credit, debt, or other contract state – from one contract to another (a motivation behind [PMv3](https://github.com/bitjson/pmv3)). These use cases often conflicted with previous, fungibility-focused token proposals ([`OP_CHECKCOLORVERIFY`](#op_checkcolorverify), [Open Assets](https://github.com/OpenAssets/open-assets-protocol/blob/master/specification.mediawiki), [Colu](https://github.com/Colored-Coins/Colored-Coins-Protocol-Specification), [`OP_GROUP`](https://www.bitcoinunlimited.net/grouptokenization/groupbchspec), [Unforgeable Groups](https://gitlab.com/0353F40E/group-tokenization/-/blob/master/CHIP-2021-02_Unforgeable_Groups_for_Bitcoin_Cash.md), [Confidential Assets](https://blockstream.com/bitcoin17-final41.pdf)).
+Advanced BCH contract use cases require strategies for transferring authenticated commitments – messages attesting to ownership, authorization, credit, debt, or other contract state – from one contract to another (a motivation behind [PMv3](https://github.com/bitjson/pmv3)). These use cases often conflicted with previous, fungibility-focused token proposals (see [Colored Coins](#colored-coins)).
 
 One key insight which precipitated this proposal's bifurcated fungible/non-fungible approach is: **token fungibility and token commitments are conceptually incompatible**.
 
@@ -659,16 +767,9 @@ As with public keys, a specialized **signature commitment type** could be design
 
 ### Shared Codepoint for All Tokens
 
-Though fungible and non-fungible tokens are entirely independent primitives, this specification defines the same `PREFIX_TOKEN` codepoint for encoding both token types.
+Though fungible and non-fungible tokens are independent primitives, this specification defines the same `PREFIX_TOKEN` codepoint for encoding both token types.
 
-While specifying separate "`TOKEN_FUNGIBLE`" and "`TOKEN_NONFUNGIBLE`" codepoints could save one byte for outputs that encode only fungible tokens, such separation would introduce significant overhead for covenants that operate on tokens of both types (within a single category): holding one token type would prevent covenants from holding the other type in the same output (assuming [outputs must have only one prefix](#one-prefix-codepoint-per-output)). While [depository covenants](#depository-child-covenants) can always be used to hold other categories of tokens, this option would still force many developers to use multi-output, "sidecar" covenant designs, even for relatively simple applications.
-
-Instead of `TOKEN_NONFUNGIBLE`, a "`TOKEN_DUAL`" could be used to add support for these covenant cases. It could encode both NFT and NFT+FT cases, while the `TOKEN_FUNGIBLE` would be used for pure FT cases as more efficient encoding that would save 1 byte per output.
-Specifying multiple token codepoints would add to implementation cost and also increase the risk of user confusion and implementation errors on software like wallets, backends, indexers, and block explorers.
-
-It is conceptually clearer to treat the codepoint byte as a single switch that activates token validation code which will encapsulate processing the token data and enforcing consensus rules for it. In other words, the `PREFIX_TOKEN` marks the beginning of a different deserialization scheme which all the tokens share - distinct from other existing deserialization schemes - and it is cleaner implementation wise to separate the deserialization-scheme "magic byte" from the payload it encodes.
-
-Tokens aren't expected to be present on the majority of outputs, and for software interested in their presence it is relatively more efficient to inspect the serialized byte for just 1 value. Because we're splicing this encoding into the existing transaction format, it is prudent to prioritize that simplicity over the 1 byte of potential savings in the serialization. A future transaction format could make a different decision after seeing on-chain usage, but the `token outputs / total outputs` ratio would have to be fairly high to justify multiple checks for tokens.
+Alternatively, additional codepoints could be reserved to save a byte for outputs that encode only tokens of one or the other type (e.g. "`PREFIX_FUNGIBLE`" and "`PREFIX_NONFUNGIBLE`"). However, this change would require matching of the additional prefixes during decoding – increasing decoding complexity in the common case (if tokens are not present on the majority of outputs) – and the potential savings are insufficient to justify expending additional codepoints.
 
 ### Behavior of Minting and Mutable Tokens
 
@@ -676,17 +777,21 @@ This specification includes support for adding two different "capabilities" to n
 
 Minting tokens allow the holder to create new non-fungible tokens that share the same category ID as the minting token. By implementing this minting capability for a category (rather than requiring all category tokens to be minted in a single transaction), this specification enables use cases that require both a stable category ID and long-running issuance. This is critical for both primarily-off-chain applications of non-fungible tokens (where issuers commonly require both stable identifiers and an issuer-provided commitment) and for most covenant use cases (where covenants must be able to create new commitments in the course of operation).
 
-By implementing category-minting control as a token, minting policies can be defined using complex contracts (e.g. multisig vaults with time-based fallbacks) or even covenants. (E.g. to enforce uniqueness of commitments within the category, to issue receipts or other bearer instruments to covenant users, etc.) Notably, this specification even allows minting tokens to create additional minting tokens; this is valuable for [many specialized covenants](#multithreaded-covenants) that require the ability to delegate token-creation authority to other covenants.
+By implementing category-minting control as a token, minting policies can be defined using complex contracts (e.g. multisig vaults with time-based fallbacks) or even covenants (e.g. to enforce uniqueness of commitments within the category, to issue receipts or other bearer instruments to covenant users, etc.). Notably, this specification even allows minting tokens to create additional minting tokens; this is valuable for [many specialized covenants](#multithreaded-covenants) that require the ability to delegate token-creation authority to other covenants.
 
 Mutable tokens allow the holder to create **only one new token** (i.e. "modify" the mutable token's commitment) that may again have the mutable capability.
 
-This is a particularly critical use case for covenants, as it enables covenants to modify the commitment in a [tracking token](#covenant-tracking-non-fungible-tokens) without exhaustively validating that the interaction did not unexpectedly mint new tokens (allowing the user to impersonate the covenant). While exhaustive validation could be made efficient with new VM opcodes (like [loops](https://github.com/bitjson/bch-loops)), such validation may commonly conflict across covenants, preventing them from being used in the same transaction. As such, this proposal considers the `mutable` capability to be essential for [cross-covenant interfaces](#cross-contract-interfaces).
+This is a particularly critical use case for covenants, as it enables covenants to modify the commitment in a single NFT (e.g. [tracking token](#covenant-tracking-identity-tokens)) without exhaustively validating that the interaction did not unexpectedly mint new tokens (allowing the spender to impersonate the covenant). While exhaustive validation could be made efficient with new VM opcodes (like [loops](https://github.com/bitjson/bch-loops)), such validation may commonly conflict across covenants, preventing them from being used in the same transaction. As such, this proposal considers the `mutable` capability to be essential for [cross-covenant interfaces](#cross-contract-interfaces).
+
+### Exclusion of Cloneable Capability
+
+This proposal could specify a "cloneable" capability that would allow the spender to create new NFTs with the same commitment as the cloneable NFT. Such a capability could simplify use cases where a single commitment must be consumed by multiple contracts. However, more byte-efficient strategies are already available for implementing this behavior (e.g. ["certification tokens"](https://bitcoincashresearch.org/t/chip-2022-02-cashtokens-token-primitives-for-bitcoin-cash/725/21)), and a "cloneable" capability would both increase protocol complexity and encourage inefficient application designs that duplicate commitment data in the UTXO set.
 
 ### Avoiding Proof-of-Work for Token Data Compression
 
 Previous token proposals require token creators to retry hashing preimages until the resulting token category ID matches required patterns. This strategy enables additional bits of information to be packed into the category ID.
 
-In practice, such proof-of-work strategies unnecessarily complicate covenant-managed token creation. To create [ecosystems of contracts that are mutually-aware of each other contract](#covenant-tracking-non-fungible-tokens), it is valuable to be able to predict the category ID of a token that has not yet been created; hashing strategies often preclude such planning.
+In practice, such proof-of-work strategies unnecessarily complicate covenant-managed token creation. To create [ecosystems of contracts that are mutually-aware of each other contract](#covenant-tracking-identity-tokens), it is valuable to be able to predict the category ID of a token that has not yet been created; hashing strategies often preclude such planning.
 
 Finally, at a software level, rapid retrying of hash preimages is expensive to implement and audit. Wallet software must recognize which fields may be modified, and some logic must select the parameters of each attempt. This additional flexibility presents a large surface area for exfiltration of key material (i.e. hiding parts of the private key in various modifiable structures). Signing standards for mitigating this risk may be expensive to specify and implement.
 
@@ -707,7 +812,7 @@ Many use cases rely on the ability for one transaction output to effectively con
 - **Simplified VM API** – because only one category of tokens can exist at any UTXO or output, the "token API" exposed via token inspection operations is significantly simplified: each operation requires only one index, and contracts need not handle combinatorial cases where tokens are placed at unexpected "sub-indexes" (in addition to validation across standard UTXO/output indexes). This reduces contract complexity and transaction sizes in the common case where contracts need only interact with one or two token categories.
 - **Simplified data model** – limiting the data model to a single token prefix allows node implementations and indexing systems to support tokens without introducing another many-to-many relationship between some token "sub-output" and the existing output type (the most scaling-critical data type). The single-prefix limitation also allows token information to be easily denormalized into fixed-size output data structures.
 
-Importantly, it should be noted that alternative strategies exist for effectively locking multiple (groups of) tokens to a single output. For example, a decentralized order book for trading non-fungible tokens could hold a portfolio of tokens in many separate [depository covenants](#depository-child-covenants), contracts that require the parent covenant to participate in any transactions. The sub-covenant can likewise verify the authenticity of the parent using a ["tracking" non-fungible token](#covenant-tracking-non-fungible-tokens) that moves along with the parent covenant. (Or in cases where the sub-covenant moves with its parent in every transaction, it can also simply authenticate the parent by outpoint index after comparing with its own outpoint transaction hash.)
+Importantly, it should be noted that alternative strategies exist for effectively locking multiple (groups of) tokens to a single output. For example, a decentralized order book for trading non-fungible tokens could hold a portfolio of tokens in many separate [depository covenants](#depository-child-covenants), contracts that require the parent covenant to participate in any transactions. The sub-covenant can likewise verify the authenticity of the parent using a ["tracking" non-fungible token](#covenant-tracking-identity-tokens) that moves along with the parent covenant. (Or in cases where the sub-covenant moves with its parent in every transaction, it can also simply authenticate the parent by outpoint index after comparing with its own outpoint transaction hash.)
 
 This parent-child strategy offers contracts practically unlimited flexibility in holding portfolios of both fungible and non-fungible tokens, and it encourages more efficient contract design across the ecosystem: rather than leaving large lists of token prefixes in a single large output (duplicating the full list in each transaction), transactions can involve only outputs with the tokens needed for a particular code path. Because contract development tooling will already require multi-output behavior, this optimization step is more likely to become widespread.
 
@@ -715,7 +820,7 @@ This parent-child strategy offers contracts practically unlimited flexibility in
 
 The token category inspection operations (`OP_*TOKENCATEGORY`) in this proposal push the **concatenation of both category and capability** (if present). While token capabilities could instead be inspected with individual `OP_*TOKENCAPABILITY` operations, the behavior specified in this proposal is valuable for contract efficiency and security.
 
-First, the combined `OP_*TOKENCATEGORY` behavior reduces contract size in the most common case: every covenant that handles tokens must regularly compare both the category and capability of tokens. With the separated `OP_*TOKENCATEGORY` behavior, this common case would require at least 3 additional bytes for each occurrence – `<index> OP_*TOKENCAPABILITY OP_CAT`, and commonly, 6 or more bytes: `<index> OP_UTXOTOKENCAPABILITY OP_CAT` and `<index> OP_OUTPUTTOKENCAPABILITY OP_CAT` (`<index>` may require multiple bytes).
+First, the combined `OP_*TOKENCATEGORY` behavior reduces contract size in a common case: every covenant that handles tokens must regularly compare both the category and capability of tokens. With the separated `OP_*TOKENCATEGORY` behavior, this common case would require at least 3 additional bytes for each occurrence – `<index> OP_*TOKENCAPABILITY OP_CAT`, and commonly, 6 or more bytes: `<index> OP_UTXOTOKENCAPABILITY OP_CAT` and `<index> OP_OUTPUTTOKENCAPABILITY OP_CAT` (`<index>` may require multiple bytes).
 
 There are generally two other cases to consider:
 
@@ -724,15 +829,43 @@ There are generally two other cases to consider:
 
 Beyond efficiency, this combined behavior is also **critical for the general security of the covenant ecosystem**: it makes the most secure validation (verifying both category and capability) the "default" and cheaper in terms of bytes than more lenient validation (allowing for other token capabilities, e.g. during minting).
 
-For example, assume this proposal specified the separated behavior: if an upgradable (e.g. by shareholder vote) covenant with a tracking token is created without any other token behavior, dependent contracts may be written to check that the user has also somehow interacted with the upgradable covenant (i.e. `<index> OP_UTXOTOKENCATEGORY <expected> OP_EQUALVERIFY`). If the upgradable covenant later begins to issue tokens for any reason, a vulnerability in the dependant contract is exposed: users issued a token by the upgradable covenant can now mislead the dependent contract into believing it is being spent in a transaction with the upgradeable contract (by spending their issued token with the dependent contract). Because the dependent contract did not include a defensive `<index> OP_UTXOTOKENCAPABILITY <0xfe> OP_EQUALVERIFY` (either by omission or to reduce contract size), it became vulnerable after a "public interface change". If `OP_UTXOTOKENCATEGORY` instead uses the combined behavior (as specified by this proposal) this class of vulnerabilities is eliminated.
+For example, assume this proposal specified the separated behavior: if an upgradable (e.g. by shareholder vote) covenant with a tracking token is created without any other token behavior, dependent contracts may be written to check that the user has also somehow interacted with the upgradable covenant (i.e. `<index> OP_UTXOTOKENCATEGORY <expected> OP_EQUALVERIFY`). If the upgradable covenant later begins to issue tokens for any reason, a vulnerability in the dependant contract is exposed: users issued a token by the upgradable covenant can now mislead the dependent contract into believing it is being spent in a transaction with the upgradeable contract (by spending their issued token with the dependent contract). Because the dependent contract did not include a defensive `<index> OP_UTXOTOKENCAPABILITY <mutable> OP_EQUALVERIFY` (either by omission or to reduce contract size), it became vulnerable after a "public interface change". If `OP_UTXOTOKENCATEGORY` instead uses the combined behavior (as specified by this proposal) this class of vulnerabilities is eliminated.
 
 Finally, this proposal's combined behavior preserves two codepoints in the Bitcoin Cash VM instruction set.
 
-### Non-Fungible Token Commitment Length
+### Support for Zero-Length Commitments
+
+This proposal allows for non-fungible token to have commitments with a length of `0`. This behavior matches that of stack items inside the VM, and it improves the efficiency and security of many contract constructions.
+
+For many token categories, zero-length commitments can be used to represent concepts like memberships, authorizations, coupons, receipts, certifications, and more. In these cases, the availability of zero-length commitments often saves several bytes per transaction vs. 1-byte commitments (1 byte per token output, 1 to 2 bytes per validation) or fungible tokens (which require prior minting and handling of reserves).
+
+Support for zero-length commitments also eliminates a possible contract vulnerability: token categories that commit to a single VM number (e.g. a counter or total in a covenant’s mutable token) could require that the next transaction perform a particular arithmetic operation on the committed number. If the required result is 0 (an empty VM stack item), and zero-length commitments were not supported, the covenant could be rendered unspendable (and funds permanently frozen). Workarounds include prefixing the committed number – costing at least 1 byte per token output (the prefix) and 2-4 bytes per validation (`<prefix> OP_CAT`, `<1> OP_SPLIT`) – or padding the committed number – costing 2-7 bytes per token output (`<8> OP_NUM2BIN`), and 1 byte per validation (`OP_BIN2NUM`). Supporting zero-length commitments avoids the need for contract audits to identify this issue or increase transaction sizes with workarounds.
+
+Notably, zero-length commitments introduce a potential ambiguity in the state exposed to contracts by `OP_UTXOTOKENCOMMITMENT` and `OP_OUTPUTTOKENCOMMITMENT`; these operations return VM Number `0` for outputs with either 1) no NFT or 2) an immutable NFT with a commitment of length `0`. However, this ambiguity does not impact contract security, and it rarely increases transaction sizes. Contracts can differentiate between the cases by requiring the output in question to contain no fungible tokens (`OP_*TOKENAMOUNT <0> OP_EQUALVERIFY`), and wallets that are designed to interact with such contracts can split UTXOs containing both fungible tokens and zero-length-commitment, immutable NFTs into separate UTXOs prior to performing actions that require a zero-length-commitment, immutable NFT from a token category for which fungible tokens also exist.
+
+Alternatively, this ambiguity could also be addressed by modifying `OP_UTXOTOKENCATEGORY` and `OP_OUTPUTTOKENCATEGORY` to include a final byte for "no capability" (i.e. an immutable NFT) rather than returning only the 32-byte token category. However, such a change would [de-optimize many common cases](#including-capabilities-in-token-category-inspection-operations) – requiring 3 additional bytes for most token validation – while only improving the efficiency of a rare case (validation of zero-length, immutable NFTs from categories that include fungible tokens) for which many efficient alternatives exist. Even for contract systems in which the rare case is applicable, this would increase transaction sizes (saving 2-3 bytes for the rare case, but costing 3 bytes per category validation in the surrounding contract).
+
+### Limitation of Non-Fungible Token Commitment Length
 
 This specification limits the length of non-fungible token commitments to `40` bytes; this restrains excess growth of the UTXO set and reduces the resource requirements of typical wallets and indexers.
 
 By committing to a hash, contracts can commit to an unlimited collection of data (e.g. using a merkle tree). For resistance to [birthday attacks](https://bitcoincashresearch.org/t/p2sh32-a-long-term-solution-for-80-bit-p2sh-collision-attacks/750), covenants should typically use `32` byte hashes. This proposal expands this minimum requirement by `8` bytes to include an additional (padded, maximum-length) VM number. This is particularly valuable for covenants that are optimized to use multiple types of commitment structures and must concisely indicate their current internal "mode" to other contracts (e.g. re-organizing an unbalanced merkle tree of contract state for efficiency when the covenant enters "voting" mode). This additional 8 bytes also provides adequate space for higher-level standards to specify prefixes for committed hashes (e.g. marking identifiers to content-addressable storage).
+
+### Inclusion of Token-Aware CashAddresses
+
+This proposal adds two new types to the existing CashAddress format: `Token-Aware P2PKH` (`2`) and `Token-Aware P2SH` (`3`). By clearly designating "token-aware" equivalents of the existing address types, users are protected from unknowingly sending tokens to addresses where they may be inaccessible to the intended recipient.
+
+By design, token support in most software remains optional, and many simple wallets may never have the need to implement token support (eliminating the need for token management user interfaces, simplifying UTXO management, and reducing maintenance costs). By introducing new, opt-in, token-aware CashAddress types, token-unaware software can continue to signal its inability to receive tokens, avoiding [lost funds and poor user experiences](https://github.com/bitjson/cashtokens/issues/32#issuecomment-1188122202).
+
+### Recommendation of `SIGHASH_UTXOS` for Multi-Entity Transactions
+
+This proposal recommends that all wallets enable the `SIGHASH_UTXOS` signing serialization flag when creating signatures for multi-entity transactions, including both 1) transactions where signatures are collected from multiple keys and assembled into a single transaction, and 2) transactions involving contracts that can be influenced by multiple entities (e.g. covenants). This recommendation eliminates several classes of vulnerabilities affecting light wallets and improves the privacy of all users of multi-entity transactions.
+
+`SIGHASH_UTXOS` eliminates a set of potential vulnerabilities in light wallets and offline signing devices including [unexpected fee burning](https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2017-August/014843.html), [unexpected token burning, theft, or unexpected actions in decentralized applications](https://github.com/bitjson/cashtokens/issues/22#issuecomment-1179333487).
+
+Alternatively, signers could download and verify the spent output of each transaction referenced by each input prior to signing vulnerable transactions, but this approach would require significantly higher bandwidth, memory, and/or storage requirements for many light wallet and offline signing devices, impeding support for interacting with tokens or decentralized applications.
+
+While these potential vulnerabilities do not impact signers with a full view of the necessary data (e.g. wallets with integrated, fully-validating nodes), because a subset of light wallets must enable `SIGHASH_UTXOS` for security, enabling `SIGHASH_UTXOS` for all signers improves privacy by maximizing the anonymity set of the resulting transactions. As such, this proposal recommends use of `SIGHASH_UTXOS` for all multi-entity transactions, even for non-vulnerable wallets.
 
 ### Limitation of Fungible Token Supply
 
@@ -748,15 +881,9 @@ Finally, the Bitcoin Cash currency itself is significantly less granular than th
 
 ### Specification of Token Supply Definitions
 
-The supply of covenant-issued tokens will often be inherently analyzable using the [supply-calculation algorithms](#fungible-token-supply-definitions) included in this specification. For example, all covenants that use a [tracking token](#covenant-tracking-non-fungible-tokens) and retain a supply of unissued tokens will have an easily-calculable [circulating supply](#circulating-supply) (without requiring wallets/indexers to understand the implementation details of the contract).
+The supply of covenant-issued tokens will often be inherently analyzable using the [supply-calculation algorithms](#fungible-token-supply-definitions) included in this specification. For example, all covenants that use a [tracking token](#covenant-tracking-identity-tokens) and retain a supply of unissued tokens will have an easily-calculable [circulating supply](#circulating-supply) (without requiring wallets/indexers to understand the implementation details of the contract).
 
 By explicitly including these supply-calculation algorithms in this specification, token issuers are more likely to be aware of this reality, choosing to issue tokens via a strategy that conforms to common user expectations (improving data availability and compatibility across the ecosystem).
-
-## Implementations
-
-Please see the following reference implementations for additional examples and test vectors:
-
-[TODO: after initial public feedback]
 
 ## Prior Art & Alternatives
 
@@ -825,6 +952,72 @@ CashTokens differs from SLP in that CashTokens are validated by the network, and
 
 > With these primitives, Bitcoin Cash can support decentralized applications comparable to Ethereum contract functionality, while retaining Bitcoin Cash’s >1000x efficiency advantage in transaction and block validation. [...] Because CashTokens could now enable more efficient, user-friendly decentralized prediction markets than PMv3, I’m withdrawing the PMv3 CHIP. —[Jason Dreyzehner, PMv3 CHIP Author](https://bitcoincashresearch.org/t/chip-2021-01-pmv3-version-3-transaction-format/265/55?u=bitjson)
 
+## Test Vectors
+
+Sets of cross-implementation test vectors are provided in the [`test-vectors`](./test-vectors/) directory. Each set is described below.
+
+### Token-Aware CashAddress Test Vectors
+
+[`cashaddr.json`](./test-vectors/cashaddr.json) includes an updated set of test vectors including tests for [token-aware CashAddresses](#cashaddress-token-support).
+
+Test vectors for the CashAddress format have been [standardized and widely used since 2017](https://github.com/bitcoincashorg/bitcoincash.org/blob/3e2e6da8c38dab7ba12149d327bc4b259aaad684/spec/cashaddr.md), including test vectors for not-yet-defined `type` values.
+
+While this specification simply uses the available `type` values, to assist implementers, several additional test vectors have been added to the existing CashAddress test vectors in [`test-vectors/cashaddr.json`](./test-vectors/cashaddr.json).
+
+### Token Encoding Test Vectors
+
+A complete set of test vectors that validate token encoding can be found in [`test-vectors/token-prefix-valid.json`](./test-vectors/token-prefix-valid.json) and [`test-vectors/token-prefix-invalid.json`](./test-vectors/token-prefix-invalid.json), respectively.
+
+### Transaction Validation Test Vectors
+
+The [`test-vectors/vmb_tests`](./test-vectors/vmb_tests/) directory contains sets of transaction test vectors that validate all technical elements of this proposal.
+
+To maximize portability between implementations, these test vectors use Libauth's [full-transaction testing strategy](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/readme.md). Test vectors are sorted into files based on their expected behavior:
+
+- **Pre-activation test vectors** – these vectors test transaction validation prior to the activation of this proposal.
+  - [`bch_vmb_tests_before_chip_cashtokens_invalid.json`](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_invalid.json) - test vectors that must fail validation in both nonstandard and standard mode (see [Standard Vs. Non-Standard VMs](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/readme.md#standard-vs-non-standard-vms)). To assist implementers, a companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_invalid_reasons.json) describes the reason each test vector is expected to fail.
+  - [`bch_vmb_tests_before_chip_cashtokens_nonstandard.json`](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_nonstandard.json) - test vectors that must fail validation in standard mode but pass validation in nonstandard mode. A companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_nonstandard_reasons.json) describes the reason each test vector is expected to fail in standard mode.
+  - [`bch_vmb_tests_before_chip_cashtokens_standard.json`](./test-vectors/vmb_tests/bch_vmb_tests_before_chip_cashtokens_standard.json) - test vectors that must pass validation in both standard and nonstandard mode.
+- **Post-activation test vectors** – these vectors test transaction validation as it must behave after activation of this proposal.
+  - [`bch_vmb_tests_chip_cashtokens_invalid.json`](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_invalid.json) - test vectors that must fail validation in both nonstandard and standard mode. To assist implementers, a companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_invalid_reasons.json) describes the reason each test vector is expected to fail.
+  - [`bch_vmb_tests_chip_cashtokens_nonstandard.json`](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_nonstandard.json) - test vectors that must fail validation in standard mode but pass validation in nonstandard mode. A companion [`reasons` file](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_nonstandard_reasons.json) describes the reason each test vector is expected to fail in standard mode.
+  - [`bch_vmb_tests_chip_cashtokens_standard.json`](./test-vectors/vmb_tests/bch_vmb_tests_chip_cashtokens_standard.json) - test vectors that must pass validation in both standard and nonstandard mode.
+
+Each test vector is an array including:
+
+1. A short, unique identifier for the test (based on the hash of the test contents)
+2. A string describing the purpose/behavior of the test
+3. The unlocking script under test (disassembled, i.e. human-readable)
+4. The locking script under test (disassembled)
+5. The full, encoded test transaction
+6. An encoded list of unspent transaction outputs (UTXOs) with which to verify the test transaction (ordered to match the input order of the test transaction)
+
+**Only array items 5 and 6 are strictly necessary**; items 1 through 4 are purely informational, and may be useful in debugging and cross-implementation communication.
+
+To use these test vectors, implementations should decode the transaction under test (5) and its UTXOs (6), then validate the transaction using all of the implementation's transaction validation infrastructure initialized in the expected standard/nonstandard mode(s). See [Implementations](#implementations) for examples.
+
+## Implementations
+
+Please see the following implementations for additional examples and test vectors:
+
+- C++
+  - [Bitcoin Cash Node (BCHN)](https://bitcoincashnode.org/) – A professional, miner-friendly node that solves practical problems for Bitcoin Cash.
+    - CashTokens support: [Merge Request !1580](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1580)
+    - Token-aware CashAddresses: [Merge Request !1596](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1596)
+    - This CHIP also includes CashToken integration test vectors for other proposals:
+      - P2SH32: [Merge Request !1556](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1556)
+      - 65-byte TXs: [Merge Request !1598](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1598)
+- JavaScript/TypeScript
+  - [Libauth](https://github/com/bitauth/libauth) – An ultra-lightweight, zero-dependency JavaScript library for Bitcoin Cash.
+    - [Pull Request #98](https://github.com/bitauth/libauth/pull/98)
+      - [Token encoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L395-L435)
+      - [Token decoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L209-L324)
+      - [Token-aware validation](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L163-L297)
+      - [Token inspection operations](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vm/instruction-sets/bch/2023/bch-2023-tokens.ts#L355-L389)
+      - [Token-aware signing serialization](https://github.com/bitauth/libauth/blob/9dfa6cc0b8710dedfe007b47bd018f5a47079df5/src/lib/vm/instruction-sets/common/signing-serialization.ts#L456-L474)
+      - [Token-aware CashAddresses](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/address/cash-address.ts#L61-L82)
+      - [Verifying vmb_tests](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/bch-vmb-tests.spec.ts#L122-L152)
+
 ## Feedback & Reviews
 
 - [CashTokens CHIP Issues](https://github.com/bitjson/cashtokens/issues)
@@ -845,7 +1038,9 @@ This section summarizes the evolution of this document.
   - Revert to limiting `commitment_length` by consensus (`40` bytes)
   - Revert `PREFIX_TOKEN` to unique codepoint (`0xef`)
   - Modify `OP_*TOKENCOMMITMENT` to push `0` for zero-length commitments
+  - Specify activation times
   - Expand test vectors
+  - Improve rationale
 - **v2.1.0 – 2022-6-30** ([`f8b500a0`](https://github.com/bitjson/cashtokens/blob/f8b500a051f82d42dbf9e9e890bc6cdc14592307/readme.md))
   - Expand motivation, benefits, rationale, prior art & alternatives
   - Simplify token encoding, update test vectors
