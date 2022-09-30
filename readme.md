@@ -6,8 +6,8 @@
         Maintainer: Jason Dreyzehner
         Status: Draft
         Initial Publication Date: 2022-02-22
-        Latest Revision Date: 2022-6-30
-        Latest Version: 2.1.0 (f8b500a0)
+        Latest Revision Date: 2022-9-30
+        Version: 2.2.0
 
 ## Summary
 
@@ -185,7 +185,7 @@ type Output = {
 
 ## Technical Specification
 
-Token primitives are defined, token encoding and activation are specified, and six new token inspection opcodes are introduced. Transaction validation and transaction signing serialization is modified to support tokens, `SIGHASH_UTXOS` is specified, and CashAddress `types` with token support are defined.
+Token primitives are defined, token encoding and activation are specified, and six new token inspection opcodes are introduced. Transaction validation and transaction signing serialization is modified to support tokens, `SIGHASH_UTXOS` is specified, BIP69 sorting is extended to support tokens, and CashAddress `types` with token support are defined.
 
 ### Token Categories
 
@@ -1058,7 +1058,7 @@ Thank you to the following contributors for reviewing and contributing improveme
 
 This section summarizes the evolution of this document.
 
-- **Draft (current)**
+- **v2.2.0 – 2022-9-30** (current)
   - Compress token encoding using bitfield
   - Encode mutable capability as `0x01` and minting capability as `0x02`
   - Revert to limiting `commitment_length` by consensus (`40` bytes)
