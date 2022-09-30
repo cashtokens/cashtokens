@@ -510,6 +510,10 @@ The `SIGHASH_UTXOS` type must be used with the `SIGHASH_FORKID` type; if a signa
 
 **For security, wallets should enable `SIGHASH_UTXOS` when participating in multi-entity transactions**. This includes both 1) transactions where signatures are collected from multiple keys and assembled into a single transaction, and 2) transactions involving contracts that can be influenced by multiple entities (e.g. covenants). (See [Recommendation of `SIGHASH_UTXOS` for Multi-Entity Transactions](#recommendation-of-sighashutxos-for-multi-entity-transactions).)
 
+### Double Spend Proof Support
+
+Transactions employing `SIGHASH_UTXOS` and transactions spending outputs containing tokens are not protected by either of the [beta specifications for Double Spend Proofs (DSP)](https://documentation.cash/protocol/network/messages/dsproof-beta). Support for these features are left to future proposals.
+
 ### CashAddress Token Support
 
 Two new [`CashAddress` types](https://github.com/bitcoincashorg/bitcoincash.org/blob/master/spec/cashaddr.md#version-byte) are specified to indicate support for accepting tokens:
@@ -1040,6 +1044,7 @@ This section summarizes the evolution of this document.
   - Modify `OP_*TOKENCOMMITMENT` to push `0` for zero-length commitments
   - Specify activation times
   - Expand test vectors
+  - Note non-support of beta specs for double spend proofs
   - Improve rationale
 - **v2.1.0 – 2022-6-30** ([`f8b500a0`](https://github.com/bitjson/cashtokens/blob/f8b500a051f82d42dbf9e9e890bc6cdc14592307/readme.md))
   - Expand motivation, benefits, rationale, prior art & alternatives
