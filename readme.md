@@ -223,7 +223,7 @@ Token behavior is enforced by the [**token validation algorithm**](#token-valida
 
 #### Fungible Token Behavior
 
-1.  A transaction output can contain any `amount` of fungible token from a single category.
+1.  A transaction output can contain any `amount` of fungible tokens from a single category.
 2.  All fungible tokens of a category are created in that category's genesis transaction; their combined `amount` may not exceed `9223372036854775807`.
 3.  A transaction can spend fungible tokens from any number of UTXOs to any number of outputs, so long as the sum of output `amount`s do not exceed the sum of input `amount`s (for each token category).
 
@@ -576,6 +576,25 @@ While this specification simply uses the available `type` values, to assist impl
 
 </details>
 
+### Token-Aware BIP69 Sorting Algorithm
+
+The [BIP69 transaction output sorting algorithm](https://github.com/bitcoin/bips/blob/master/bip-0069.mediawiki#transaction-outputs) is extended to support the sorting of outputs by token information.
+
+As with the existing algorithm, the additional fields are ordered for sorting efficiency:
+
+1. Output value – ascending
+2. locking bytecode – sorted lexicographically<sup>1</sup>, ascending (e.g. `0x51` < `0x5161`)
+3. token information: (no tokens < has tokens)
+   1. amount – ascending (e.g. `0` < `1`)
+   2. `HAS_NFT` – `false` < `true`
+      1. capability – ascending; `none` < `mutable` < `minting`
+      2. commitment – sorted lexicographically, ascending, short-to-long; e.g. zero-length < `0x00` < `0x01` < `0x0100`)
+   3. category – sorted lexicographically, ascending, where bytes are in little-endian order (matching the order used in encoded transactions)
+
+**Notes**
+
+1. For clarity, lexicographically-sorted fields must be compared byte-by-byte from start to end. Where one item is a prefix of another item, the shorter item is considered the "lower" value. E.g. the following values are sorted lexicographically in ascending order: `0x00`, `0x0011`, `0x11`, `0x1100`.
+
 ### Fungible Token Supply Definitions
 
 Several measurements of fungible token supply are standardized for wider ecosystem compatibility. (See [Specification of Token Supply Definitions](#specification-of-token-supply-definitions).)
@@ -749,7 +768,7 @@ Two specialized **hash commitment types** could be designed to allow commitments
 
 Many decentralized oracle use cases require participants to commit to secret values prior to a reveal period (e.g. [sealed voting](#sealed-voting)). For a hash commitment type to be useful in these applications, the type must support merging and splitting of commitments without revealing the hashed contents.
 
-This **secret hash commitment type** would require a protocol-standardized commitment data structure to/from which sets of hashed values can be added or removed (e.g. a standard), and efficient utilization within contracts would require new VM operations that allow the contract to verify that one or more hashes are included or excluded from the data structure (e.g. [`OP_MERKLEBRANCHVERIFY`](https://github.com/bitcoin/bips/blob/master/bip-0116.mediawiki)). Additionally, many use cases also require nonsecret/validated metadata (e.g. a block height, block time, a count of shares cast, etc.) in addition to the hash of the secret preimage, so a secret hash commitment type would need to either 1) support associating non-secret data with each hash, or 2) defer to byte-string commitments for such use cases.
+This **secret hash commitment type** would require a protocol-standardized commitment data structure to/from which sets of hashed values can be added or removed (e.g. a standard Merkle tree), and efficient utilization within contracts would require new VM operations that allow the contract to verify that one or more hashes are included or excluded from the data structure (e.g. [`OP_MERKLEBRANCHVERIFY`](https://github.com/bitcoin/bips/blob/master/bip-0116.mediawiki)). Additionally, many use cases also require nonsecret/validated metadata (e.g. a block height, block time, a count of shares cast, etc.) in addition to the hash of the secret preimage, so a secret hash commitment type would need to either 1) support associating non-secret data with each hash, or 2) defer to byte-string commitments for such use cases.
 
 In practice, contracts can already define equivalent, application-specific data structures and validation strategies using VM bytecode and byte-string commitments; because these efficiency gains apply only to a small subset of contracts, the required increase in protocol and wallet implementation complexity for a specialized secret hash commitment type cannot be justified.
 
@@ -1042,6 +1061,7 @@ This section summarizes the evolution of this document.
   - Revert to limiting `commitment_length` by consensus (`40` bytes)
   - Revert `PREFIX_TOKEN` to unique codepoint (`0xef`)
   - Modify `OP_*TOKENCOMMITMENT` to push `0` for zero-length commitments
+  - Extend BIP69 sorting algorithm to support tokens
   - Specify activation times
   - Expand test vectors
   - Note non-support of beta specs for double spend proofs
