@@ -7,7 +7,7 @@
         Status: Draft
         Initial Publication Date: 2022-02-22
         Latest Revision Date: 2022-9-30
-        Version: 2.2.0
+        Latest Version: 2.2.0 (e02012a2)
 
 ## Summary
 
@@ -1058,7 +1058,9 @@ Thank you to the following contributors for reviewing and contributing improveme
 
 This section summarizes the evolution of this document.
 
-- **v2.2.0 – 2022-9-30** (current)
+- **Draft**
+  - (no changes yet)
+- **v2.2.0 – 2022-9-30** ([`e02012a2`](https://github.com/bitjson/cashtokens/blob/e02012a219a0fb2abef02aa3e08ad326774bd3f3/readme.md))
   - Compress token encoding using bitfield
   - Encode mutable capability as `0x01` and minting capability as `0x02`
   - Revert to limiting `commitment_length` by consensus (`40` bytes)
