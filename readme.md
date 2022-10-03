@@ -11,66 +11,24 @@
 
 <details>
 
-<summary>Table of Contents</summary>
+<summary><strong>Table of Contents</strong></summary>
 
-- [CHIP-2022-02-CashTokens: Token Primitives for Bitcoin Cash](#chip-2022-02-cashtokens-token-primitives-for-bitcoin-cash)
-  - [Summary](#summary)
-    - [Terms](#terms)
-  - [Deployment](#deployment)
-  - [Motivation](#motivation)
-    - [Contract-Issued Commitments](#contract-issued-commitments)
-      - [Byte-String Commitments](#byte-string-commitments)
-      - [Numeric Commitments](#numeric-commitments)
-  - [Benefits](#benefits)
-    - [Cross-Contract Interfaces](#cross-contract-interfaces)
-    - [Decentralized Applications](#decentralized-applications)
-    - [Universal Token Primitives](#universal-token-primitives)
-  - [Technical Summary](#technical-summary)
-    - [Transaction Output Data Model](#transaction-output-data-model)
-  - [Technical Specification](#technical-specification)
-    - [Token Categories](#token-categories)
-    - [Token Types](#token-types)
-    - [Token Behavior](#token-behavior)
-      - [Universal Token Behavior](#universal-token-behavior)
-      - [Non-Fungible Token Behavior](#non-fungible-token-behavior)
-      - [Fungible Token Behavior](#fungible-token-behavior)
-    - [Token Encoding](#token-encoding)
-      - [Token Prefix](#token-prefix)
-      - [Token Prefix Validation](#token-prefix-validation)
-      - [Token Prefix Standardness](#token-prefix-standardness)
-      - [Valid Token Prefix Encodings](#valid-token-prefix-encodings)
-        - [Reserved Token Prefix Encodings](#reserved-token-prefix-encodings)
-      - [Invalid Token Prefix Encodings](#invalid-token-prefix-encodings)
-    - [Token Encoding Activation](#token-encoding-activation)
-    - [Token-Aware Transaction Validation](#token-aware-transaction-validation)
-      - [Token Validation Algorithm](#token-validation-algorithm)
-    - [Token Inspection Operations](#token-inspection-operations)
-    - [Existing Introspection Operations](#existing-introspection-operations)
-    - [Interpretation of Signature Preimage Inspection](#interpretation-of-signature-preimage-inspection)
-    - [Signing Serialization of Tokens](#signing-serialization-of-tokens)
-    - [`SIGHASH_UTXOS`](#sighash_utxos)
-    - [Double Spend Proof Support](#double-spend-proof-support)
-    - [CashAddress Token Support](#cashaddress-token-support)
-      - [Token-Aware CashAddresses](#token-aware-cashaddresses)
-    - [Token-Aware BIP69 Sorting Algorithm](#token-aware-bip69-sorting-algorithm)
-    - [Fungible Token Supply Definitions](#fungible-token-supply-definitions)
-      - [Genesis Supply](#genesis-supply)
-      - [Total Supply](#total-supply)
-      - [Reserved Supply](#reserved-supply)
-      - [Circulating Supply](#circulating-supply)
-  - [Usage Examples](#usage-examples)
-  - [Rationale](#rationale)
-  - [Prior Art & Alternatives](#prior-art--alternatives)
-  - [Stakeholders & Statements](#stakeholders--statements)
-  - [Test Vectors](#test-vectors)
-    - [Token-Aware CashAddress Test Vectors](#token-aware-cashaddress-test-vectors)
-    - [Token Encoding Test Vectors](#token-encoding-test-vectors)
-    - [Transaction Validation Test Vectors](#transaction-validation-test-vectors)
-  - [Implementations](#implementations)
-  - [Feedback & Reviews](#feedback--reviews)
-  - [Acknowledgements](#acknowledgements)
-  - [Changelog](#changelog)
-  - [Copyright](#copyright)
+- [Summary](#summary)
+- [Deployment](#deployment)
+- [Motivation](#motivation)
+- [Benefits](#benefits)
+- [Technical Summary](#technical-summary)
+- [Technical Specification](#technical-specification)
+- [Usage Examples](#usage-examples)
+- [Rationale](#rationale)
+- [Prior Art & Alternatives](#prior-art--alternatives)
+- [Stakeholders & Statements](#stakeholders--statements)
+- [Test Vectors](#test-vectors)
+- [Implementations](#implementations)
+- [Feedback & Reviews](#feedback--reviews)
+- [Acknowledgements](#acknowledgements)
+- [Changelog](#changelog)
+- [Copyright](#copyright)
 
 </details>
 
@@ -249,6 +207,39 @@ type Output = {
 </details>
 
 ## Technical Specification
+
+<details>
+
+<summary><strong>Subsections</strong></summary>
+
+- [Token Categories](#token-categories)
+- [Token Types](#token-types)
+- [Token Behavior](#token-behavior)
+  - [Universal Token Behavior](#universal-token-behavior)
+  - [Non-Fungible Token Behavior](#non-fungible-token-behavior)
+  - [Fungible Token Behavior](#fungible-token-behavior)
+- [Token Encoding](#token-encoding)
+  - [Token Prefix](#token-prefix)
+  - [Token Prefix Validation](#token-prefix-validation)
+  - [Token Prefix Standardness](#token-prefix-standardness)
+- [Token Encoding Activation](#token-encoding-activation)
+- [Token-Aware Transaction Validation](#token-aware-transaction-validation)
+  - [Token Validation Algorithm](#token-validation-algorithm)
+- [Token Inspection Operations](#token-inspection-operations)
+  - [Existing Introspection Operations](#existing-introspection-operations)
+  - [Interpretation of Signature Preimage Inspection](#interpretation-of-signature-preimage-inspection)
+- [Signing Serialization of Tokens](#signing-serialization-of-tokens)
+- [`SIGHASH_UTXOS`](#sighash_utxos)
+- [Double Spend Proof Support](#double-spend-proof-support)
+- [CashAddress Token Support](#cashaddress-token-support)
+- [Token-Aware BIP69 Sorting Algorithm](#token-aware-bip69-sorting-algorithm)
+- [Fungible Token Supply Definitions](#fungible-token-supply-definitions)
+  - [Genesis Supply](#genesis-supply)
+  - [Total Supply](#total-supply)
+  - [Reserved Supply](#reserved-supply)
+  - [Circulating Supply](#circulating-supply)
+
+</details>
 
 Token primitives are defined, token encoding and activation are specified, and six new token inspection opcodes are introduced. Transaction validation and transaction signing serialization is modified to support tokens, `SIGHASH_UTXOS` is specified, BIP69 sorting is extended to support tokens, and CashAddress `types` with token support are defined.
 
@@ -552,11 +543,11 @@ For the complete set of test vectors, see [Test Vectors](#test-vectors).
 
 </details>
 
-### Existing Introspection Operations
+#### Existing Introspection Operations
 
 Note, this specification has **no impact on the behavior of [`OP_UTXOBYTECODE`, `OP_ACTIVEBYTECODE`, or `OP_OUTPUTBYTECODE`](https://gitlab.com/GeneralProtocols/research/chips/-/blob/master/CHIP-2021-02-Add-Native-Introspection-Opcodes.md)**. Each operation continues to return only the contents of the respective bytecode, excluding both the `CompactSize`-encoded "`token_prefix_and_locking_bytecode_length`" and the token prefix (if present).
 
-### Interpretation of Signature Preimage Inspection
+#### Interpretation of Signature Preimage Inspection
 
 It is possible to design contracts which inefficiently inspect the encoding of tokens using **signature preimage inspection** – inspecting the contents of a preimage for which a signature passes both `OP_CHECKSIG(VERIFY)` and `OP_CHECKDATASIG(VERIFY)`.
 
@@ -836,7 +827,7 @@ Thank you to the following contributors for reviewing and contributing improveme
 This section summarizes the evolution of this document.
 
 - **Draft**
-  - (no changes yet)
+  - Extract `examples.md`, `rationale.md`, and `alternatives.md` for approachability
 - **v2.2.0 – 2022-9-30** ([`e02012a2`](https://github.com/bitjson/cashtokens/blob/e02012a219a0fb2abef02aa3e08ad326774bd3f3/readme.md))
   - Compress token encoding using bitfield
   - Encode mutable capability as `0x01` and minting capability as `0x02`
