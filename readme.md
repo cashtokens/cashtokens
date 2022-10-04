@@ -48,8 +48,8 @@ A **token** is an asset – distinct from the Bitcoin Cash currency – that can
 
 Deployment of this specification is proposed for the May 2023 upgrade.
 
-- Activation is proposed for `1668513600` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2022-11-15T12:00:00.000Z`) on `testnet4`, splitting to create `chipnet`.
-- Activation is proposed for `1684152000` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2023-05-15T12:00:00.000Z`) on the BCH network (`mainnet`), `testnet3`, and `testnet4`.
+- Activation is proposed for `1668513600` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2022-11-15T12:00:00.000Z`) on [`chipnet`](https://bitcoincashresearch.org/t/staging-chips-on-testnet/573/10).
+- Activation is proposed for `1684152000` [MTP](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki), (`2023-05-15T12:00:00.000Z`) on the BCH network (`mainnet`), `testnet3`, `testnet4`, and `scalenet`.
 
 ## Motivation
 
