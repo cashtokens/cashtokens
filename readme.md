@@ -129,7 +129,7 @@ This proposal extends the data model of transaction outputs to add four new `tok
 | Value            | The value of the output in satoshis, the smallest unit of bitcoin cash. (A.K.A. `vout`)                                                                        |
 | Locking Bytecode | The VM bytecode used to encumber this transaction output. (A.K.A. `scriptPubKey`)                                                                              |
 | **Token Fields** | (New, optional fields added by this proposal:)                                                                                                                 |
-| Category         | The 32-byte ID of the token category to which the token(s) in this output belong. This field is omitted if no tokens are present.                              |
+| Category ID      | The 32-byte ID of the token category to which the token(s) in this output belong. This field is omitted if no tokens are present.                              |
 | Capability       | The capability of the NFT held in this output: `none`, `mutable`, or `minting`. This field is omitted if no NFT is present.                                    |
 | Commitment       | The commitment contents of the NFT held in this output (`0` to `40` bytes). This field is omitted if no NFT is present.                                        |
 | Amount           | The number of fungible tokens held in this output (an integer between `1` and `9223372036854775807`). This field is omitted if no fungible tokens are present. |
