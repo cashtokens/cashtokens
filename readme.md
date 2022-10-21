@@ -440,7 +440,7 @@ Prior to activation, PATFOs remain **nonstandard** but do not invalidate the tra
 
 Note, even properly-encoded token outputs included in transactions mined prior to activation are considered PATFOs, regardless of whether or not the transaction would pass token-aware transaction validation after activation. Due to the possibility of a chain re-organization impacting the precise activation time, token issuers are advised to wait until activation is confirmed to a depth of at least 11 blocks before broadcasting critical transactions involving tokens.
 
-PATFOs are provably unspendable<sup>1</sup>; all software implementing this specification should immediately mark PATFOs as unspendable and/or remove them from their local view of the UTXO set (e.g. on startup and upon receipt).
+PATFOs are provably unspendable<sup>1</sup>; all software implementing this specification should immediately mark PATFOs as unspendable and/or logically treat them as such for the purposes of spending.
 
 **By consensus, PATFOs mined in blocks prior to the activation of [Token-Aware Transaction Validation](#token-aware-transaction-validation) must remain unspendable after activation**. (Please note: the presence of PATFOs does not render a transaction invalid; until activation, valid blocks may contain PATFOs.)
 
@@ -450,7 +450,7 @@ After activation, any transaction creating an invalid token prefix<sup>2</sup> i
 
 <summary>Notes</summary>
 
-1. For pre-activation token-forgery outputs (PATFOs), this has been the case for even longer than `OP_RETURN` outputs: PATFOs have been provably unspendable since the Bitcoin Cash protocol's publication in 2008. As such, they can be safely pruned without activation and at no risk of network consensus failures.
+1. For pre-activation token-forgery outputs (PATFOs), this has been the case for even longer than `OP_RETURN` outputs: PATFOs have been provably unspendable since the Bitcoin Cash protocol's publication in 2008.
 2. That is, any transaction output where locking bytecode index `0` is set to the `PREFIX_TOKEN` codepoint, but a valid token prefix cannot be parsed.
 
 </details>
