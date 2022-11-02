@@ -22,7 +22,7 @@
 - [Usage Examples](#usage-examples)
 - [Rationale](#rationale)
 - [Prior Art & Alternatives](#prior-art--alternatives)
-- [Stakeholders & Statements](#stakeholders--statements)
+- [Stakeholder Responses & Statements](#stakeholder-responses--statements)
 - [Test Vectors](#test-vectors)
 - [Implementations](#implementations)
 - [Feedback & Reviews](#feedback--reviews)
@@ -501,7 +501,7 @@ The following 6 operations pop the top item from the stack as an index (VM Numbe
 | `OP_UTXOTOKENCATEGORY`     | `0xce` (`206`) | Pop the top item from the stack as an input index (VM Number). If the Unspent Transaction Output (UTXO) spent by that input includes no tokens, push a 0 (VM Number) to the stack. If the UTXO does not include a non-fungible token with a capability, push the UTXO's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number). |
 | `OP_UTXOTOKENCOMMITMENT`   | `0xcf` (`207`) | Pop the top item from the stack as an input index (VM Number). Push the token commitment of the Unspent Transaction Output (UTXO) spent by that input to the stack. If the UTXO does not include a non-fungible token, or if it includes a non-fungible token with a zero-length commitment, push a 0 (VM Number).                                                                                                                                                                       |
 | `OP_UTXOTOKENAMOUNT`       | `0xd0` (`208`) | Pop the top item from the stack as an input index (VM Number). Push the fungible token amount of the Unspent Transaction Output (UTXO) spent by that input to the stack as a VM Number. If the UTXO includes no fungible tokens, push a 0 (VM Number).                                                                                                                                                                                                                                   |
-| `OP_OUTPUTTOKENCATEGORY`   | `0xd1` (`209`) | Pop the top item from the stack as an output index (VM Number). If the output at that index includes no tokens, push a 0 (VM Number) to the stack. If the output does not include a non-fungible token with a capability, push the output's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number).                       |
+| `OP_OUTPUTTOKENCATEGORY`   | `0xd1` (`209`) | Pop the top item from the stack as an output index (VM Number). If the output at that index includes no tokens, push a 0 (VM Number) to the stack. If the output does not include a non-fungible token with a capability, push the output's token category, otherwise, push the concatenation of the token category and capability, where the mutable capability is represented by 1 (VM Number) and the minting capability is represented by 2 (VM Number).                             |
 | `OP_OUTPUTTOKENCOMMITMENT` | `0xd2` (`210`) | Pop the top item from the stack as an output index (VM Number). Push the token commitment of the output at that index to the stack. If the output does not include a non-fungible token, or if it includes a non-fungible token with a zero-length commitment, push a 0 (VM Number).                                                                                                                                                                                                     |
 | `OP_OUTPUTTOKENAMOUNT`     | `0xd3` (`211`) | Pop the top item from the stack as an output index (VM Number). Push the fungible token amount of the output at that index to the stack as a VM Number. If the output includes no fungible tokens, push a 0 (VM Number).                                                                                                                                                                                                                                                                 |
 
@@ -742,10 +742,6 @@ Software implementations might choose to emphasize circulating supply (rather th
     - [Simple Ledger Protocol (v1)](alternatives.md#simple-ledger-protocol-v1)
     - [Unforgeable Groups](alternatives.md#unforgeable-groups)
 
-## Stakeholders & Statements
-
-> With these primitives, Bitcoin Cash can support decentralized applications comparable to Ethereum contract functionality, while retaining Bitcoin Cash’s >1000x efficiency advantage in transaction and block validation. [...] Because CashTokens could now enable more efficient, user-friendly decentralized prediction markets than PMv3, I’m withdrawing the PMv3 CHIP. —[Jason Dreyzehner, PMv3 CHIP Author](https://bitcoincashresearch.org/t/chip-2021-01-pmv3-version-3-transaction-format/265/55?u=bitjson)
-
 ## Test Vectors
 
 Sets of cross-implementation test vectors are provided in the [`test-vectors`](./test-vectors/) directory. Each set is described below.
@@ -811,6 +807,10 @@ Please see the following implementations for additional examples and test vector
       - [Token-aware signing serialization](https://github.com/bitauth/libauth/blob/9dfa6cc0b8710dedfe007b47bd018f5a47079df5/src/lib/vm/instruction-sets/common/signing-serialization.ts#L456-L474)
       - [Token-aware CashAddresses](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/address/cash-address.ts#L61-L82)
       - [Verifying vmb_tests](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/vmb-tests/bch-vmb-tests.spec.ts#L122-L152)
+
+## Stakeholder Responses & Statements
+
+[Stakeholder Responses & Statements &rarr;](stakeholders.md)
 
 ## Feedback & Reviews
 
