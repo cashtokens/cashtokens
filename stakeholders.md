@@ -119,7 +119,7 @@ Wallets that support Bitcoin Cash.
 | [Neutrino](https://neutrino.cash/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Payperless](https://www.payperless.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Paytaca Wallet](https://www.paytaca.com/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Permissionless Software Foundation](https://psfoundation.cash/) |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Permissionless Software Foundation](https://psfoundation.cash/) |   `v2.2.0`    |    X    |            |         |   ⏳    |
 | [Satochip](https://satochip.io/)                                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SimpleHold](https://simplehold.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Stack Wallet](https://stackwallet.com/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -275,7 +275,7 @@ Exchanges, miners, services, and other businesses.
 | [F2Pool](https://www.f2pool.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [FTX](https://ftx.us/)                                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Foundry](https://foundrydigital.com/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
-| [FullStack.Cash](https://fullstack.cash/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
+| [FullStack.Cash](https://fullstack.cash/)                      |   `v2.2.0`    |    X    |            |         |   ⏳    |
 | [Gate.io](https://gate.io/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Gemini](https://www.gemini.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [General Protocols](https://generalprotocols.com)              |   `v2.2.0`    |         |            |         |   ⏳    |
