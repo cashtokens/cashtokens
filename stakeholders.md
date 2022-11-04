@@ -429,3 +429,8 @@ The following statements have been submitted in support of this CHIP.
 > I support the CashTokens CHIP for lock-in. I'm excited to use these features in flipstarter.me and other projects for better user experience, decentralization, and censorship-resistance — in a way that actually scales.
 >
 > —<cite>Sahid Miller, [Flipstarter.me](https://flipstarter.me/) and [Anyonecanpay.me](https://anyonecanpay.me)</cite>
+
+
+> I believe that CashTokens CHIP is a very important upgrade for BCH. SLP was one reason I favoried BCH when I had to chose between coins years ago. I think CashTokens are the solution to fix SLP issues like token burn, indexers and [many other](https://cdn.rcimg.net/ClearSky/913af532/8ee535afb1aa3ef2532c4ab69e7f9dbc.png?width=700).
+>
+> —<cite>𝖆𝖐𝖆-𝖉, [tbch.googol.cash](https://tbch.googol.cash/) and long time BCH token supporter</cite>
