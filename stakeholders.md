@@ -63,7 +63,7 @@ To make a [public statement](https://github.com/bitjson/cashtokens/blob/master/s
 For reference:
 
 - [CHIP-2022-02-CashTokens – Full Specification](https://github.com/bitjson/cashtokens)
-- [Stakeholders Responses & Statements](https://github.com/bitjson/cashtokens/blob/master/stakeholders.md)
+- [Stakeholder Responses & Statements](https://github.com/bitjson/cashtokens/blob/master/stakeholders.md)
 
 Please let me know if you have any questions.
 
@@ -77,7 +77,7 @@ Responses to this standard communication are recorded for all organizations that
 
 ### Nodes
 
-Open source node implementations that support Bitcoin Cash.
+Responses from open source node implementations that support Bitcoin Cash.
 
 | Node                                                    | As of Version | Approve | Disapprove | Neutral | Pending |
 | ------------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
@@ -90,7 +90,7 @@ Open source node implementations that support Bitcoin Cash.
 
 ### Wallets
 
-Wallets that support Bitcoin Cash.
+Responses from wallets that support Bitcoin Cash.
 
 | Wallet                                             | As of Version | Approve | Disapprove | Neutral | Pending |
 | -------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
@@ -121,7 +121,7 @@ Wallets that support Bitcoin Cash.
 | [Mobi](https://www.mobi.me/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Neutrino](https://neutrino.cash/)                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Payperless](https://www.payperless.com/)          |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Paytaca Wallet](https://www.paytaca.com/)         |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Paytaca Wallet](https://www.paytaca.com/)         |   `v2.2.0`    |   ✅    |            |         |         |
 | [Satochip](https://satochip.io/)                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SimpleHold](https://simplehold.io/)               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Stack Wallet](https://stackwallet.com/)           |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -137,7 +137,7 @@ Wallets that support Bitcoin Cash.
 
 ### Projects
 
-Open source libraries, indexers, educational resources, and community initiatives.
+Responses from open source libraries, indexers, educational resources, and community initiatives.
 
 | Project                                                           | As of Version | Approve | Disapprove | Neutral | Pending |
 | ----------------------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
@@ -154,7 +154,7 @@ Open source libraries, indexers, educational resources, and community initiative
 | [Bitauth IDE](https://ide.bitauth.com)                            |   `v2.2.0`    |   ✅    |            |         |         |
 | [BitcartCC](https://bitcartcc.com/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitcoin Cash Hangout](https://rss.com/podcasts/fiendishcrypto/)  |   `v2.2.0`    |   ✅    |            |         |         |
-| [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)           |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)           |   `v2.2.0`    |   ✅    |            |         |         |
 | [BitcoinCash.org](https://bitcoincash.org/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitcoinCashResearch.org](https://bitcoincashresearch.org/)       |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitcoinFees.cash](https://bitcoinfees.cash/)                     |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -196,12 +196,12 @@ Open source libraries, indexers, educational resources, and community initiative
 | [SmartBCH](https://smartbch.org/)                                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SmartScan](https://www.smartscan.cash/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Spedn](https://spedn.pl/)                                        |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Watchtower](https://watchtower.cash/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Watchtower](https://watchtower.cash/)                            |   `v2.2.0`    |   ✅    |            |         |         |
 | [Where2.cash](https://www.where2.cash/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
 
 ### Industry
 
-Exchanges, miners, services, and other businesses.
+Responses from exchanges, miners, services, and other businesses.
 
 | Organization                                                   | As of Version | Approve | Disapprove | Neutral | Pending |
 | -------------------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
@@ -210,7 +210,7 @@ Exchanges, miners, services, and other businesses.
 | [Alfacoins](https://www.alfacoins.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Alfatop](https://alfa.top/)                                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Antpool](https://www.antpool.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Anyonecanpay.me](https://anyonecanpay.me)                     |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Anyonecanpay.me](https://anyonecanpay.me)                     |   `v2.2.0`    |   ✅    |            |         |   ⏳    |
 | [ArzPaya](https://arzpaya.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [AscendEX](https://ascendex.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [AtomicDEX](https://atomicdex.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -268,7 +268,6 @@ Exchanges, miners, services, and other businesses.
 | [CoinGate](https://coingate.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinGecko](https://www.coingecko.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinGigs](https://coingigs.net/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Coinhop](https://coinhopapp.com/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinLedger](https://coinledger.io/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinLoan](https://coinloan.io/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coinone](https://coinone.co.kr/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -334,6 +333,7 @@ Exchanges, miners, services, and other businesses.
 | [Mining-Dutch](https://www.mining-dutch.nl/)                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MistSwap](https://mistswap.fi/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MoonPay](https://www.moonpay.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Mullvad VPN](https://mullvad.net/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Namecheap](https://www.namecheap.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Netcoins](https://netcoins.ca/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Nexo](https://nexo.io/)                                       |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -426,11 +426,34 @@ The following statements have been submitted in support of this CHIP.
 >
 > —<cite>Calin Culianu, [Bitcoin Cash Node](https://bitcoincashnode.org/), [Fulcrum](https://github.com/cculianu/Fulcrum), and [Electron Cash](https://electroncash.org/)</cite>
 
+> Approved! This CHIP adds valuable and powerful capabilities to Bitcoin Cash. I am particularly pleased that it does so efficiently and without at all harming the monetary properties of the coin.
+>
+> —<cite>Andrew#128, [Bitcoin Cash Node](https://bitcoincashnode.org/) and [Electron Cash](https://electroncash.org/)</cite>
+
+> The idea of UTXO tokens on Bitcoin is as old as `OP_CHECKCOLORVERIFY` circa 2013 so this concludes almost a decade long process! As someone who spent more than a year trying to move "Group Tokenization" forward, I am thrilled with how it has evolved and converged to a really elegant technical solution designed to perfectly integrate with the existing Script VM. CashTokens will unlock so much power for application builders, and all that at no expense to existing users or scalability! I fully support this proposal!
+>
+> —<cite>bitcoincashautist, [CHIP-2021-02 Unforgeable Groups](https://gitlab.com/0353F40E/group-tokenization) Owner</cite>
+
+> CashTokens will be a great addition to BCH. Not only because it adds real, miner-validated tokens to the ecosystem, but because its design makes it possible for transaction script designers to create complex contracts in fewer bytes. This in turn means even more room for innovation, and possibilities that don't exist anywhere else.
+>
+> —<cite>Andrew Groot, [Bitcoin Verde](https://bitcoinverde.org/)</cite>
+
 > I support the CashTokens CHIP for lock-in. I'm excited to use these features in flipstarter.me and other projects for better user experience, decentralization, and censorship-resistance — in a way that actually scales.
 >
 > —<cite>Sahid Miller, [Flipstarter.me](https://flipstarter.me/) and [Anyonecanpay.me](https://anyonecanpay.me)</cite>
 
-
-> I believe that CashTokens CHIP is a very important upgrade for BCH. SLP was one reason I favoried BCH when I had to chose between coins years ago. I think CashTokens are the solution to fix SLP issues like token burn, indexers and [many other](https://cdn.rcimg.net/ClearSky/913af532/8ee535afb1aa3ef2532c4ab69e7f9dbc.png?width=700).
+> I believe that CashTokens CHIP is a very important upgrade for BCH. SLP was one reason I favored BCH when I had to chose between coins years ago. I think CashTokens are the solution to fix SLP issues like token burn, indexers and many other.
 >
-> —<cite>𝖆𝖐𝖆-𝖉, [tbch.googol.cash](https://tbch.googol.cash/) and long time BCH token supporter</cite>
+> —<cite>𝖆𝖐𝖆-𝖉, [tbch.googol.cash](https://tbch.googol.cash/)</cite>
+
+> I fully support the deployment of CashTokens on Bitcoin Cash mainnet.
+>
+> —<cite>[Jonas Lundqvist](https://github.com/jonas-lundqvist)</cite>
+
+> Cash tokens is possibly the longest researched project with several teams starting and abandoning the project. In Bitcoin Cash the first paper was published in 2017. It was called op-group. I've been involved with all of the revisions in one way or another and for me the latest CHIP is "good enough". Which means that in my opinion it can be used to elevate the chain to allow many more usecases and we can depend on it being maintainable and usable for many years to come.
+>
+> —<cite>Tom Zander, "[Completing Bitcoin Cash with Cash Tokens](https://read.cash/@TomZ/completing-bitcoin-cash-with-cash-tokens-e530d38d)" ([Flowee](https://flowee.org/products/hub/), [Flowee Pay](https://flowee.org/products/pay/), [Flowee Products](https://flowee.org/products/))</cite>
+
+> The Bitcoin Cash Podcast wholeheartedly supports the November lock-in and May implementation [[...]](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)
+>
+> —<cite>Jeremy Ellingham, [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)</cite>
