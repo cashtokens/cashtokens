@@ -457,3 +457,7 @@ The following statements have been submitted in support of this CHIP.
 > The Bitcoin Cash Podcast wholeheartedly supports the November lock-in and May implementation [[...]](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)
 >
 > —<cite>Jeremy Ellingham, [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)</cite>
+
+> This proposal makes two novel contributions to Bitcoin Cash. First, it elucidates that fungible and non-fungible tokens should be cryptocurrency primitives rather than applications. And second, it shows how these primitives can be introduced with a minimally disputive change to the protocol. The implications are nothing less than revolutionary. Stablecoins, prediction markets and other applications will be able to operate with the high throughput and low cost that Bitcoin Cash has already demonstrated. If Bitcoin Cash is to become world money then we must adopt this CHIP.
+>
+> -<cite>Richard Brady, [Coinbooth](https://coinbooth.io)</cite>
