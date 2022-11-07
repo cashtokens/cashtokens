@@ -457,3 +457,6 @@ The following statements have been submitted in support of this CHIP.
 > The Bitcoin Cash Podcast wholeheartedly supports the November lock-in and May implementation [[...]](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)
 >
 > —<cite>Jeremy Ellingham, [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)</cite>
+
+> The demise of SLP has cost the BCH community a great deal but demonstrated a need for on-chain safe tokens and enhanced expressiveness while staying within the original goals of BitcoinCash. CashTokens has exceeded the expectations and is exactly what is needed to bring BCH back to the right balance between safety, scalability, and expressiveness. This is the most important improvement to the BCH VM ever.
+> -<cite>Benjamin Scherrey, [ActorForth BCHDevSuite](https://actorforth.org](https://devsuite.actorforth.org/), Owner of [CHIP-2021-03-12_Multiple_OP_RETURN_for_Bitcoin_Cash](https://github.com/ActorForth/Auction-Protocol/blob/main/CHIP-2021-03-12_Multiple_OP_RETURN_for_Bitcoin_Cash.md), [BiggestLab.io](https://biggestlab.io), [CryptoKnights.games](https://cryptoknights.games)</cite>
