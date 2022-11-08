@@ -509,3 +509,7 @@ The following statements have been submitted in support of this CHIP.
 > We APPROVE. Thanks for your work!
 >
 > —<cite>[BitcoinVN](https://bitcoinvn.io/)</cite>
+
+> CashTokens is a culmination of years of experimentation on tokenization in Bitcoin and Bitcoin Cash blockchains. By implementing this as a contract-issued commitment, it has provided developers with a way, not only to issue tokens, but also to build advanced decentralized applications. Peer-to-peer cash will become more programmable than ever. As one of the prominent developers of user-facing applications in Bitcoin Cash, we are very much excited by the possibilities this upgrade can enable. Thus, we fully support the deployment of CashTokens for May 2023 upgrade.
+>
+> —<cite>Joemar Taganna, [Paytaca](https://www.paytaca.com/), [Spice Token](https://spicetoken.org/)</cite>
