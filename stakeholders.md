@@ -455,6 +455,7 @@ The following articles have been published in support of this CHIP:
 - [Flowee](https://flowee.org/products/hub/): "[Completing Bitcoin Cash with Cash Tokens](https://read.cash/@TomZ/completing-bitcoin-cash-with-cash-tokens-e530d38d)" (November 4, 2022)
 - [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/): "[CHIP Endorsement May 2023](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)" (November 4, 2022)
 - [General Protocols](https://generalprotocols.com): "[General Protocols Statement on CashTokens and P2SH32 CHIP Proposals for the May 2023 BCH Upgrade](https://read.cash/@GeneralProtocols/general-protocols-statement-on-cashtokens-and-p2sh32-chip-proposals-for-the-may-2023-bch-upgrade-c5248f65)" (November 6, 2022)
+- [mainnet.cash](https://mainnet.cash): [Mainnet.cash supports CHIP-2022-02-CashTokens](https://mainnet.cash/chips.html#mainnet-cash-supports-chip-2022-02-cashtokens) (November 9, 2022)
 
 The following statements have been submitted in support of this CHIP.
 
