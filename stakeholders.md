@@ -553,3 +553,7 @@ The following statements have been submitted in support of this CHIP.
 > Antpool approves activation of CHIP-2022-02-CashTokens when upgrading to Bitcoin Cash (BCH) in May 2023.
 >
 > —<cite>[Antpool](https://www.antpool.com/)</cite>
+
+> The CashTokens and P2SH32 CHIP Proposals for the May 2023 BCH Upgrade are AWESOME!
+>
+> —<cite>[2qx](https://github.com/2qx/) on (https://awesomebitcoin.cash/)</cite>
