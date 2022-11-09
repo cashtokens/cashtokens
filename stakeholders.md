@@ -94,6 +94,7 @@ Responses from wallets that support Bitcoin Cash.
 
 | Wallet                                                           | As of Version | Approve | Disapprove | Neutral | Pending |
 | ---------------------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
+| [Atomic Wallet](https://atomicwallet.io/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [`bchwallet`](https://github.com/gcash/bchwallet)                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitcoin.com Wallet](https://wallet.bitcoin.com/)                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitPay Wallet](https://bitpay.com/wallet)                       |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -196,7 +197,8 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [PayButton](https://paybutton.org/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Permissionless Software Foundation](https://psfoundation.cash/)  |   `v2.2.0`    |   ✅    |            |         |         |
 | [Pos.cash](https://github.com/softwareverde/pos-cash)             |   `v2.2.0`    |   ✅    |            |         |         |
-| [Rostrum](https://crates.io/crates/rostrum)                       |   `v2.2.0`    |   ✅    |            |         |         |
+| [rbch](https://github.com/Rucknium/rbch)                          |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum)            |   `v2.2.0`    |   ✅    |            |         |         |
 | [ScanToPay.cash](https://scantopay.cash/)                         |   `v2.2.0`    |   ✅    |            |         |         |
 | [Signup](https://signup.cash/)                                    |   `v2.2.0`    |   ✅    |            |         |         |
 | [SimpleLedger.info](https://simpleledger.info/)                   |   `v2.2.0`    |   ✅    |            |         |         |
@@ -213,11 +215,12 @@ Responses from exchanges, miners, services, and other businesses.
 
 | Organization                                                   | As of Version | Approve | Disapprove | Neutral | Pending |
 | -------------------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
+| [1BCH.com](https://1bch.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [365 Cash](https://365cash.co/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Alagoria](https://alagoria.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Alfacoins](https://www.alfacoins.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Alfatop](https://alfa.top/)                                   |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Antpool](https://www.antpool.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Antpool](https://www.antpool.com/)                            |   `v2.2.0`    |   ✅    |            |         |         |
 | [Anyonecanpay.me](https://anyonecanpay.me)                     |   `v2.2.0`    |   ✅    |            |         |         |
 | [Anypay](https://anypayx.com/)                                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [ArzPaya](https://arzpaya.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -237,11 +240,14 @@ Responses from exchanges, miners, services, and other businesses.
 | [Bitcoin.com](https://bitcoin.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitcoin.de](https://www.bitcoin.de/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitcoinVN](https://bitcoinvn.io/)                             |   `v2.2.0`    |   ✅    |            |         |         |
+| [Bitdeer](https://www.bitdeer.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitexen](https://www.bitexen.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitFlyer](https://bitflyer.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitfinex](https://www.bitfinex.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitGlobal](https://www.bitglobal.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bithumb](https://www.bithumb.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [BitMEX](https://www.bitmex.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Bitpanda](https://www.bitpanda.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitPay](https://bitpay.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitso](https://bitso.com/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitstamp](https://www.bitstamp.net/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -250,11 +256,14 @@ Responses from exchanges, miners, services, and other businesses.
 | [BitYard](https://www.bityard.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BKEX](https://www.bkex.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Blockchain Poker](https://blockchain.poker/)                  |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Blockchain.com](https://blockchain.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Blockchair](https://blockchair.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BlockNG](https://blockng.money/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Blockonomics](https://www.blockonomics.co/)                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BTC.com](https://btc.com/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BTCBOX](https://www.btcbox.co.jp/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BTCPOP](https://btcpop.co/)                                   |   `v2.2.0`    |         |            |   ➖    |         |
+| [Buy Hodl Sell](https://buyhodlsell.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Buda.com](https://www.buda.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bybit](https://www.bybit.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Centre](https://www.centre.io/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -266,6 +275,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [CheckBook.cash](https://checkbook.cash/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Circle](https://www.circle.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Clementine's Nightmare](https://clementinesnightmare.io/)     |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Coin ATM Radar](https://coinatmradar.com/)                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coin Dance](https://cash.coin.dance/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coinbase](https://www.coinbase.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coinbooth](https://coinbooth.io/)                             |   `v2.2.0`    |   ✅    |            |         |         |
@@ -273,18 +283,22 @@ Responses from exchanges, miners, services, and other businesses.
 | [CoinChange](https://coinchange.to/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coincheck](https://coincheck.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinCodex](https://coincodex.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [CoinCola](https://www.coincola.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinEx](https://www.coinex.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinFalcon](https://coinfalcon.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinGate](https://coingate.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinGecko](https://www.coingecko.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinGigs](https://coingigs.net/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Coinify](https://www.coinify.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinLedger](https://coinledger.io/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinLoan](https://coinloan.io/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coinone](https://coinone.co.kr/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinPayments](https://www.coinpayments.net/)                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Coinrabbit](https://coinrabbit.io/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinRemitter](https://coinremitter.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
+| [CoinSalad](https://coinsalad.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinStats](https://coinstats.app/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [CoinSwitch](https://coinswitch.co/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinTracker](https://www.cointracker.io/)                     |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CoinTracking](https://cointracking.info/)                     |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Crex24](https://crex24.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -307,11 +321,13 @@ Responses from exchanges, miners, services, and other businesses.
 | [Gate.io](https://gate.io/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Gemini](https://www.gemini.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [General Protocols](https://generalprotocols.com)              |   `v2.2.0`    |   ✅    |            |         |         |
+| [Genesis Block](https://genesisblockhk.com/)                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Genesis Trading](https://genesistrading.com/)                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Goblins.cash](https://goblins.cash/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [GoCrypto](https://gocrypto.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [GoUrl.io](https://gourl.io/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Grayscale Investments](https://grayscale.com/)                |   `v2.2.0`    |         |            |         |   ⏳    |
+| [HereBets.com](https://herebets.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [HitBTC](https://hitbtc.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Hop.cash](https://hop.cash/)                                  |   `v2.2.0`    |   ✅    |            |         |         |
 | [Honk World](https://honk.cash/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -323,9 +339,10 @@ Responses from exchanges, miners, services, and other businesses.
 | [Juungle](https://www.juungle.net/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Karsha Exchange](https://karsha.biz/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Keys4Coins](https://www.keys4coins.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Koinly](https://koinly.io/)                                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Korbit](https://www.korbit.co.kr/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Kraken](https://kraken.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
-| [KuCoin](https://www.kucoin.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
+| [KuCoin](https://www.kucoin.com/)                              |   `v2.2.0`    |         |            |   ➖    |         |
 | [Launchpad IP](https://launchpadip.com/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Lazyfox.io](https://lazyfox.io/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [LBank](https://www.lbank.info/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -333,6 +350,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [Liquid](https://www.liquid.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Living Room of Satoshi](https://www.livingroomofsatoshi.com/) |   `v2.2.0`    |         |            |         |   ⏳    |
 | [LocalCryptos](https://localcryptos.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
+| [LocalBitcoins](https://localbitcoins.com/)                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Luno](https://www.luno.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MarketCap.cash](https://www.marketcap.cash/)                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Matrixport](https://www.matrixport.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -345,6 +363,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [MistSwap](https://mistswap.fi/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MoonPay](https://www.moonpay.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Mullvad VPN](https://mullvad.net/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [N.exchange](https://n.exchange/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Namecheap](https://www.namecheap.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Netcoins](https://netcoins.ca/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Nexo](https://nexo.io/)                                       |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -354,16 +373,20 @@ Responses from exchanges, miners, services, and other businesses.
 | [NowPayments](https://nowpayments.io/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Oasis](https://oasis.cash/)                                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [OKX](https://www.okx.com/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Overbit](https://www.overbit.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Ownrare.art](https://ownrare.art/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Pagcripto](https://www.pagcripto.com.br/)                     |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Panmoni](https://panmoni.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Phemex](https://phemex.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Plisio](https://plisio.net/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Poolin](https://www.poolin.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Poloniex](https://poloniex.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Pompler](https://pompler.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
+| [PrimeXBT](https://primexbt.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Prompt.Cash](https://prompt.cash/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [ProBit](https://www.probit.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Prohashing](https://prohashing.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Publish0x](https://www.publish0x.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Purse](https://purse.io/)                                     |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Read.cash](https://read.cash/)                                |   `v2.2.0`    |   ✅    |            |         |         |
 | [Revoke](https://revoke.cash/)                                 |   `v2.2.0`    |   ✅    |            |         |         |
@@ -381,6 +404,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [Sonar](https://sonar.cash/)                                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SouthXChange](https://southxchange.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Spice Token](https://spicetoken.org/)                         |   `v2.2.0`    |   ✅    |            |         |         |
+| [SpiderPool](https://www.spiderpool.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Stake](https://stake.com/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [StealthEX](https://stealthex.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Swapin](https://www.swapin.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -395,6 +419,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [The Giving Block](https://thegivingblock.com/)                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [The Rock Trading](https://www.therocktrading.com/)            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Trastra](https://trastra.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Travala](https://www.travala.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [TxStreet](https://txstreet.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Unbanked](https://unbanked.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Uphold](https://uphold.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -524,3 +549,7 @@ The following statements have been submitted in support of this CHIP.
 > One Surgery remains committed to developing tools for the global surgery community, bringing surgical care solutions to everyone in the world. We believe #BitcoinCash, and the potential of on-chain tokenization (through #CashTokens innovation), will give One.Surgery greater flexibility in creating non-custodial cryptocurrency solutions to empower advocacy, research and education efforts to our global surgery community. [[...]](https://twitter.com/OneDotSurgery/status/1590184970160861184)
 >
 > —<cite>Saqib Noor, [One.Surgery](https://one.surgery/)</cite>
+
+> Antpool approves activation of CHIP-2022-02-CashTokens when upgrading to Bitcoin Cash (BCH) in May 2023.
+>
+> —<cite>[Antpool](https://www.antpool.com/)</cite>
