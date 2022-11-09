@@ -148,7 +148,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [ActorForth](https://github.com/ActorForth/ActorForth)            |   `v2.2.0`    |   ✅    |            |         |         |
 | [Allodium](https://allodium.is/)                                  |   `v2.2.0`    |   ✅    |            |         |         |
 | [AnyHedge](https://anyhedge.com/)                                 |   `v2.2.0`    |   ✅    |            |         |         |
-| [awesomebitcoin.cash](https://awesomebitcoin.cash/)               |   `v2.2.0`    |         |            |         |   ⏳    |
+| [awesomebitcoin.cash](https://awesomebitcoin.cash/)               |   `v2.2.0`    |   ✅    |            |         |        |
 | [bch.info](https://bch.info/)                                     |   `v2.2.0`    |   ✅    |            |         |         |
 | [`bch-rpc-explorer`](https://github.com/sickpig/bch-rpc-explorer) |   `v2.2.0`    |   ✅    |            |         |         |
 | [BCH DevSuite](https://devsuite.actorforth.org/)                  |   `v2.2.0`    |   ✅    |            |         |         |
@@ -168,7 +168,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [CashChannels.org](http://cashchannels.org/)                      |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashFusion.org](https://cashfusion.org/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashFusion Red Team](https://fusionstats.redteam.cash/)          |   `v2.2.0`    |         |            |         |   ⏳    |
-| [CashID](https://www.cashid.info/)                                |   `v2.2.0`    |   ✅    |            |         |   ⏳    |
+| [CashID](https://www.cashid.info/)                                |   `v2.2.0`    |   ✅    |            |         |        |
 | [Cashnodes.io](https://cashnodes.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashScript](https://cashscript.org/)                             |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashShuffle](https://cashshuffle.com/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -190,7 +190,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [HelpMe.Cash](https://helpme.cash/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Knuth Libraries](https://github.com/k-nuth)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Libauth](https://libauth.org/)                                   |   `v2.2.0`    |   ✅    |            |         |         |
-| [Mainnet.cash](https://mainnet.cash/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Mainnet.cash](https://mainnet.cash/)                             |   `v2.2.0`    |   ✅    |            |         |        |
 | [Meep](https://github.com/gcash/meep)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [One.Surgery](https://one.surgery/)                               |   `v2.2.0`    |   ✅    |            |         |         |
 | [Oracles.Cash](https://oracles.cash/)                             |   `v2.2.0`    |   ✅    |            |         |         |
@@ -455,6 +455,7 @@ The following articles have been published in support of this CHIP:
 - [Flowee](https://flowee.org/products/hub/): "[Completing Bitcoin Cash with Cash Tokens](https://read.cash/@TomZ/completing-bitcoin-cash-with-cash-tokens-e530d38d)" (November 4, 2022)
 - [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/): "[CHIP Endorsement May 2023](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)" (November 4, 2022)
 - [General Protocols](https://generalprotocols.com): "[General Protocols Statement on CashTokens and P2SH32 CHIP Proposals for the May 2023 BCH Upgrade](https://read.cash/@GeneralProtocols/general-protocols-statement-on-cashtokens-and-p2sh32-chip-proposals-for-the-may-2023-bch-upgrade-c5248f65)" (November 6, 2022)
+- [mainnet.cash](https://mainnet.cash): [Mainnet.cash supports CHIP-2022-02-CashTokens](https://mainnet.cash/chips.html#mainnet-cash-supports-chip-2022-02-cashtokens) (November 9, 2022)
 
 The following statements have been submitted in support of this CHIP.
 
@@ -553,3 +554,7 @@ The following statements have been submitted in support of this CHIP.
 > Antpool approves activation of CHIP-2022-02-CashTokens when upgrading to Bitcoin Cash (BCH) in May 2023.
 >
 > —<cite>[Antpool](https://www.antpool.com/)</cite>
+
+> The CashTokens and P2SH32 CHIP Proposals for the May 2023 BCH Upgrade are AWESOME!
+>
+> —<cite>[2qx](https://github.com/2qx/) on [awesomebitcoin.cash](https://awesomebitcoin.cash/)</cite>
