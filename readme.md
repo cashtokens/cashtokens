@@ -582,7 +582,7 @@ Two new [`CashAddress` types](https://github.com/bitcoincashorg/bitcoincash.org/
 | `2` (`0b0010`) | Token-Aware P2PKH |
 | `3` (`0b0011`) | Token-Aware P2SH  |
 
-**Token-aware wallet software** – wallet software which supports management of tokens – should use these CashAddress version byte values in newly created addresses.
+**Token-aware wallet software** – wallet software which supports management of tokens – may use these CashAddress version byte values to signal token support.
 
 Token-aware wallet software **must refuse to send tokens to addresses without explicit token support** i.e. `P2PKH` CashAddresses (type bits: `0b0000`), `P2SH` CashAddresses (type bits: `0b0001`), and legacy Base58 addresses.
 
@@ -827,14 +827,16 @@ Thank you to the following contributors for reviewing and contributing improveme
 This section summarizes the evolution of this document.
 
 - **Draft**
-  - Extract `examples.md`, `rationale.md`, and `alternatives.md` for approachability
+  - Remove confusing recommendation about token-aware CashAddress usage ([#82](https://github.com/bitjson/cashtokens/issues/82))
+  - Extract [`examples.md`](./examples.md), [`rationale.md`](./rationale.md), and [`alternatives.md`](./alternatives.md) for approachability
+  - Add [`stakeholders.md`](./stakeholders.md) to collect final approvals
 - **v2.2.0 – 2022-9-30** ([`e02012a2`](https://github.com/bitjson/cashtokens/blob/e02012a219a0fb2abef02aa3e08ad326774bd3f3/readme.md))
-  - Compress token encoding using bitfield
+  - Compress token encoding using bitfield ([#33](https://github.com/bitjson/cashtokens/pull/33))
   - Encode mutable capability as `0x01` and minting capability as `0x02`
-  - Revert to limiting `commitment_length` by consensus (`40` bytes)
-  - Revert `PREFIX_TOKEN` to unique codepoint (`0xef`)
-  - Modify `OP_*TOKENCOMMITMENT` to push `0` for zero-length commitments
-  - Extend BIP69 sorting algorithm to support tokens
+  - Revert to limiting `commitment_length` to `40` bytes by consensus ([#23](https://github.com/bitjson/cashtokens/issues/23))
+  - Revert `PREFIX_TOKEN` to a unique codepoint (`0xef`) ([#41](https://github.com/bitjson/cashtokens/issues/41))
+  - Modify `OP_*TOKENCOMMITMENT` to push `0` for zero-length commitments ([#25](https://github.com/bitjson/cashtokens/issues/25))
+  - Extend BIP69 sorting algorithm to support tokens ([#60](https://github.com/bitjson/cashtokens/pull/60))
   - Specify activation times
   - Expand test vectors
   - Note non-support of beta specs for double spend proofs
@@ -844,7 +846,7 @@ This section summarizes the evolution of this document.
   - Simplify token encoding, update test vectors
   - Set `PREFIX_TOKEN` to `0xd0` and limit `commitment_length` using standardness
   - Specify handling of pre-activation token-forgery outputs
-  - Specify token-aware signing serialization algorithm and `SIGHASH_UTXOS`
+  - Specify token-aware signing serialization algorithm and `SIGHASH_UTXOS` ([#22](https://github.com/bitjson/cashtokens/issues/22))
 - **v2.0.1 – 2022-2-25** ([`fcb110c3`](https://github.com/bitjson/cashtokens/blob/fcb110c3309901886b2c7d3417568d8b13fb01b5/readme.md))
   - Expand rationale
   - Note impossibility of valid token outputs in coinbase transactions
