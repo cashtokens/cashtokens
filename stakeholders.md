@@ -168,7 +168,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [CashChannels.org](http://cashchannels.org/)                      |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashFusion.org](https://cashfusion.org/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashFusion Red Team](https://fusionstats.redteam.cash/)          |   `v2.2.0`    |         |            |         |   ⏳    |
-| [CashID](https://www.cashid.info/)                                |   `v2.2.0`    |   ✅    |            |         |   ⏳    |
+| [CashID](https://www.cashid.info/)                                |   `v2.2.0`    |   ✅    |            |         |        |
 | [Cashnodes.io](https://cashnodes.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashScript](https://cashscript.org/)                             |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashShuffle](https://cashshuffle.com/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
