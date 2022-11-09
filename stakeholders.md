@@ -148,7 +148,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [ActorForth](https://github.com/ActorForth/ActorForth)            |   `v2.2.0`    |   ✅    |            |         |         |
 | [Allodium](https://allodium.is/)                                  |   `v2.2.0`    |   ✅    |            |         |         |
 | [AnyHedge](https://anyhedge.com/)                                 |   `v2.2.0`    |   ✅    |            |         |         |
-| [awesomebitcoin.cash](https://awesomebitcoin.cash/)               |   `v2.2.0`    |         |            |         |   ⏳    |
+| [awesomebitcoin.cash](https://awesomebitcoin.cash/)               |   `v2.2.0`    |   ✅    |            |         |   ⏳    |
 | [bch.info](https://bch.info/)                                     |   `v2.2.0`    |   ✅    |            |         |         |
 | [`bch-rpc-explorer`](https://github.com/sickpig/bch-rpc-explorer) |   `v2.2.0`    |   ✅    |            |         |         |
 | [BCH DevSuite](https://devsuite.actorforth.org/)                  |   `v2.2.0`    |   ✅    |            |         |         |
@@ -190,7 +190,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [HelpMe.Cash](https://helpme.cash/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Knuth Libraries](https://github.com/k-nuth)                      |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Libauth](https://libauth.org/)                                   |   `v2.2.0`    |   ✅    |            |         |         |
-| [Mainnet.cash](https://mainnet.cash/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Mainnet.cash](https://mainnet.cash/)                             |   `v2.2.0`    |   ✅    |            |         |   ⏳    |
 | [Meep](https://github.com/gcash/meep)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [One.Surgery](https://one.surgery/)                               |   `v2.2.0`    |   ✅    |            |         |         |
 | [Oracles.Cash](https://oracles.cash/)                             |   `v2.2.0`    |   ✅    |            |         |         |
