@@ -83,7 +83,7 @@ Responses from open source node implementations that support Bitcoin Cash.
 | ------------------------------------------------------- | :-----------: | :-----: | :--------: | :-----: | :-----: |
 | [BCHD](https://bchd.cash/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitcoin Cash Node](https://bitcoincashnode.org/)       |   `v2.2.0`    |   ✅    |            |         |         |
-| [Bitcoin Unlimited](https://www.bitcoinunlimited.info/) |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Bitcoin Unlimited](https://www.bitcoinunlimited.info/) |   `v2.2.0`    |   ✅    |            |         |         |
 | [Bitcoin Verde](https://bitcoinverde.org/)              |   `v2.2.0`    |   ✅    |            |         |         |
 | [Flowee](https://flowee.org/products/hub/)              |   `v2.2.0`    |   ✅    |            |         |         |
 | [Knuth](https://kth.cash/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -165,6 +165,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [BitcoinCashSite.com](https://bitcoincashsite.com/)               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitcoinFees.cash](https://bitcoinfees.cash/)                     |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Bitcore](https://github.com/bitpay/bitcore)                      |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Bmap.app](https://bmap.app/)                                     |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashAccount.info](https://www.cashaccount.info/)                 |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashChannels.org](http://cashchannels.org/)                      |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashFusion.org](https://cashfusion.org/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -231,7 +232,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [B2BinPay](https://b2binpay.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BCH BULL](https://bchbull.com/)                               |   `v2.2.0`    |   ✅    |            |         |         |
 | [BCH.games](https://bch.games/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
-| [bch.domains](https://bch.domains/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [bch.domains](https://bch.domains/)                            |   `v2.2.0`    |   ✅    |            |         |         |
 | [BenSwap](https://benswap.cash/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BestRate](https://bestrate.org/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Binance](https://www.binance.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -418,6 +419,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [Tether](https://tether.to/)                                   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [THORSwap](https://thorswap.finance/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [The Giving Block](https://thegivingblock.com/)                |   `v2.2.0`    |         |            |         |   ⏳    |
+| [The Real Bitcoin Club](https://therealbitcoin.club/)          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [The Rock Trading](https://www.therocktrading.com/)            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Trastra](https://trastra.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Travala](https://www.travala.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -571,7 +573,7 @@ The following statements have been submitted in support of this CHIP.
 
 > I support the CashTokens proposal as a well considered, long awaited and important addition to the Bitcoin Cash protocol feature set. [[...](https://memo.cash/post/07ba05702abe1fc409f8bb58dd86a968da94135b94a10e04086a9e4c7212663a)]
 >
-> —<cite>freetrader, [Bitcoin Cash Node](https://bitcoincashnode.org/)</cite>
+> —<cite>[freetrader](https://gitlab.com/freetrader), [Bitcoin Cash Node](https://bitcoincashnode.org/)</cite>
 
 > The upcoming update sounds exciting and we for sure are approving the CHIP-2022-02-CashTokens.
 >
@@ -583,4 +585,8 @@ The following statements have been submitted in support of this CHIP.
 
 > As `bch-rpc-explorer` maintainer I'd like to say that I will add the necessary features to the explorer to display tokens implemented via CashTokens ver. 2.2.0
 >
-> —<cite>[sickpig](https://github.com/scikpig/)</cite>
+> —<cite>[sickpig](https://github.com/sickpig/), [`bch-rpc-explorer`](https://github.com/sickpig/bch-rpc-explorer)</cite>
+
+> Our team is excited about the CashTokens and BCMR and endorses the idea of L1 naming system on BCH.
+>
+> —<cite>[mainnet-pat](https://github.com/mainnet-pat/), [bch.domains](https://bch.domains/)</cite>
