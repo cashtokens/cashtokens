@@ -580,3 +580,7 @@ The following statements have been submitted in support of this CHIP.
 > As a project, we would like to formally declare our support for the following CHIPs [[...]](https://read.cash/@bitcoincashnode/bchn-statement-on-chips-for-may-2023-36023169)
 >
 > —<cite>[Bitcoin Cash Node](https://bitcoincashnode.org/)</cite>
+
+> As `bch-rpc-explorer` maintainer I'd like to say that I will add the necessary features to the explorer to display tokens implemented via CashTokens ver. 2.2.0
+>
+> —<cite>[sickpig](https://github.com/scikpig/)</cite>
