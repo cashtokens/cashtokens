@@ -112,7 +112,7 @@ Responses from wallets that support Bitcoin Cash.
 | [Electron Cash](https://electroncash.org/)                       |   `v2.2.0`    |   ✅    |            |         |         |
 | [Exodus](https://www.exodus.com/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Flowee Pay](https://flowee.org/products/pay/)                   |   `v2.2.0`    |   ✅    |            |         |         |
-| [Guarda](https://guarda.com/)                                    |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Guarda](https://guarda.com/)                                    |   `v2.2.0`    |   ✅    |            |         |         |
 | [imToken](https://token.im/)                                     |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Jaxx Liberty](https://jaxx.io/)                                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [KeepKey](https://shapeshift.com/keepkey)                        |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -452,11 +452,12 @@ The following public statements have been submitted in response to this CHIP.
 
 The following articles have been published in support of this CHIP:
 
-- [Bitauth.com](https://bitauth.com): "[Bitcoin Cash Upgrade 2023](https://blog.bitjson.com/bitcoin-cash-upgrade-2023/)" (October 21, 2022)
-- [Flowee](https://flowee.org/products/hub/): "[Completing Bitcoin Cash with Cash Tokens](https://read.cash/@TomZ/completing-bitcoin-cash-with-cash-tokens-e530d38d)" (November 4, 2022)
-- [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/): "[CHIP Endorsement May 2023](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)" (November 4, 2022)
-- [General Protocols](https://generalprotocols.com): "[General Protocols Statement on CashTokens and P2SH32 CHIP Proposals for the May 2023 BCH Upgrade](https://read.cash/@GeneralProtocols/general-protocols-statement-on-cashtokens-and-p2sh32-chip-proposals-for-the-may-2023-bch-upgrade-c5248f65)" (November 6, 2022)
-- [mainnet.cash](https://mainnet.cash): [Mainnet.cash supports CHIP-2022-02-CashTokens](https://mainnet.cash/chips.html#mainnet-cash-supports-chip-2022-02-cashtokens) (November 9, 2022)
+- [Bitauth.com](https://bitauth.com) (October 21, 2022): "[Bitcoin Cash Upgrade 2023](https://blog.bitjson.com/bitcoin-cash-upgrade-2023/)"
+- [Flowee](https://flowee.org/products/hub/) (November 4, 2022): "[Completing Bitcoin Cash with Cash Tokens](https://read.cash/@TomZ/completing-bitcoin-cash-with-cash-tokens-e530d38d)"
+- [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/) (November 4, 2022): "[CHIP Endorsement May 2023](https://bitcoincashpodcast.com/blog/chip-endorsement-may-2023)"
+- [General Protocols](https://generalprotocols.com) (November 6, 2022): "[General Protocols Statement on CashTokens and P2SH32 CHIP Proposals for the May 2023 BCH Upgrade](https://read.cash/@GeneralProtocols/general-protocols-statement-on-cashtokens-and-p2sh32-chip-proposals-for-the-may-2023-bch-upgrade-c5248f65)"
+- [mainnet.cash](https://mainnet.cash) (November 9, 2022): "[Mainnet.cash supports CHIP-2022-02-CashTokens](https://mainnet.cash/chips.html#mainnet-cash-supports-chip-2022-02-cashtokens)"
+- [Bitcoin Cash Node](https://bitcoincashnode.org/) (November 10, 2022): "[BCHN Statement on CHIPs for May 2023](https://read.cash/@bitcoincashnode/bchn-statement-on-chips-for-may-2023-36023169)"
 
 The following statements have been submitted in support of this CHIP.
 
@@ -564,6 +565,18 @@ The following statements have been submitted in support of this CHIP.
 >
 > —<cite>Rosco Kalis, [CashScript](https://cashscript.org/), [Revoke](https://revoke.cash/)</cite>
 
-> BitcoinCash is designed to be the future of finance, and CashTokens is the obvious toolkit that enables that future on the highly efficient and scalable UTXO system. CashTokens has my full support, and hope it gets implemented into the May ‘23 upgrade, where all BCH wallets support it to allow the system to flourish and harness real economic activity and growth.
+> Bitcoin Cash is designed to be the future of finance, and CashTokens is the obvious toolkit that enables that future on the highly efficient and scalable UTXO system. CashTokens has my full support, and hope it gets implemented into the May ‘23 upgrade, where all BCH wallets support it to allow the system to flourish and harness real economic activity and growth.
 >
 > —<cite>Elliot (Fiendish Crypto), [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)</cite>
+
+> I support the CashTokens proposal as a well considered, long awaited and important addition to the Bitcoin Cash protocol feature set. [[...](https://memo.cash/post/07ba05702abe1fc409f8bb58dd86a968da94135b94a10e04086a9e4c7212663a)]
+>
+> —<cite>freetrader, [Bitcoin Cash Node](https://bitcoincashnode.org/)</cite>
+
+> The upcoming update sounds exciting and we for sure are approving the CHIP-2022-02-CashTokens.
+>
+> —<cite>[Guarda](https://guarda.com/)</cite>
+
+> As a project, we would like to formally declare our support for the following CHIPs [[...]](https://read.cash/@bitcoincashnode/bchn-statement-on-chips-for-may-2023-36023169)
+>
+> —<cite>[Bitcoin Cash Node](https://bitcoincashnode.org/)</cite>
