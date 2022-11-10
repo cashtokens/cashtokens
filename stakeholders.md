@@ -153,7 +153,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [`bch-rpc-explorer`](https://github.com/sickpig/bch-rpc-explorer) |   `v2.2.0`    |   ✅    |            |         |         |
 | [BCH DevSuite](https://devsuite.actorforth.org/)                  |   `v2.2.0`    |   ✅    |            |         |         |
 | [`bchtipbot`](https://github.com/merc1er/bchtipbot)               |   `v2.2.0`    |   ✅    |            |         |         |
-| [BCHMempool.cash](https://bchmempool.cash/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
+| [BCHMempool.cash](https://bchmempool.cash/)                       |   `v2.2.0`    |   ✅    |            |         |         |
 | [bestbchwallets.com](https://www.bestbchwallets.com/)             |   `v2.2.0`    |   ✅    |            |         |         |
 | [Bitauth IDE](https://ide.bitauth.com)                            |   `v2.2.0`    |   ✅    |            |         |         |
 | [BitcartCC](https://bitcartcc.com/)                               |   `v2.2.0`    |   ✅    |            |         |         |
@@ -590,3 +590,40 @@ The following statements have been submitted in support of this CHIP.
 > Our team is excited about the CashTokens and BCMR and endorses the idea of L1 naming system on BCH.
 >
 > —<cite>[mainnet-pat](https://github.com/mainnet-pat/), [bch.domains](https://bch.domains/)</cite>
+
+> bchmempool supports the CashTokens CHIP. Below is the support message signed by [plowsof](https://github.com/plowsof) and [Rucknium](https://github.com/Rucknium).
+
+```
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SLP showed that there was high demand for tokens in the BCH ecosystem.
+Flaws in SLP such as indexing and accidental token burn made it a victim
+of its own success. The careful design of CashTokens avoids these problems
+and enables even more functionality. bchmempool supports the CashTokens CHIP.
+-----BEGIN PGP SIGNATURE-----
+
+iI0EARMIADUWIQTci88MUIPyAweCgD5OipEtQO0FLAUCY21ZHhcccGxvd3NvZkBw
+cm90b25tYWlsLmNvbQAKCRBOipEtQO0FLPJNAQDJhMU0i9nLOUQ2S3cHia1VzIw8
+BJkUPbFQ80D9l45FWwD/clvbiH37qgRXk2zjgYdYrH+eNZ8Kkb3KPL/o0ng2Ga4=
+=RvR3
+-----END PGP SIGNATURE-----
+-----BEGIN PGP SIGNATURE-----
+
+iQJMBAEBCgA2FiEEXV4Iojid8iWr0HgbKR4MIp1jFpcFAmNs58AYHHJ1Y2tuaXVt
+QHByb3Rvbm1haWwuY29tAAoJECkeDCKdYxaXzUkP+gO+hPG9THUHn+h4/HTHPvv5
+OCOhX0y8SYj+Xawrr+krhsacV8uvJtaucZEpuMJmqAMrhcGFeuydVm+FuYJZVR7W
+/HVAmP3Czz5oTZurPkdLTMW103hCPqm8+Hpp6gNH/PUtWa9DsUs0aJJG0lnhPVU+
+mCjdBRmOlEVeqD1uhWXgseLYzoRsf0aHlR+L6uYC5VpLrJtu8+2TR5RCsUWHzayX
+kOJ34Z8HsfZjXdaYwi+BZa8MZs3+/pznxM6SFDy3oXwzB3iidb2A62tc3+RQIj0T
+R5d06iT/ID8fHAmXCJ2P6Vd9VSb/AQcUw6SXYOcWTcYomAiPMQBu/OKySM5HLygJ
+HxapWL2VZ0i1y7gc/shrnNoYa+6kA0Cw7YuGu+sFDZggdpWnE+uaNdiyGZdMKlbh
+ocPtHQuejSTKwXg3DbXmwUxaOAESPEmW4J97sAiVRER/PqvAmomQ+IVL+jQLujwJ
+Z9cj9nhdNgKaRkEkw+cite6YGku12ddz5IsQ++3l49Mp9kyCR3ivVlJXPYFkHixS
+r3MsIYLSsKMelYeNgsL1H8FQ8zqoYdRFEh0aG6bTZ5cp0P51kVmYbjM9qqaKv9Wn
+ro2jEdTQySTwH7d7W49UdslERX9aLsufGBJi0IXK4/6yCzGF7CzD3eHEf7FrSiGj
+G43JXpWrL2eNJmqQxnOH
+=vvhb
+-----END PGP SIGNATURE-----
+```
+> —<cite>[bchmempool.cash](https://bchmempool.cash/)</cite>
