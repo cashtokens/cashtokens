@@ -199,8 +199,10 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [PayButton](https://paybutton.org/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Permissionless Software Foundation](https://psfoundation.cash/)  |   `v2.2.0`    |   ✅    |            |         |         |
 | [Pos.cash](https://github.com/softwareverde/pos-cash)             |   `v2.2.0`    |   ✅    |            |         |         |
+| [python-bitcoincash](https://pypi.org/project/bitcoincash/)       |   `v2.2.0`    |   ✅    |            |         |         |
 | [rbch](https://github.com/Rucknium/rbch)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum)            |   `v2.2.0`    |   ✅    |            |         |         |
+| [rust-bitcoincash](https://crates.io/crates/bitcoincash)          |   `v2.2.0`    |   ✅    |            |         |         |
 | [ScanToPay.cash](https://scantopay.cash/)                         |   `v2.2.0`    |   ✅    |            |         |         |
 | [Signup](https://signup.cash/)                                    |   `v2.2.0`    |   ✅    |            |         |         |
 | [SimpleLedger.info](https://simpleledger.info/)                   |   `v2.2.0`    |   ✅    |            |         |         |
@@ -643,3 +645,7 @@ G43JXpWrL2eNJmqQxnOH
 —<cite>[bchmempool.cash](https://bchmempool.cash/)</cite>
 
 </blockquote>
+
+> I support and look forward to building new products on top of the CashTokens upgrade.
+>
+> —<cite>dagurval, [BU](https://bitcoincashnode.org), [BCHN](https://bitcoincashnode.org), [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum), [Flipstarter](https://gitlab.com/flipstarter/flipstarter-electron-cash/)
