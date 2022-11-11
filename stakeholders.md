@@ -590,3 +590,7 @@ The following statements have been submitted in support of this CHIP.
 > Our team is excited about the CashTokens and BCMR and endorses the idea of L1 naming system on BCH.
 >
 > —<cite>[mainnet-pat](https://github.com/mainnet-pat/), [bch.domains](https://bch.domains/)</cite>
+
+> The amount of thought and care that has been put into the CashTokens proposal is nothing short of awe-inspiring. I fully endorse and approve this upgrade, and am excited to build new products and services on top of it!
+>
+> -<cite>[Kallisti](https://twitter.com/kzKallisti), [bch.ninja](https://bch.ninja/)</cite>
