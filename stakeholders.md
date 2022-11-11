@@ -200,7 +200,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [Permissionless Software Foundation](https://psfoundation.cash/)  |   `v2.2.0`    |   ✅    |            |         |         |
 | [Pos.cash](https://github.com/softwareverde/pos-cash)             |   `v2.2.0`    |   ✅    |            |         |         |
 | [python-bitcoincash](https://pypi.org/project/bitcoincash/)       |   `v2.2.0`    |   ✅    |            |         |         |
-| [rbch](https://github.com/Rucknium/rbch)                          |   `v2.2.0`    |         |            |         |   ⏳    |
+| [rbch](https://cran.r-project.org/package=rbch)                   |   `v2.2.0`    |   ✅    |            |         |         |
 | [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum)            |   `v2.2.0`    |   ✅    |            |         |         |
 | [rust-bitcoincash](https://crates.io/crates/bitcoincash)          |   `v2.2.0`    |   ✅    |            |         |         |
 | [ScanToPay.cash](https://scantopay.cash/)                         |   `v2.2.0`    |   ✅    |            |         |         |
@@ -649,3 +649,43 @@ G43JXpWrL2eNJmqQxnOH
 > I support and look forward to building new products on top of the CashTokens upgrade.
 >
 > —<cite>dagurval, [BU](https://bitcoincashnode.org), [BCHN](https://bitcoincashnode.org), [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum), [Flipstarter](https://gitlab.com/flipstarter/flipstarter-electron-cash/)
+  
+<blockquote>
+rbch supports the CashTokens CHIP. Parsing and statistical analysis of CashToken data should eventually be possible with rbch.
+
+<details>
+  
+<summary><em>Signature</em></summary>
+
+Signed by [Rucknium](https://github.com/Rucknium):
+
+```
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+rbch supports the CashTokens CHIP. Parsing and statistical analysis of
+CashToken data should eventually be possible with rbch.
+-----BEGIN PGP SIGNATURE-----
+
+iQJMBAEBCgA2FiEEXV4Iojid8iWr0HgbKR4MIp1jFpcFAmNuOUAYHHJ1Y2tuaXVt
+QHByb3Rvbm1haWwuY29tAAoJECkeDCKdYxaX7g4QAJhdYoXG3O524y+jQQECK9el
+uA1tjn3pNILE1liDXDisVfe72YkPVidCWQx0m6IkV0nRkSEnr/51pVj7lNJM4KqQ
+1WKFl8U8RdDtdQP/43EeMFzV0a2Q4SAyAXFkKl3Lawul9t5fmhqqfqBHYB5Y+/Qs
+DCn0rfn0qdQvH3uYZ7hbVslzYH+SUlYXjumvl2jkl2HEpg5TFIw70qyhOH2fWKRn
+djGvPwS1QeGAZI23yLx7L47VpNl7WNtuLwpRog3oKJK6xrFjuxPSuWZoCBXAzuvF
+rj6B4h7ENPo5q9c562Ca8zfPu1yo4soHI4LFG7m8NE9r1XElERLGgxgx/J6707I3
+rpJtd6l9uXcXBh3kWR7hmotcN5w36L+Q/QbEh7jpom72B7An1VYgGr+iOwqLgEwo
+Ud1nSgX9ky8pDplCZlRdYamnLmrGUiZMUgRBKd98bQ3Ui7VFVrrYR3Uct87CPtD6
+VrbFQEmDYbH4NIu5OYQqM3L1pKHV4hZVTRGJXkita6kjm16yShBVYkwXS3VAp8ff
+B+xb/0GlpJ+MfeP+ZtDNeQnGgkYgKzXSLX4745+nn5v1ZcU6V2qRyYAami7YYc9c
+xcaKSAM49dcIHYMCg4y6laP+7xxvTtrbbx3OkxYJokhyq/2wjabJ7YiCaOIpsx5y
+dIXB37wfQ4lveIm2U0xi
+=F+lz
+-----END PGP SIGNATURE-----
+```
+
+</details>
+
+—<cite>[rbch](https://cran.r-project.org/package=rbch)</cite>
+
+</blockquote>
