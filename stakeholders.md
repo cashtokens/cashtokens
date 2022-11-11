@@ -86,7 +86,7 @@ Responses from open source node implementations that support Bitcoin Cash.
 | [Bitcoin Unlimited](https://www.bitcoinunlimited.info/) |   `v2.2.0`    |   ✅    |            |         |         |
 | [Bitcoin Verde](https://bitcoinverde.org/)              |   `v2.2.0`    |   ✅    |            |         |         |
 | [Flowee](https://flowee.org/products/hub/)              |   `v2.2.0`    |   ✅    |            |         |         |
-| [Knuth](https://kth.cash/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Knuth](https://kth.cash/)                              |   `v2.2.0`    |   ✅    |            |         |         |
 
 ### Wallets
 
@@ -190,7 +190,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [Jedex](https://github.com/bitjson/jedex)                         |   `v2.2.0`    |   ✅    |            |         |         |
 | [Johoe's Mempool Statistics](https://jochen-hoenicke.de/queue/)   |   `v2.2.0`    |         |            |         |   ⏳    |
 | [HelpMe.Cash](https://helpme.cash/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Knuth Libraries](https://github.com/k-nuth)                      |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Knuth Libraries](https://github.com/k-nuth)                      |   `v2.2.0`    |   ✅    |            |         |         |
 | [Libauth](https://libauth.org/)                                   |   `v2.2.0`    |   ✅    |            |         |         |
 | [Mainnet.cash](https://mainnet.cash/)                             |   `v2.2.0`    |   ✅    |            |         |         |
 | [Meep](https://github.com/gcash/meep)                             |   `v2.2.0`    |         |            |         |   ⏳    |
