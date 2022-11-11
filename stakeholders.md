@@ -169,7 +169,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [CashAccount.info](https://www.cashaccount.info/)                 |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashChannels.org](http://cashchannels.org/)                      |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashFusion.org](https://cashfusion.org/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
-| [CashFusion Red Team](https://fusionstats.redteam.cash/)          |   `v2.2.0`    |         |            |         |   ⏳    |
+| [CashFusion Red Team](https://fusionstats.redteam.cash/)          |   `v2.2.0`    |         |            |   ➖    |         |
 | [CashID](https://www.cashid.info/)                                |   `v2.2.0`    |   ✅    |            |         |         |
 | [Cashnodes.io](https://cashnodes.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashScript](https://cashscript.org/)                             |   `v2.2.0`    |   ✅    |            |         |         |
@@ -450,7 +450,50 @@ The following public statements have been submitted in response to this CHIP.
 
 ### Neutral
 
-**No statements** have been submitted from organizations that abstained from responding to this CHIP.
+<blockquote>
+The CashTokens CHIP broadens the capabilities of the Bitcoin Cash blockchain for users and application developers. CashTokens will likely have a neutral effect on fungibility and privacy for current and future users who use Bitcoin Cash only as electronic cash. On behalf of the CashFusion Red Team project, I give a "neutral" response. I hope to see research and development on ways to improve fungibility and privacy within the token ecosystem, e.g. token-specific CoinJoin protocols.
+
+<details>
+
+<summary><em>Signature</em></summary>
+
+Signed by [Rucknium](https://github.com/Rucknium):
+
+```
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+The CashTokens CHIP broadens the capabilities of the Bitcoin Cash blockchain
+for users and application developers. CashTokens will likely have a neutral
+effect on fungibility and privacy for current and future users who use Bitcoin
+Cash only as electronic cash. On behalf of the CashFusion Red Team project,
+I give a "neutral" response. I hope to see research and development on ways
+to improve fungibility and privacy within the token ecosystem, e.g.
+token-specific CoinJoin protocols.
+-----BEGIN PGP SIGNATURE-----
+
+iQJMBAEBCgA2FiEEXV4Iojid8iWr0HgbKR4MIp1jFpcFAmNuOUAYHHJ1Y2tuaXVt
+QHByb3Rvbm1haWwuY29tAAoJECkeDCKdYxaXTOQP/3Rxt0CGw/eW1FNnMfif9lxy
+mHbupC47CRGw8GWKl6HS5yCi8sPvihRzRfJQNy961MOmbY6QJYmoUoQ1KPewdKIt
+XQ45E52HSwuPf5jPmS37CElSx7GiXcJuyZPbLQGXnS6nfmIguA9REweM/R9BYNkh
+GFNmudYb1ugeiMVgOMSAOi8h78GyN4FrDlcYZ5t4R+jZgcLmx6NmpnPtFkjDnk/t
+9vVx1JrAmWJuoY+fAMBKn0tfDQjF6LOCzn988jZEtxP2aVCNdeCw2N6HY0A04IUP
+AvFhC9wX0l6N3yKJK6B+1Z5pZKwW5iWuJuK/E7rzub+SdlTcXyGf+Iurn0e3VCPJ
+jqrrzuUwFJTUndzLBpvWenbD+teVPHJEvdxx90k9Rt/hBfRHOYdtOxOcO1sDvRpy
++OiCnqPPXsk50YETIM1G4IKA+itS/+ndPaV5dMnarAll5kunnUHjuFxtA2A6d0yY
+Vl3/JkfbOo/L5HymlJewJ4/J25cr1kJeWAb6vYZa86sAyQ8rdePNoQ0yBwLIqhqc
+8iEIY58GDzpJOskYSGW/VDYTlEAfkDG6cWPheoYqorVtWzeh+Uf/E25fyVSBAuS4
+YNDV5U20oVx2CWmV3t93x3RVp5bqAa3u0xWqc/OyxyhTIN5V/rDs4aEVwJOW74fW
+pN8BCtvXjuanQy63ycdu
+=cbH5
+-----END PGP SIGNATURE-----
+```
+
+</details>
+
+—<cite>[CashFusion Red Team](https://fusionstats.redteam.cash/)</cite>
+
+</blockquote>
 
 ### Approve
 
