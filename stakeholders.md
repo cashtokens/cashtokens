@@ -209,7 +209,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [slp.dev](https://slp.dev/)                                       |   `v2.2.0`    |   ✅    |            |         |         |
 | [SmartBCH](https://smartbch.org/)                                 |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SmartScan](https://www.smartscan.cash/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Spedn](https://spedn.pl/)                                        |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Spedn](https://spedn.pl/)                                        |   `v2.2.0`    |         |            |   ➖    |         |
 | [Watchtower](https://watchtower.cash/)                            |   `v2.2.0`    |   ✅    |            |         |         |
 | [Where2.cash](https://www.where2.cash/)                           |   `v2.2.0`    |   ✅    |            |         |         |
 
