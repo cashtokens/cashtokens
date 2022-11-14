@@ -358,7 +358,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [Luno](https://www.luno.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MarketCap.cash](https://www.marketcap.cash/)                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Matrixport](https://www.matrixport.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Memo](https://memo.cash/)                                     |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Memo Technology, Inc.](https://memo.cash/)                    |   `v2.2.0`    |         |     ❌     |         |         |
 | [Member.cash](https://member.cash/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Menufy](https://www.menufy.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Mercuryo](https://mercuryo.io/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -446,7 +446,13 @@ The following public statements have been submitted in response to this CHIP.
 
 ### Disapprove
 
-**No statements** have been submitted from organizations that disapprove of this CHIP.
+The following statements have been submitted from organizations that disapprove of this CHIP.
+
+> Thanks for reaching out to me for input. I replied to you about this back in February: https://twitter.com/jasonchavannes/status/1496508571642695680. I also wrote a blog post in 2018 about why Layer 2 tokens are better than Layer 1: https://jasonc.me/blog/layer-2-tokens-bitcoin-cash. My stance remains the same. I Disapprove, I think BCH already supports tokens in a better way. Cramming too much into Layer 1 is why Ethereum can't scale.
+>
+> —<cite>Jason Chavannes, [Memo Technology, Inc.](https://memo.cash/)</cite>
+
+**Maintainer Response**: This statement does not appear to examine the contents of the CashTokens CHIP. 1) Existing, "Layer 2" tokens cannot support contract use cases without trusted counterparties; this introduces middlemen, harms censorship-resistance, and prevents deployment of many decentralized applications on Bitcoin Cash – see [CashTokens: Motivation](https://github.com/bitjson/cashtokens#motivation). 2) CashToken validation is stateless, so Bitcoin Cash will remain thousands of times more scalable than "global state" systems like Ethereum – see [CashTokens: Benefits](https://github.com/bitjson/cashtokens#benefits).
 
 ### Neutral
 
