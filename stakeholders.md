@@ -395,7 +395,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [Revoke](https://revoke.cash/)                                 |   `v2.2.0`    |   ✅    |            |         |         |
 | [Rocketr](https://rocketr.net/)                                |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SatoshiDice](https://satoshidice.com/)                        |   `v2.2.0`    |         |            |         |   ⏳    |
-| [Satoshi's Angels](https://www.satoshisangels.com/)            |   `v2.2.0`    |         |            |         |   ⏳    |
+| [Satoshi's Angels](https://www.satoshisangels.com/)            |   `v2.2.0`    |   ✅    |            |         |         |
 | [SBICrypto Pool](https://sbicrypto.com/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
 | [ShapeShift](https://shapeshift.com/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
 | [SideShift.ai](https://sideshift.ai/)                          |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -442,63 +442,6 @@ Responses from exchanges, miners, services, and other businesses.
 ## Statements
 
 The following public statements have been submitted in response to this CHIP.
-
-### Disapprove
-
-The following statements have been submitted from organizations that disapprove of this CHIP.
-
-> Thanks for reaching out to me for input. I replied to you about this back in February: https://twitter.com/jasonchavannes/status/1496508571642695680. I also wrote a blog post in 2018 about why Layer 2 tokens are better than Layer 1: https://jasonc.me/blog/layer-2-tokens-bitcoin-cash. My stance remains the same. I Disapprove, I think BCH already supports tokens in a better way. Cramming too much into Layer 1 is why Ethereum can't scale.
->
-> —<cite>Jason Chavannes, [Memo Technology, Inc.](https://memo.cash/)</cite>
-
-**Maintainer Response**: This statement does not appear to examine the contents of the CashTokens CHIP. 1) Existing, "Layer 2" tokens cannot support contract use cases without trusted counterparties; this introduces middlemen, harms censorship-resistance, and prevents deployment of many decentralized applications on Bitcoin Cash – see [CashTokens: Motivation](https://github.com/bitjson/cashtokens#motivation). 2) CashToken validation is stateless, so Bitcoin Cash will remain thousands of times more scalable than "global state" systems like Ethereum – see [CashTokens: Benefits](https://github.com/bitjson/cashtokens#benefits).
-
-### Neutral
-
-<blockquote>
-The CashTokens CHIP broadens the capabilities of the Bitcoin Cash blockchain for users and application developers. CashTokens will likely have a neutral effect on fungibility and privacy for current and future users who use Bitcoin Cash only as electronic cash. On behalf of the CashFusion Red Team project, I give a "neutral" response. I hope to see research and development on ways to improve fungibility and privacy within the token ecosystem, e.g. token-specific CoinJoin protocols.
-
-<details>
-
-<summary><em>Signature</em></summary>
-
-Signed by [Rucknium](https://github.com/Rucknium):
-
-```
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
-
-The CashTokens CHIP broadens the capabilities of the Bitcoin Cash blockchain
-for users and application developers. CashTokens will likely have a neutral
-effect on fungibility and privacy for current and future users who use Bitcoin
-Cash only as electronic cash. On behalf of the CashFusion Red Team project,
-I give a "neutral" response. I hope to see research and development on ways
-to improve fungibility and privacy within the token ecosystem, e.g.
-token-specific CoinJoin protocols.
------BEGIN PGP SIGNATURE-----
-
-iQJMBAEBCgA2FiEEXV4Iojid8iWr0HgbKR4MIp1jFpcFAmNuOUAYHHJ1Y2tuaXVt
-QHByb3Rvbm1haWwuY29tAAoJECkeDCKdYxaXTOQP/3Rxt0CGw/eW1FNnMfif9lxy
-mHbupC47CRGw8GWKl6HS5yCi8sPvihRzRfJQNy961MOmbY6QJYmoUoQ1KPewdKIt
-XQ45E52HSwuPf5jPmS37CElSx7GiXcJuyZPbLQGXnS6nfmIguA9REweM/R9BYNkh
-GFNmudYb1ugeiMVgOMSAOi8h78GyN4FrDlcYZ5t4R+jZgcLmx6NmpnPtFkjDnk/t
-9vVx1JrAmWJuoY+fAMBKn0tfDQjF6LOCzn988jZEtxP2aVCNdeCw2N6HY0A04IUP
-AvFhC9wX0l6N3yKJK6B+1Z5pZKwW5iWuJuK/E7rzub+SdlTcXyGf+Iurn0e3VCPJ
-jqrrzuUwFJTUndzLBpvWenbD+teVPHJEvdxx90k9Rt/hBfRHOYdtOxOcO1sDvRpy
-+OiCnqPPXsk50YETIM1G4IKA+itS/+ndPaV5dMnarAll5kunnUHjuFxtA2A6d0yY
-Vl3/JkfbOo/L5HymlJewJ4/J25cr1kJeWAb6vYZa86sAyQ8rdePNoQ0yBwLIqhqc
-8iEIY58GDzpJOskYSGW/VDYTlEAfkDG6cWPheoYqorVtWzeh+Uf/E25fyVSBAuS4
-YNDV5U20oVx2CWmV3t93x3RVp5bqAa3u0xWqc/OyxyhTIN5V/rDs4aEVwJOW74fW
-pN8BCtvXjuanQy63ycdu
-=cbH5
------END PGP SIGNATURE-----
-```
-
-</details>
-
-—<cite>[CashFusion Red Team](https://fusionstats.redteam.cash/)</cite>
-
-</blockquote>
 
 ### Approve
 
@@ -761,3 +704,60 @@ dIXB37wfQ4lveIm2U0xi
 > We at Buy Hodl Sell support the CashTokens CHIP proposal for the May 2023 BCH upgrade. We are continually impressed by the constant progress of the Bitcoin Cash network and are excited for the many economic use-cases and innovations that native tokens on the BCH chain enable. This is a great step for both Bitcoin Cash and decentralised blockchains as a whole.
 >
 > —<cite>Peter Zenger, [Buy Hodl Sell](https://buyhodlsell.com/)</cite>
+
+### Disapprove
+
+The following statements have been submitted from organizations that disapprove of this CHIP.
+
+> Thanks for reaching out to me for input. I replied to you about this back in February: https://twitter.com/jasonchavannes/status/1496508571642695680. I also wrote a blog post in 2018 about why Layer 2 tokens are better than Layer 1: https://jasonc.me/blog/layer-2-tokens-bitcoin-cash. My stance remains the same. I Disapprove, I think BCH already supports tokens in a better way. Cramming too much into Layer 1 is why Ethereum can't scale.
+>
+> —<cite>Jason Chavannes, [Memo Technology, Inc.](https://memo.cash/)</cite>
+
+**Maintainer Response**: This statement does not appear to examine the contents of the CashTokens CHIP. 1) Existing, "Layer 2" tokens cannot support contract use cases without trusted counterparties; this introduces middlemen, harms censorship-resistance, and prevents deployment of many decentralized applications on Bitcoin Cash – see [CashTokens: Motivation](https://github.com/bitjson/cashtokens#motivation). 2) CashToken validation is stateless, so Bitcoin Cash will remain thousands of times more scalable than "global state" systems like Ethereum – see [CashTokens: Benefits](https://github.com/bitjson/cashtokens#benefits).
+
+### Neutral
+
+<blockquote>
+The CashTokens CHIP broadens the capabilities of the Bitcoin Cash blockchain for users and application developers. CashTokens will likely have a neutral effect on fungibility and privacy for current and future users who use Bitcoin Cash only as electronic cash. On behalf of the CashFusion Red Team project, I give a "neutral" response. I hope to see research and development on ways to improve fungibility and privacy within the token ecosystem, e.g. token-specific CoinJoin protocols.
+
+<details>
+
+<summary><em>Signature</em></summary>
+
+Signed by [Rucknium](https://github.com/Rucknium):
+
+```
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+The CashTokens CHIP broadens the capabilities of the Bitcoin Cash blockchain
+for users and application developers. CashTokens will likely have a neutral
+effect on fungibility and privacy for current and future users who use Bitcoin
+Cash only as electronic cash. On behalf of the CashFusion Red Team project,
+I give a "neutral" response. I hope to see research and development on ways
+to improve fungibility and privacy within the token ecosystem, e.g.
+token-specific CoinJoin protocols.
+-----BEGIN PGP SIGNATURE-----
+
+iQJMBAEBCgA2FiEEXV4Iojid8iWr0HgbKR4MIp1jFpcFAmNuOUAYHHJ1Y2tuaXVt
+QHByb3Rvbm1haWwuY29tAAoJECkeDCKdYxaXTOQP/3Rxt0CGw/eW1FNnMfif9lxy
+mHbupC47CRGw8GWKl6HS5yCi8sPvihRzRfJQNy961MOmbY6QJYmoUoQ1KPewdKIt
+XQ45E52HSwuPf5jPmS37CElSx7GiXcJuyZPbLQGXnS6nfmIguA9REweM/R9BYNkh
+GFNmudYb1ugeiMVgOMSAOi8h78GyN4FrDlcYZ5t4R+jZgcLmx6NmpnPtFkjDnk/t
+9vVx1JrAmWJuoY+fAMBKn0tfDQjF6LOCzn988jZEtxP2aVCNdeCw2N6HY0A04IUP
+AvFhC9wX0l6N3yKJK6B+1Z5pZKwW5iWuJuK/E7rzub+SdlTcXyGf+Iurn0e3VCPJ
+jqrrzuUwFJTUndzLBpvWenbD+teVPHJEvdxx90k9Rt/hBfRHOYdtOxOcO1sDvRpy
++OiCnqPPXsk50YETIM1G4IKA+itS/+ndPaV5dMnarAll5kunnUHjuFxtA2A6d0yY
+Vl3/JkfbOo/L5HymlJewJ4/J25cr1kJeWAb6vYZa86sAyQ8rdePNoQ0yBwLIqhqc
+8iEIY58GDzpJOskYSGW/VDYTlEAfkDG6cWPheoYqorVtWzeh+Uf/E25fyVSBAuS4
+YNDV5U20oVx2CWmV3t93x3RVp5bqAa3u0xWqc/OyxyhTIN5V/rDs4aEVwJOW74fW
+pN8BCtvXjuanQy63ycdu
+=cbH5
+-----END PGP SIGNATURE-----
+```
+
+</details>
+
+—<cite>[CashFusion Red Team](https://fusionstats.redteam.cash/)</cite>
+
+</blockquote>
