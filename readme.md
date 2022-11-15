@@ -6,8 +6,8 @@
         Maintainer: Jason Dreyzehner
         Status: Draft
         Initial Publication Date: 2022-02-22
-        Latest Revision Date: 2022-9-30
-        Latest Version: 2.2.0 (e02012a2)
+        Latest Revision Date: 2022-11-15
+        Version: 2.2.1
 
 <details>
 
@@ -826,7 +826,7 @@ Thank you to the following contributors for reviewing and contributing improveme
 
 This section summarizes the evolution of this document.
 
-- **Draft**
+- **v2.2.1 – 2022-11-15** (current)
   - Remove confusing recommendation about token-aware CashAddress usage ([#82](https://github.com/bitjson/cashtokens/issues/82))
   - Extract [`examples.md`](./examples.md), [`rationale.md`](./rationale.md), and [`alternatives.md`](./alternatives.md) for approachability
   - Add [`stakeholders.md`](./stakeholders.md) to collect final approvals
