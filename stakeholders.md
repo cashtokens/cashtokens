@@ -160,7 +160,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [Bitcash](https://github.com/pybitcash/bitcash)                   |   `v2.2.0`    |   ✅    |            |         |         |
 | [Bitcoin Cash Hangout](https://rss.com/podcasts/fiendishcrypto/)  |   `v2.2.0`    |   ✅    |            |         |         |
 | [Bitcoin Cash Podcast](https://bitcoincashpodcast.com/)           |   `v2.2.0`    |   ✅    |            |         |         |
-| [BitcoinCash.org](https://bitcoincash.org/)                       |   `v2.2.0`    |         |            |         |   ⏳    |
+| [BitcoinCash.org](https://bitcoincash.org/)                       |   `v2.2.0`    |   ✅    |            |         |         |
 | [BitcoinCashResearch.org](https://bitcoincashresearch.org/)       |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitcoinCashSite.com](https://bitcoincashsite.com/)               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [BitcoinFees.cash](https://bitcoinfees.cash/)                     |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -170,7 +170,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [CashChannels.org](http://cashchannels.org/)                      |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashFusion.org](https://cashfusion.org/)                         |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashFusion Red Team](https://fusionstats.redteam.cash/)          |   `v2.2.0`    |         |            |   ➖    |         |
-| [CashID](https://www.cashid.info/)                                |   `v2.2.0`    |   ✅    |            |         |         |
+| [CashID.info](https://www.cashid.info/)                           |   `v2.2.0`    |   ✅    |            |         |         |
 | [Cashnodes.io](https://cashnodes.io/)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [CashScript](https://cashscript.org/)                             |   `v2.2.0`    |   ✅    |            |         |         |
 | [CashShuffle](https://cashshuffle.com/)                           |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -195,7 +195,7 @@ Responses from open source libraries, indexers, educational resources, and commu
 | [Mainnet.cash](https://mainnet.cash/)                             |   `v2.2.0`    |   ✅    |            |         |         |
 | [Meep](https://github.com/gcash/meep)                             |   `v2.2.0`    |         |            |         |   ⏳    |
 | [One.Surgery](https://one.surgery/)                               |   `v2.2.0`    |   ✅    |            |         |         |
-| [Oracles.Cash](https://oracles.cash/)                             |   `v2.2.0`    |   ✅    |            |         |         |
+| [Oracles.cash](https://oracles.cash/)                             |   `v2.2.0`    |   ✅    |            |         |         |
 | [PayButton](https://paybutton.org/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Permissionless Software Foundation](https://psfoundation.cash/)  |   `v2.2.0`    |   ✅    |            |         |         |
 | [Pos.cash](https://github.com/softwareverde/pos-cash)             |   `v2.2.0`    |   ✅    |            |         |         |
@@ -354,7 +354,6 @@ Responses from exchanges, miners, services, and other businesses.
 | [Liquid](https://www.liquid.com/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Living Room of Satoshi](https://www.livingroomofsatoshi.com/) |   `v2.2.0`    |         |            |         |   ⏳    |
 | [LocalCryptos](https://localcryptos.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
-| [LocalBitcoins](https://localbitcoins.com/)                    |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Luno](https://www.luno.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MarketCap.cash](https://www.marketcap.cash/)                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Matrixport](https://www.matrixport.com/)                      |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -364,7 +363,7 @@ Responses from exchanges, miners, services, and other businesses.
 | [Mercuryo](https://mercuryo.io/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
 | [MEXC](https://www.mexc.com/)                                  |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Mining-Dutch](https://www.mining-dutch.nl/)                   |   `v2.2.0`    |         |            |         |   ⏳    |
-| [MistSwap](https://mistswap.fi/)                               |   `v2.2.0`    |         |            |         |   ⏳    |
+| [MistSwap](https://mistswap.fi/)                               |   `v2.2.0`    |   ✅    |            |         |         |
 | [MoonPay](https://www.moonpay.com/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [Mullvad VPN](https://mullvad.net/)                            |   `v2.2.0`    |         |            |         |   ⏳    |
 | [N.exchange](https://n.exchange/)                              |   `v2.2.0`    |         |            |         |   ⏳    |
@@ -692,7 +691,7 @@ G43JXpWrL2eNJmqQxnOH
 > I support and look forward to building new products on top of the CashTokens upgrade.
 >
 > —<cite>dagurval, [BU](https://bitcoincashnode.org), [BCHN](https://bitcoincashnode.org), [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum), [Flipstarter](https://gitlab.com/flipstarter/flipstarter-electron-cash/)
-  
+
 <blockquote>
 rbch supports the CashTokens CHIP. Parsing and statistical analysis of CashToken data should eventually be possible with rbch.
 
@@ -732,3 +731,27 @@ dIXB37wfQ4lveIm2U0xi
 —<cite>[rbch](https://cran.r-project.org/package=rbch)</cite>
 
 </blockquote>
+
+> MistSwap is very excited by the potential decentralized applications and economic innovation enabled by CashTokens. We appreciate the great work led by Jason and everyone else who has contributed to building, experimenting, and engineering the token standards along this long path to today: thank you!
+>
+> —<cite>Kasumi, [MistSwap](https://mistswap.fi/) </cite>
+
+> With CashTokens, new ways of managing identity are now available and could be the basis for a new iteration of the CashAccounts protocol.
+>
+> —<cite>[CashAccount.info](https://www.cashaccount.info/)</cite>
+
+> CashTokens look like an interesting proposal and might allow for seamless transferability of authentication when used with the CashID protocol.
+>
+> —<cite>[CashID.info](https://www.cashid.info/)</cite>
+
+> Tokenization is an important technology that is currently underused in the Bitcoin Cash ecosystem. I have been using tokens since the CounterParty protocol, and I am looking forward to using the tools and services that will be built on CashTokens.
+>
+> —<cite>[jonathan#100](https://gitlab.com/monsterbitar)</cite>
+
+> CashTokens, by virtue of their interactions with lockscripts allows for new and interesting usecases and might be the missing piece allowing proper monetization of information.
+>
+> —<cite>[Oracles.cash](https://oracles.cash)</cite>
+
+> We at Buy Hodl Sell support the CashTokens CHIP proposal for the May 2023 BCH upgrade. We are continually impressed by the constant progress of the Bitcoin Cash network and are excited for the many economic use-cases and innovations that native tokens on the BCH chain enable. This is a great step for both Bitcoin Cash and decentralised blockchains as a whole.
+>
+> —<cite>Peter Zenger, [Buy Hodl Sell](https://buyhodlsell.com/)</cite>
