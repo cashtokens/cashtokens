@@ -830,6 +830,7 @@ This section summarizes the evolution of this document.
   - Remove confusing recommendation about token-aware CashAddress usage ([#82](https://github.com/bitjson/cashtokens/issues/82))
   - Extract [`examples.md`](./examples.md), [`rationale.md`](./rationale.md), and [`alternatives.md`](./alternatives.md) for approachability
   - Add [`stakeholders.md`](./stakeholders.md) to collect final approvals
+  - Expand test vectors ([#90](https://github.com/bitjson/cashtokens/pull/90))
 - **v2.2.0 – 2022-9-30** ([`e02012a2`](https://github.com/bitjson/cashtokens/blob/e02012a219a0fb2abef02aa3e08ad326774bd3f3/readme.md))
   - Compress token encoding using bitfield ([#33](https://github.com/bitjson/cashtokens/pull/33))
   - Encode mutable capability as `0x01` and minting capability as `0x02`
