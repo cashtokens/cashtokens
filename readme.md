@@ -798,7 +798,7 @@ Please see the following implementations for additional examples and test vector
       - P2SH32: [Merge Request !1556](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1556)
       - 65-byte TXs: [Merge Request !1598](https://gitlab.com/bitcoin-cash-node/bitcoin-cash-node/-/merge_requests/1598)
 - JavaScript/TypeScript
-  - [Libauth](https://github/com/bitauth/libauth) – An ultra-lightweight, zero-dependency JavaScript library for Bitcoin Cash.
+  - [Libauth](https://github.com/bitauth/libauth) – An ultra-lightweight, zero-dependency JavaScript library for Bitcoin Cash.
     - [Pull Request #98](https://github.com/bitauth/libauth/pull/98)
       - [Token encoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L395-L435)
       - [Token decoding](https://github.com/bitauth/libauth/blob/43914ca973e90dfc84b6173dcace7233f8c2e05c/src/lib/message/transaction-encoding.ts#L209-L324)
