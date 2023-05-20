@@ -4,10 +4,10 @@
         Type: Standards
         Layer: Consensus
         Maintainer: Jason Dreyzehner
-        Status: Draft
+        Status: Final
         Initial Publication Date: 2022-02-22
-        Latest Revision Date: 2022-11-15
-        Latest Version: 2.2.1 (7552da2d)
+        Final Revision Date: 2023-5-20
+        Version: 2.2.2
 
 <details>
 
@@ -826,6 +826,9 @@ Thank you to the following contributors for reviewing and contributing improveme
 
 This section summarizes the evolution of this document.
 
+- **v2.2.2 – 2022-5-20**
+  - Mention unissued supply as an alternative term for reserved supply
+  - Mark CHIP as final
 - **v2.2.1 – 2022-11-15** ([`7552da2d`](https://github.com/bitjson/cashtokens/blob/7552da2dfad217aa5f4130f52d7d6cbbfeef7a23/readme.md))
   - Remove confusing recommendation about token-aware CashAddress usage ([#82](https://github.com/bitjson/cashtokens/issues/82))
   - Extract [`examples.md`](./examples.md), [`rationale.md`](./rationale.md), and [`alternatives.md`](./alternatives.md) for approachability
