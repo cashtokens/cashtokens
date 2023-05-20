@@ -56,7 +56,7 @@ Does {{Organization}} approve of activating CHIP-2022-02-CashTokens in the May 2
 - No (Disapprove), or
 - Abstain (Neutral)
 
-To make a [public statement](https://github.com/bitjson/cashtokens/blob/master/stakeholders.md#statements) explaining this decision, please provide it here (required for disapproval): <br><br>
+To make a [public statement](https://github.com/bitjson/cashtokens/blob/master/stakeholders.md#statements) explaining this decision, please provide it here (required for disapproval): <br/><br/>
 
 </blockquote>
 
@@ -67,7 +67,7 @@ For reference:
 
 Please let me know if you have any questions.
 
-Thank you,<br>Jason Dreyzehner<br>CashTokens CHIP Maintainer<br>
+Thank you,<br/>Jason Dreyzehner<br/>CashTokens CHIP Maintainer<br/>
 
 </blockquote>
 
@@ -639,7 +639,7 @@ G43JXpWrL2eNJmqQxnOH
 
 > I support and look forward to building new products on top of the CashTokens upgrade.
 >
-> —<cite>dagurval, [BU](https://bitcoincashnode.org), [BCHN](https://bitcoincashnode.org), [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum), [Flipstarter](https://gitlab.com/flipstarter/flipstarter-electron-cash/)
+> —<cite>dagurval, [BU](https://bitcoincashnode.org), [BCHN](https://bitcoincashnode.org), [Rostrum](https://gitlab.com/bitcoinunlimited/rostrum), [Flipstarter](https://gitlab.com/flipstarter/flipstarter-electron-cash/)</cite>
 
 <blockquote>
 rbch supports the CashTokens CHIP. Parsing and statistical analysis of CashToken data should eventually be possible with rbch.
